@@ -1,0 +1,21 @@
+{
+  "name": "@repo/configs",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.tsconfig.json": "./tsconfig.json",
+    "./vite": "./vite.config.js"
+  },
+  "scripts": {
+    "clean": "rm -rf dist && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:vite",
+    "rollup-preserve-directives": "catalog:vite",
+    "typescript": "catalog:payload-stack",
+    "vite": "catalog:vite",
+    "vite-plugin-dts": "catalog:vite",
+    "vite-tsconfig-paths": "catalog:vite"
+  }
+}

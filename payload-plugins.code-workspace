@@ -1,0 +1,17 @@
+{
+  "folders": [
+    { "name": "🚀 APP", "path": "dev" },
+    { "name": "🌐 PLUGIN: Intl", "path": "packages/intl" },
+    { "name": "🗄️ PLUGIN: Smart Cache", "path": "packages/smart-cache" },
+    { "name": "CONFIG", "path": "configs" },
+    { "name": "ROOT", "path": "." }
+  ],
+  "settings": {
+    "explorer.autoReveal": true,
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.next": true,
+    }
+  }
+}

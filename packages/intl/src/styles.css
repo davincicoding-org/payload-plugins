@@ -1,0 +1,72 @@
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --radius-sm: var(--style-radius-s);
+  --radius-md: var(--style-radius-m);
+  --radius-lg: var(--style-radius-l);
+  --color-border: var(--theme-border-color);
+  --color-background: var(--theme-bg);
+  --color-foreground: var(--theme-text);
+  --color-input: var(--theme-input-bg);
+  --color-elevation-0: var(--theme-elevation-0);
+  --color-elevation-50: var(--theme-elevation-50);
+  --color-elevation-100: var(--theme-elevation-100);
+  --color-elevation-250: var(--theme-elevation-250);
+  --color-elevation-400: var(--theme-elevation-400);
+  --color-elevation-600: var(--theme-elevation-600);
+  --color-elevation-800: var(--theme-elevation-800);
+}
+
+@utility text-error {
+  color: var(--theme-error-400);
+}
+
+@utility bg-error {
+  background-color: var(--theme-error-100);
+}
+
+@utility border-error {
+  @apply border;
+  border-color: var(--theme-error-400);
+}
+
+.tiptap-editor {
+  @apply text-lg;
+
+  > .ProseMirror {
+    @apply prose prose-lg focus:outline-none dark:prose-invert;
+    &:focus {
+      outline: none;
+    }
+
+    > :first-child {
+      @apply mt-0;
+    }
+
+    > :last-child {
+      @apply mb-0;
+    }
+  }
+}
+
+.messages-tree-collapsible {
+  @apply hover:border-border;
+
+  > .collapsible__toggle-wrap {
+    @apply sticky border-b border-border;
+    top: calc(var(--nesting-level) * 40px - 26px);
+    z-index: calc(9 - var(--nesting-level));
+  }
+
+  .collapsible__content {
+    @apply p-3;
+  }
+}

@@ -1,0 +1,35 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    # THESE PERMISSIONS ARE REQUIRED FOR OIDC
+    permissions:
+      id-token: write    # Required for OIDC handshake
+      contents: write    # Required for Changesets to push version updates
+      pull-requests: write # Required for Changesets to open the PR
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: pnpm install --frozen-lockfile
+      
+      - name: Create Release PR or Publish
+        uses: changesets/action@v1
+        with:
+          commit: "chore(release): version packages"
+          publish: pnpm ci:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

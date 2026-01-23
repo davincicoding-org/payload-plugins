@@ -1,0 +1,57 @@
+{
+  "name": "dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "clean": "rm -rf .next && rm -rf node_modules",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "lint": "cross-env NODE_OPTIONS=--no-deprecation biome lint .",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "test": "pnpm run test:int && pnpm run test:e2e",
+    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "catalog:payload-stack",
+    "@payloadcms/next": "catalog:payload-stack",
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
+    "@payloadcms/ui": "catalog:payload-stack",
+    "@t3-oss/env-nextjs": "^0.13.10",
+    "cross-env": "^7.0.3",
+    "dotenv": "16.4.7",
+    "graphql": "^16.8.1",
+    "next": "catalog:payload-stack",
+    "next-intl": "^4.7.0",
+    "payload": "catalog:payload-stack",
+    "payload-intl": "workspace:*",
+    "payload-smart-cache": "workspace:*",
+    "react": "catalog:payload-stack",
+    "react-dom": "catalog:payload-stack",
+    "sharp": "0.34.2",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@testing-library/react": "16.3.0",
+    "@types/node": "^22.5.4",
+    "@types/react": "catalog:payload-stack",
+    "@types/react-dom": "catalog:payload-stack",
+    "@vitejs/plugin-react": "4.5.2",
+    "jsdom": "26.1.0",
+    "playwright": "1.56.1",
+    "playwright-core": "1.56.1",
+    "typescript": "catalog:payload-stack",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.3"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9 || ^10"
+  }
+}
