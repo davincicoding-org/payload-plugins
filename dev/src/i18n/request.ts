@@ -1,17 +1,16 @@
-import config from '@payload-config';
+import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
-import { getPayload } from 'payload';
 import { fetchMessages } from 'payload-intl';
 import { env } from '@/env';
-import { messages as defaultMessages } from './messages';
+import { routing } from './routing';
 
-export default getRequestConfig(async () => {
-  const locale = 'en';
-  const payload = await getPayload({ config });
-  const messages =
-    env.NODE_ENV === 'development'
-      ? await fetchMessages(payload, locale)
-      : defaultMessages;
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = (await requestLocale) || 'en';
+  const locale = hasLocale(routing.locales, requested)
+    ? requested
+    : routing.defaultLocale;
+
+  const messages = await fetchMessages({ serverUrl: env.BASE_URL }, locale);
 
   return {
     locale,

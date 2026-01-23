@@ -2,6 +2,9 @@ import { unstable_cache } from 'next/cache';
 
 import type { EntitySlug } from '../types';
 
+// TODO  create createRequestHandlers
+
+// TODO attach tags to the returned function
 export const createRequestHandler = <Data, Inputs extends unknown[]>(
   handler: (...inputs: Inputs) => Promise<Data>,
   tags?: EntitySlug[],

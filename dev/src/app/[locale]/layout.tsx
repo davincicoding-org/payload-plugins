@@ -6,11 +6,14 @@ export const metadata = {
   title: 'Payload Blank Template',
 };
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props;
+export default async function RootLayout({
+  children,
+  params,
+}: LayoutProps<'/[locale]'>) {
+  const { locale } = await params;
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
         <main>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
