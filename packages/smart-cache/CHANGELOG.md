@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- [`0d04129`](https://github.com/davincicoding-org/payload-plugins/commit/0d0412973b4f01117debb7f0ba6cdb70d82246a8) Thanks [@michaelcamper](https://github.com/michaelcamper)! - rename endpoint
+
+## 1.0.1
+
+### Patch Changes
+
 - [`37ff0cc`](https://github.com/davincicoding-org/payload-plugins/commit/37ff0cc878dd52705b7a109289c7127ad1c7e719) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add missing exports
 
 - [`f1e27bf`](https://github.com/davincicoding-org/payload-plugins/commit/f1e27bf9440af6a18fc6303ae9bc5aeb45ac7243) Thanks [@michaelcamper](https://github.com/michaelcamper)! - remove type from createCachedRequest export
