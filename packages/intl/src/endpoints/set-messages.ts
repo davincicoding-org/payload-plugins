@@ -1,9 +1,10 @@
 import type { Endpoint, File, PayloadRequest } from 'payload';
+import { ENDPOINT_CONFIG } from '@/const';
 import type { Messages, Translations } from '@/types';
-
 import { getPluginContext, getSupportedLocales } from '@/utils/config';
 
 export const setMessagesEndpoint: Endpoint = {
+  ...ENDPOINT_CONFIG.setMessages,
   handler: async (req: PayloadRequest) => {
     const { user } = await req.payload.auth({ headers: req.headers });
     if (!user) {
@@ -56,6 +57,4 @@ export const setMessagesEndpoint: Endpoint = {
 
     return Response.json({ success: true });
   },
-  method: 'put',
-  path: '/intl-plugin',
 };

@@ -1,19 +1,55 @@
 import type { BasePayload } from 'payload';
-
+import { ENDPOINT_CONFIG } from '@/const';
 import { getPluginContext } from '@/utils/config';
 import { getErrorMessage } from '@/utils/error-handling';
-
 import type { Messages } from '../types';
 
+interface MessagesRequestConfig {
+  serverUrl: string;
+  /**
+   * If defined a custom api route in your payload.config.ts (`routes.api`), add them same here.
+   * @default 'api'
+   */
+  apiRoute?: string;
+}
+
+export async function fetchMessages(
+  config: MessagesRequestConfig,
+  locale: string,
+): Promise<Messages>;
 export async function fetchMessages(
   payload: BasePayload,
   locale: string,
+): Promise<Messages>;
+export async function fetchMessages(
+  configOrPayload: MessagesRequestConfig | BasePayload,
+  locale: string,
 ): Promise<Messages> {
-  if (!payload.config.serverURL) {
-    throw new Error(
-      'serverURL is required in your payload.config.ts file for payload-intl to work.',
+  if ('serverUrl' in configOrPayload) {
+    const { serverUrl, apiRoute = 'api' } = configOrPayload;
+
+    const cleanApiRoute = apiRoute.replace(/^\/|\/$/g, '');
+
+    const relativePath = ENDPOINT_CONFIG.getMessages.path
+      .replace(/^\/|\/$/g, '')
+      .replace(':locale', locale);
+
+    const fullPath = `/${cleanApiRoute}/${relativePath}`;
+
+    const url = new URL(fullPath, serverUrl);
+
+    console.debug(
+      `PAYLOAD_INTL: Fetching messages from API: ${url.toString()}`,
     );
+
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`Failed to fetch messages for locale ${locale}`);
+    }
+    return await response.json();
   }
+
+  const payload = configOrPayload;
 
   const {
     docs: [doc],
@@ -28,6 +64,8 @@ export async function fetchMessages(
   }
 
   const { url } = doc as unknown as { url: string };
+
+  console.debug(`PAYLOAD_INTL: Fetching messages from stroage: ${url}`);
 
   const response = await fetch(url);
 
@@ -46,32 +84,3 @@ export async function fetchMessages(
 
   return await response.json();
 }
-
-/*
-try {
-      const response = await fetch(endpointUrl, {
-        method: "PUT",
-         headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(changes),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(
-          "message" in error ? error.message : "Unknown error"
-        );
-      }
-
-      form.reset(currentValues);
-      toast.success("Saved", { id: toastId });
-    } catch (error) {
-      toast.error(
-        `Failed to save: ${error instanceof Error ? error.message : "Unknown error"}`,
-        { id: toastId },
-      );
-    }
-  };
-
-*/
