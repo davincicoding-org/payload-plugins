@@ -34,7 +34,7 @@
     "react": "catalog:payload-stack",
     "react-dom": "catalog:payload-stack",
     "sharp": "0.34.2",
-    "zod": "^4.3.5"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

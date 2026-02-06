@@ -5,6 +5,10 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
+  default:
+    zod:
+      specifier: 4.3.5
+      version: 4.3.5
   payload-stack:
     '@payloadcms/db-postgres':
       specifier: 3.72.0
@@ -205,6 +209,9 @@ importers:
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.5
     devDependencies:
       '@payloadcms/ui':
         specifier: catalog:payload-stack
