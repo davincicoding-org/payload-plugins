@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@payloadcms/ui": "catalog:payload-stack",
-    "@repo/configs": "workspace:*",
+    "@repo/common": "workspace:*",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.11",
     "@types/lodash-es": "^4.17.12",

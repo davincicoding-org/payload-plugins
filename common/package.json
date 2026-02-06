@@ -1,17 +1,24 @@
 {
-  "name": "@repo/configs",
+  "name": "@repo/common",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "exports": {
     "./base.tsconfig.json": "./tsconfig.json",
-    "./vite": "./vite.config.js"
+    "./vite": "./vite.config.js",
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
-    "clean": "rm -rf dist && rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:vite",
+    "payload": "catalog:payload-stack",
     "rollup-preserve-directives": "catalog:vite",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",

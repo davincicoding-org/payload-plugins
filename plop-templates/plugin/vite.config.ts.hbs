@@ -1,4 +1,4 @@
-import { basePluginConfig } from '@repo/configs/vite';
+import { basePluginConfig } from '@repo/common/vite';
 import { defineConfig, mergeConfig } from 'vite';
 
 export default defineConfig(
