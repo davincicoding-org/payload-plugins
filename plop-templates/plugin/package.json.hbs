@@ -1,0 +1,76 @@
+{
+  "name": "payload-{{name}}",
+  "version": "0.0.1",
+  "description": "{{description}}",
+  "keywords": [
+    "payload"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davincicoding-org/payload-plugins.git",
+    "directory": "packages/{{name}}"
+  },
+  "license": "MIT",
+  "author": "Michael Zeltner",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./rsc": {
+      "types": "./dist/exports/rsc.d.ts",
+      "import": "./dist/exports/rsc.js",
+      "default": "./dist/exports/rsc.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prebuild": "pnpm typecheck",
+    "build": "vite build",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "vite build --watch",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@payloadcms/ui": "catalog:payload-stack",
+    "@repo/configs": "workspace:*",
+    "@types/node": "^22.5.4",
+    "@types/react": "catalog:payload-stack",
+    "@types/react-dom": "catalog:payload-stack",
+    "next": "catalog:payload-stack",
+    "payload": "catalog:payload-stack",
+    "react": "catalog:payload-stack",
+    "react-dom": "catalog:payload-stack",
+    "rollup-preserve-directives": "catalog:vite",
+    "typescript": "catalog:payload-stack",
+    "vite": "catalog:vite",
+    "vite-plugin-dts": "catalog:vite",
+    "vite-tsconfig-paths": "catalog:vite",
+    "vitest": "^3.1.2"
+  },
+  "peerDependencies": {
+    "@payloadcms/next": ">=3.72.0",
+    "@payloadcms/ui": ">=3.72.0",
+    "next": ">=15.2.3",
+    "payload": ">=3.72.0"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9 || ^10"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
