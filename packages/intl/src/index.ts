@@ -1,6 +1,7 @@
-import type { Plugin } from 'payload';
+import type { CollectionSlug, Plugin } from 'payload';
 import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
+import { Messages } from './entities';
 import type { MessagesViewProps } from './exports/view';
 import type { MessagesGuard, MessagesHooks, MessagesSchema } from './types.ts';
 import { attachPluginContext, getSupportedLocales } from './utils/config';
@@ -12,7 +13,7 @@ export interface MessagesPluginConfig {
    *
    * @default `messages`
    */
-  collectionSlug?: string;
+  collectionSlug?: CollectionSlug;
   /**
    * Access control for allowing to edit the messages.
    *
@@ -28,6 +29,7 @@ export const intlPlugin =
     schema,
     tabs,
     collectionSlug = 'messages',
+    hooks = {},
     editorAccess = (req) => req.user !== null,
   }: MessagesPluginConfig): Plugin =>
   (config) => {
@@ -85,7 +87,7 @@ export const intlPlugin =
     // });
 
     config.collections ??= [];
-    config.collections.push();
+    config.collections.push(Messages({ slug: collectionSlug, hooks }));
 
     config.endpoints ??= [];
     config.endpoints.push(getMessagesEndpoint);

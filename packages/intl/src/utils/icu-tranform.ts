@@ -1,7 +1,11 @@
 import type { MessageFormatElement } from '@formatjs/icu-messageformat-parser';
 import { parse, TYPE } from '@formatjs/icu-messageformat-parser';
-import type { VariableMentionNodeAttrs } from '@/types';
-
+import type {
+  SerializedLexicalNode,
+  SerializedParagraphNode,
+  SerializedTextNode,
+} from '@payloadcms/richtext-lexical/lexical';
+import type { SerializedBeautifulMentionNode } from 'lexical-beautiful-mentions';
 import { formatVariableLabel } from './format';
 import { uncaughtSwitchCase } from './guards';
 
@@ -78,95 +82,118 @@ const stringifyElement = (
   return `{${name}, ${type}, ${filteredOptions.join(' ')}}`;
 };
 
-type TextContent = {
-  type: 'text';
-  text: string;
-};
+function serializeTextNode(text: string): SerializedTextNode {
+  return {
+    type: 'text',
+    version: 1,
+    text,
+    detail: 0,
+    format: 0,
+    mode: 'normal',
+    style: '',
+  };
+}
 
-type VariableContent = {
-  type: 'variable';
-  attrs: VariableMentionNodeAttrs;
-};
+function serializeMentionNode(
+  name: string,
+  label: string,
+  icu: string,
+): SerializedBeautifulMentionNode {
+  return {
+    type: 'variableMention',
+    version: 1,
+    trigger: '@',
+    value: name,
+    data: { label, icu },
+  };
+}
 
-type ProseMirrorJSONRepresentation = {
-  type: 'doc';
-  content: {
-    type: 'paragraph';
-    content: (TextContent | VariableContent)[];
-  }[];
+type SerializedICUEditorState = {
+  root: {
+    type: 'root';
+    version: 1;
+    direction: null;
+    format: '';
+    indent: 0;
+    children: [SerializedParagraphNode];
+  };
 };
 
 /**
- * Parse an ICU message string into a ProseMirror JSON representation
+ * Parse an ICU message string into a Lexical serialized editor state
  */
-export const parseIcuToProseMirrorJSON = (
+export const parseIcuToLexicalState = (
   icuMessage: string,
-): ProseMirrorJSONRepresentation => {
+): SerializedICUEditorState => {
   try {
     const elements = parseICUMessage(icuMessage);
-    const content = elements.flatMap<TextContent | VariableContent>(
-      (element) => {
-        switch (element.type) {
-          case TYPE.literal:
-            return [
-              {
-                type: 'text',
-                text: element.value,
-              },
-            ];
-          case TYPE.pound:
-            return [
-              {
-                type: 'text',
-                text: '#',
-              },
-            ];
-          case TYPE.argument:
-          case TYPE.number:
-          case TYPE.date:
-          case TYPE.time:
-          case TYPE.select:
-          case TYPE.plural:
-          case TYPE.tag:
-            return [
-              {
-                type: 'variable',
-                attrs: {
-                  name: element.value,
-                  label: formatVariableLabel(element),
-                  icu: serializeICUMessage([element]),
-                },
-              },
-            ];
-          default:
-            return uncaughtSwitchCase(element);
-        }
-      },
-    );
+    const children = elements.flatMap<SerializedLexicalNode>((element) => {
+      switch (element.type) {
+        case TYPE.literal:
+          return [serializeTextNode(element.value)];
+        case TYPE.pound:
+          return [serializeTextNode('#')];
+        case TYPE.argument:
+        case TYPE.number:
+        case TYPE.date:
+        case TYPE.time:
+        case TYPE.select:
+        case TYPE.plural:
+        case TYPE.tag:
+          return [
+            serializeMentionNode(
+              element.value,
+              formatVariableLabel(element),
+              serializeICUMessage([element]),
+            ),
+          ];
+        default:
+          return uncaughtSwitchCase(element);
+      }
+    });
 
     return {
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content,
-        },
-      ],
+      root: {
+        type: 'root',
+        version: 1,
+        direction: null,
+        format: '',
+        indent: 0,
+        children: [
+          {
+            type: 'paragraph',
+            version: 1,
+            direction: null,
+            format: '',
+            indent: 0,
+            textFormat: 0,
+            textStyle: '',
+            children,
+          },
+        ],
+      },
     };
-  } catch (error) {
+  } catch {
     return {
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [
-            {
-              type: 'text',
-              text: icuMessage,
-            },
-          ],
-        },
-      ],
+      root: {
+        type: 'root',
+        version: 1,
+        direction: null,
+        format: '',
+        indent: 0,
+        children: [
+          {
+            type: 'paragraph',
+            version: 1,
+            direction: null,
+            format: '',
+            indent: 0,
+            textFormat: 0,
+            textStyle: '',
+            children: [serializeTextNode(icuMessage)],
+          },
+        ],
+      },
     };
   }
 };

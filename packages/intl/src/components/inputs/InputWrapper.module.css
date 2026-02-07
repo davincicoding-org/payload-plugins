@@ -10,6 +10,7 @@
   margin-inline: 0;
   flex: 1;
   border-radius: var(--style-radius-m);
+  overflow: visible;
 }
 
 .fieldset:focus-within {

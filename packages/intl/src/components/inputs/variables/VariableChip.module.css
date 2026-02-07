@@ -5,6 +5,8 @@
   border-radius: var(--style-radius-m);
   background-color: var(--theme-elevation-250);
   padding-inline: 0.25rem;
+  appearance: none;
+  border: none;
 }
 
 .chip:hover {
@@ -23,7 +25,9 @@
   border-radius: var(--style-radius-m);
   border: 1px solid var(--theme-border-color);
   background-color: var(--theme-elevation-50);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
   outline: none;
 }
 
@@ -31,11 +35,11 @@
   display: none;
 }
 
-.popoverContent[data-state='open'] {
+.popoverContent[data-state="open"] {
   animation: popoverIn 150ms ease-out;
 }
 
-.popoverContent[data-state='closed'] {
+.popoverContent[data-state="closed"] {
   animation: popoverOut 150ms ease-in;
 }
 

@@ -1,9 +1,13 @@
 .list {
   display: flex;
   flex-direction: column;
+  width: max-content;
   overflow: clip;
   border-radius: var(--style-radius-m);
   background-color: var(--theme-elevation-100);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .list:empty {

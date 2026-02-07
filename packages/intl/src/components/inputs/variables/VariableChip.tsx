@@ -1,8 +1,11 @@
-import type { ReactNodeViewProps } from '@tiptap/react';
-import { NodeViewWrapper } from '@tiptap/react';
+'use client';
+
+import type { NodeKey } from '@payloadcms/richtext-lexical/lexical';
+import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical';
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext';
+import type { BeautifulMentionNode } from 'lexical-beautiful-mentions';
 import { Popover } from 'radix-ui';
 import { useMemo } from 'react';
-import type { VariableMentionNodeAttrs } from '@/types';
 
 import {
   isArgumentElement,
@@ -21,28 +24,37 @@ import styles from './VariableChip.module.css';
 
 const TEMPORAL_ELEMENTS_FLAG = false;
 
+export interface VariableChipProps {
+  name: string;
+  label: string;
+  icu: string;
+  nodeKey: NodeKey;
+}
+
 // TODO replace popover with portal below input field
 
-export function VariableChip({
-  node,
-  updateAttributes,
-}: ReactNodeViewProps<HTMLElement>) {
-  const attrs = node.attrs as VariableMentionNodeAttrs;
-  const handleUpdate = (value: string) =>
-    updateAttributes({
-      icu: value,
+export function VariableChip({ name, label, icu, nodeKey }: VariableChipProps) {
+  const [editor] = useLexicalComposerContext();
+
+  const handleUpdate = (value: string) => {
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey) as BeautifulMentionNode | null;
+      if (node) {
+        node.setData({ ...node.getData(), icu: value });
+      }
     });
+  };
 
   const element = useMemo(() => {
     try {
-      const [part] = parseICUMessage(attrs.icu);
+      const [part] = parseICUMessage(icu);
       if (!part) throw new Error('No part found');
       return part;
     } catch (error) {
       console.error(error);
-      throw new Error(`Invalid ICU: ${attrs.icu}`, { cause: error });
+      throw new Error(`Invalid ICU: ${icu}`, { cause: error });
     }
-  }, [attrs.icu]);
+  }, [icu]);
 
   const isDisabled =
     isArgumentElement(element) ||
@@ -51,20 +63,17 @@ export function VariableChip({
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <NodeViewWrapper
-          as="span"
+        <button
           className={[styles.chip, isDisabled ? styles.chipDisabled : undefined]
             .filter(Boolean)
             .join(' ')}
-          contentEditable={false}
-          data-icu={attrs.icu}
-          data-variable={attrs.name}
-          role="button"
-          tabIndex={0}
+          data-icu={icu}
+          data-variable={name}
+          type="button"
         >
           {/* <VariableIcon type={element.type} className="size-4" /> */}
-          {attrs.label}
-        </NodeViewWrapper>
+          {label}
+        </button>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content

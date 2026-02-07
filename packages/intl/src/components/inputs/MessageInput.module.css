@@ -1,20 +1,25 @@
 .editor {
+  position: relative;
   min-height: 2rem;
   font-size: var(--font-size-large);
 }
 
-.editor :global(.ProseMirror) {
+.menuAnchor {
+  z-index: 50;
+}
+
+.contentEditable {
   outline: none;
 }
 
-.editor :global(.ProseMirror):focus {
+.contentEditable:focus {
   outline: none;
 }
 
-.editor :global(.ProseMirror) > :first-child {
+.contentEditable > :first-child {
   margin-top: 0;
 }
 
-.editor :global(.ProseMirror) > :last-child {
+.contentEditable > :last-child {
   margin-bottom: 0;
 }
