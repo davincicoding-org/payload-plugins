@@ -6,6 +6,7 @@ import { isDateElement, isTimeElement } from '@/utils/guards';
 
 import { DateVariableEditor } from '../editors/DateVariableEditor';
 import { TimeElementEditor } from '../editors/TimeVariableEditor';
+import styles from './TemporalElementEditor.module.css';
 
 const TEMPORAL_TYPES = ['date', 'time'] as const;
 
@@ -36,16 +37,16 @@ export function TemporalElementEditor({
   }, []);
 
   return (
-    <div className="">
+    <div>
       <ToggleGroup.Root
-        className="flex bg-elevation-100"
+        className={styles.toggleGroup}
         onValueChange={(value) => setType(value as TemporalType)}
         type="single"
         value={type}
       >
         {TEMPORAL_TYPES.map((type) => (
           <ToggleGroup.Item
-            className="flex-1 border-none data-[state=off]:cursor-pointer data-[state=on]:bg-elevation-800 data-[state=on]:text-elevation-0 data-[state=off]:opacity-50 data-[state=off]:hover:opacity-100"
+            className={styles.toggleItem}
             key={type}
             value={type}
           >
@@ -54,7 +55,7 @@ export function TemporalElementEditor({
         ))}
       </ToggleGroup.Root>
 
-      <div className="p-3">
+      <div className={styles.content}>
         {type === 'date' && (
           <DateVariableEditor
             element={isDateElement(element) ? element : undefined}

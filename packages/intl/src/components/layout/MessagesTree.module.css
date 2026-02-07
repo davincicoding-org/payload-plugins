@@ -1,0 +1,36 @@
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.item {
+  display: grid;
+  min-width: 0;
+}
+
+.collapsible {
+  min-width: 0;
+}
+
+.collapsible:hover {
+  border-color: var(--theme-border-color);
+}
+
+.collapsible > .collapsible__toggle-wrap {
+  position: sticky;
+  border-bottom: 1px solid var(--theme-border-color);
+  top: calc(var(--nesting-level) * 40px - 26px);
+  z-index: calc(9 - var(--nesting-level));
+}
+
+.collapsible .collapsible__content {
+  padding: 0.75rem;
+}
+
+.header {
+  font-size: var(--font-size-large);
+}
+
+.headerError {
+  color: var(--theme-error-400);
+}

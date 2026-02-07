@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 import { useFormState } from 'react-hook-form';
 import { useMessagesForm } from '@/context/messages-form';
 import type { MessagesSchema } from '@/types';
-import { cn } from '@/utils/cn';
 import { toWords } from '@/utils/format';
+import styles from './MessagesTabs.module.css';
 
 interface MessagesTabsProps {
   schema: MessagesSchema;
@@ -30,21 +30,20 @@ export function MessagesTabs({
   );
 
   return (
-    <div
-      className="overflow-x-auto text-nowrap border-border border-b-2 px-4"
-      role="tablist"
-    >
+    <div className={styles.tabs} role="tablist">
       {Object.keys(schema).map((key) => (
         <Button
           buttonStyle={activeTab === key ? 'pill' : 'tab'}
-          className={cn(
-            'my-0 rounded-b-none text-lg',
+          className={[
+            styles.tab,
             hasErrors(key)
               ? activeTab === key
-                ? 'bg-error'
-                : 'text-error'
+                ? styles.tabError
+                : styles.tabErrorInactive
               : undefined,
-          )}
+          ]
+            .filter(Boolean)
+            .join(' ')}
           key={key}
           onClick={() => setActiveTab(key)}
           size="large"

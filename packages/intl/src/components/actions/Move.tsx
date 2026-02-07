@@ -4,6 +4,8 @@ import { get } from 'lodash-es';
 
 import { useMessagesForm } from '@/context/messages-form';
 
+import styles from './Move.module.css';
+
 export function Move() {
   const { getValues, setValue, locales } = useMessagesForm();
   const handleMove = () => {
@@ -24,8 +26,8 @@ export function Move() {
   return (
     <Button
       buttonStyle="subtle"
-      className="my-0"
-      icon={<IconBraces className="size-5" />}
+      className={styles.button}
+      icon={<IconBraces className={styles.icon} />}
       iconPosition="left"
       onClick={handleMove}
     >

@@ -8,6 +8,7 @@ import { parseIcuToProseMirrorJSON } from '@/utils/icu-tranform';
 
 import type { InputWrapperProps } from './InputWrapper';
 import { InputWrapper } from './InputWrapper';
+import styles from './MessageInput.module.css';
 import { VariableMention } from './variables/extension';
 
 export interface MessageInputProps extends InputWrapperProps {
@@ -41,7 +42,7 @@ export function MessageInput({
   return (
     <InputWrapper className={className} error={error} label={label}>
       <EditorContent
-        className="tiptap-editor min-h-8"
+        className={styles.editor}
         editor={editor}
         lang={lang}
         onBlur={onBlur}

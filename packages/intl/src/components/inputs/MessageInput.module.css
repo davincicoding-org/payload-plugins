@@ -1,0 +1,20 @@
+.editor {
+  min-height: 2rem;
+  font-size: var(--font-size-large);
+}
+
+.editor :global(.ProseMirror) {
+  outline: none;
+}
+
+.editor :global(.ProseMirror):focus {
+  outline: none;
+}
+
+.editor :global(.ProseMirror) > :first-child {
+  margin-top: 0;
+}
+
+.editor :global(.ProseMirror) > :last-child {
+  margin-bottom: 0;
+}

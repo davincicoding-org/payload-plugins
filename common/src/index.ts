@@ -6,12 +6,6 @@ import z from 'zod';
 export const entityIdSchema = z.union([z.number(), z.string()]);
 export type EntityID = TypeWithID['id'] & z.infer<typeof entityIdSchema>;
 
-export type Entity<T extends Record<string, unknown>> = TypeWithID & T;
-export type EntityRelation<
-  T extends TypeWithID = TypeWithID,
-  Cardinality extends 'one' | 'many' = 'one',
-> = Cardinality extends 'many' ? (EntityID | T)[] : EntityID | T;
-
 // MARK: Utilities
 
 export const createCollectionConfigFactory =
@@ -27,5 +21,5 @@ export const createCollectionConfigFactory =
     ...(typeof factory === 'function' ? factory(options) : factory),
   });
 
-export const resolveForeignKey = (entity: EntityRelation) =>
+export const resolveForeignKey = (entity: TypeWithID['id'] | TypeWithID) =>
   typeof entity === 'object' ? entity.id : entity;

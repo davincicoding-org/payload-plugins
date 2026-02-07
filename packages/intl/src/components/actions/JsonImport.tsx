@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 
 import { useMessagesForm } from '@/context/messages-form';
 
+import styles from './JsonImport.module.css';
+
 export function JsonImport() {
   const { locales, setValue } = useMessagesForm();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,11 +45,11 @@ export function JsonImport() {
       />
       <Button
         buttonStyle="subtle"
-        className="my-0"
-        icon={<IconBraces className="size-5" />}
+        className={styles.button}
+        icon={<IconBraces className={styles.icon} />}
         iconPosition="left"
         SubMenuPopupContent={({ close }) => (
-          <div className="flex flex-col gap-2">
+          <div className={styles.submenu}>
             {locales.map((locale) => (
               <Button
                 buttonStyle="subtle"

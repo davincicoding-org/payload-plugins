@@ -4,7 +4,6 @@ import { Popover } from 'radix-ui';
 import { useMemo } from 'react';
 import type { VariableMentionNodeAttrs } from '@/types';
 
-import { cn } from '@/utils/cn';
 import {
   isArgumentElement,
   isNumericElement,
@@ -18,7 +17,7 @@ import { SelectVariableEditor } from './editors/SelectVariableEditor';
 import { TagVariableEditor } from './editors/TagVariableEditor';
 import { NumericVariablePicker } from './pickers/NumericVariablePicker';
 import { TemporalElementEditor } from './pickers/TemporalElementEditor';
-import { VariableIcon } from './VariableIcon';
+import styles from './VariableChip.module.css';
 
 const TEMPORAL_ELEMENTS_FLAG = false;
 
@@ -45,19 +44,18 @@ export function VariableChip({
     }
   }, [attrs.icu]);
 
+  const isDisabled =
+    isArgumentElement(element) ||
+    (isTemporalElement(element) && !TEMPORAL_ELEMENTS_FLAG);
+
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
         <NodeViewWrapper
           as="span"
-          className={cn(
-            'inline-flex cursor-pointer items-center rounded-md bg-elevation-250 px-1 hover:bg-elevation-400',
-            {
-              'pointer-events-none':
-                isArgumentElement(element) ||
-                (isTemporalElement(element) && !TEMPORAL_ELEMENTS_FLAG),
-            },
-          )}
+          className={[styles.chip, isDisabled ? styles.chipDisabled : undefined]
+            .filter(Boolean)
+            .join(' ')}
           contentEditable={false}
           data-icu={attrs.icu}
           data-variable={attrs.name}
@@ -71,7 +69,7 @@ export function VariableChip({
       <Popover.Portal>
         <Popover.Content
           align="start"
-          className="data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 grid origin-(--radix-hover-card-content-transform-origin) overflow-clip rounded-md border border-border bg-elevation-50 shadow-md outline-hidden empty:hidden data-[state=closed]:animate-out data-[state=open]:animate-in"
+          className={styles.popoverContent}
           side="bottom"
           sideOffset={5}
         >

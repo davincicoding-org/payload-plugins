@@ -13,12 +13,12 @@ import type {
   MessagesSchema,
   Translations,
 } from '@/types';
-import { cn } from '@/utils/cn';
 import { getErrorMessage } from '@/utils/error-handling';
 import { JsonImport } from './actions/JsonImport';
 import { MessageField } from './layout/MessageField';
 import { MessagesTabs } from './layout/MessagesTabs';
 import { MessagesTree } from './layout/MessagesTree';
+import styles from './MessagesForm.module.css';
 
 interface MessagesFormProps {
   locales: Locales;
@@ -83,17 +83,14 @@ export function MessagesForm({
 
   return (
     <MessagesFormProvider form={form} locales={locales}>
-      <form
-        className="flex h-[calc(100vh-var(--app-header-height))] flex-col"
-        onSubmit={form.handleSubmit(handleSubmit)}
-      >
-        <div className="sticky top-0 z-10 bg-background">
-          <header className="mb-6 flex items-center justify-between gap-4">
-            <h1 className="text-4xl">Messages</h1>
-            <div className="flex items-center gap-2">
+      <form className={styles.form} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className={styles.stickyHeader}>
+          <header className={styles.header}>
+            <h1 className={styles.title}>Messages</h1>
+            <div className={styles.actions}>
               <JsonImport />
               <Button
-                className="my-0"
+                className={styles.saveButton}
                 disabled={!form.formState.isDirty}
                 type="submit"
               >
@@ -111,17 +108,14 @@ export function MessagesForm({
           )}
         </div>
 
-        <div
-          className="min-h-0 overflow-y-auto pt-8 pb-16"
-          id="messages-form-content"
-        >
+        <div className={styles.content} id="messages-form-content">
           {!tabs && <MessagesTree nestingLevel={0} path="" schema={schema} />}
           {tabs &&
             Object.entries(schema).map(([key, value]) => {
               if (typeof value === 'string') {
                 return (
                   <MessageField
-                    className={cn({ hidden: activeTab !== key })}
+                    hidden={activeTab !== key}
                     key={key}
                     messageKey={key}
                     path={key}
@@ -131,7 +125,7 @@ export function MessagesForm({
               }
               return (
                 <MessagesTree
-                  className={cn({ hidden: activeTab !== key })}
+                  hidden={activeTab !== key}
                   key={key}
                   nestingLevel={0}
                   path={key}

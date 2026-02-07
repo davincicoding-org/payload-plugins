@@ -1,0 +1,25 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-weight: 500;
+  font-size: var(--font-size-small);
+}
+
+.input {
+  outline: none;
+}
+
+.input:focus {
+  outline: none;
+}

@@ -1,0 +1,19 @@
+.localeRow {
+  margin-inline: -0.75rem;
+  display: flex;
+  min-width: 0;
+  gap: 1rem;
+  padding-inline: 0.75rem;
+}
+
+.localeRowScrollable {
+  overflow-x: auto;
+}
+
+.localeItem {
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}

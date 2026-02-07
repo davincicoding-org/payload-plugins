@@ -1,5 +1,4 @@
 import { resolve } from 'node:path';
-import tailwindcss from '@tailwindcss/vite';
 import preserveDirectives from 'rollup-preserve-directives';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -11,7 +10,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export const basePluginConfig = (pluginDir) => {
   return defineConfig({
     plugins: [
-      tailwindcss(),
       tsconfigPaths({
         ignoreConfigErrors: true,
       }),

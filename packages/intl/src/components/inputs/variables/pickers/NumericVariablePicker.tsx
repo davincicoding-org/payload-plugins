@@ -5,6 +5,7 @@ import type { NumberElement, PluralElement } from '@/types';
 import { isNumberElement, isPluralElement } from '@/utils/guards';
 
 import { PluralVariableEditor } from '../editors/PluralVariableEditor';
+import styles from './NumericVariablePicker.module.css';
 
 const NUMERIC_TYPES = [
   'number',
@@ -39,16 +40,16 @@ export function NumericVariablePicker({
   }, []);
 
   return (
-    <div className="">
+    <div>
       <ToggleGroup.Root
-        className="flex bg-elevation-100"
+        className={styles.toggleGroup}
         onValueChange={(value) => setType(value as NumericType)}
         type="single"
         value={type}
       >
         {NUMERIC_TYPES.map((type) => (
           <ToggleGroup.Item
-            className="flex-1 border-none data-[state=off]:cursor-pointer data-[state=on]:bg-elevation-800 data-[state=on]:text-elevation-0 data-[state=off]:opacity-50 data-[state=off]:hover:opacity-100"
+            className={styles.toggleItem}
             key={type}
             value={type}
           >
@@ -57,7 +58,7 @@ export function NumericVariablePicker({
         ))}
       </ToggleGroup.Root>
 
-      <div className="p-3">
+      <div className={styles.content}>
         {type === 'plural' && (
           <PluralVariableEditor
             element={isPluralElement(element) ? element : undefined}

@@ -1,0 +1,7 @@
+.textarea {
+  padding: 0.75rem;
+}
+
+.textarea:focus {
+  outline: none;
+}

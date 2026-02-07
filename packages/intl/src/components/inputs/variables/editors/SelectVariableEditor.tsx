@@ -4,6 +4,8 @@ import type { SelectElement } from '@/types';
 
 import { parseICUMessage, serializeICUMessage } from '@/utils/icu-tranform';
 
+import styles from './SelectVariableEditor.module.css';
+
 export interface SelectVariableEditorProps {
   element: SelectElement;
   onUpdate: (value: string) => void;
@@ -50,18 +52,15 @@ export function SelectVariableEditor({
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 p-3">
+    <div className={styles.root}>
       {fields.map((field, index) => (
-        <div className="flex flex-col gap-1" key={field.name}>
-          <label
-            className="font-medium text-sm"
-            htmlFor={`options.${index}.content`}
-          >
+        <div className={styles.field} key={field.name}>
+          <label className={styles.label} htmlFor={`options.${index}.content`}>
             {field.name}
           </label>
           {/* // TODO add support for variable mentions */}
           <input
-            className="focus:outline-none"
+            className={styles.input}
             {...register(`options.${index}.content`)}
           />
         </div>

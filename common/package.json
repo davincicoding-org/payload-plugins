@@ -22,7 +22,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "catalog:vite",
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "rollup-preserve-directives": "catalog:vite",

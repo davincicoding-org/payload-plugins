@@ -1,0 +1,62 @@
+.chip {
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+  border-radius: var(--style-radius-m);
+  background-color: var(--theme-elevation-250);
+  padding-inline: 0.25rem;
+}
+
+.chip:hover {
+  background-color: var(--theme-elevation-400);
+}
+
+.chipDisabled {
+  pointer-events: none;
+}
+
+.popoverContent {
+  z-index: 50;
+  display: grid;
+  transform-origin: var(--radix-hover-card-content-transform-origin);
+  overflow: clip;
+  border-radius: var(--style-radius-m);
+  border: 1px solid var(--theme-border-color);
+  background-color: var(--theme-elevation-50);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  outline: none;
+}
+
+.popoverContent:empty {
+  display: none;
+}
+
+.popoverContent[data-state='open'] {
+  animation: popoverIn 150ms ease-out;
+}
+
+.popoverContent[data-state='closed'] {
+  animation: popoverOut 150ms ease-in;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes popoverOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}

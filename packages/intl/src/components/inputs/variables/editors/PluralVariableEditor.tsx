@@ -5,8 +5,9 @@ import { Fragment, useImperativeHandle, useMemo } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type { PluralElement } from '@/types';
 
-import { cn } from '@/utils/cn';
 import { parseICUMessage, serializeICUMessage } from '@/utils/icu-tranform';
+
+import styles from './PluralVariableEditor.module.css';
 
 const NAMED_PLURAL_OPTIONS = ['zero', 'one', 'two', 'few', 'many'] as const;
 
@@ -73,20 +74,20 @@ export function PluralVariableEditor({
   });
 
   return (
-    <div className="flex flex-col gap-3">
-      <fieldset className="mx-0 grid grid-cols-[3rem_8rem_1.5rem] gap-y-2 rounded-md border border-border px-2 pr-0">
+    <div className={styles.root}>
+      <fieldset className={styles.optionsFieldset}>
         <legend>Options</legend>
         {options.fields.map((field, index) => (
           <Fragment key={field.id}>
             <label htmlFor={`options.${index}`}>{field.name}</label>
             {/* // TODO add support for variable mentions */}
             <input
-              className="focus:outline-none"
+              className={styles.input}
               type="text"
               {...register(`options.${index}.content`, { required: true })}
             />
             <button
-              className="ml-auto flex cursor-pointer items-center justify-center border-none bg-transparent p-0 hover:text-error"
+              className={styles.removeButton}
               onClick={() => options.remove(index)}
               type="button"
             >
@@ -99,17 +100,17 @@ export function PluralVariableEditor({
           <label htmlFor="other">other</label>
           {/* // TODO add support for variable mentions */}
           <input
-            className="col-span-2 focus:outline-none"
+            className={styles.inputSpan2}
             type="text"
             {...register('other', { required: true })}
           />
         </>
       </fieldset>
-      <div className="grid grid-cols-2 items-center gap-2">
-        <label className="flex items-center gap-3 pl-2">
+      <div className={styles.controlsGrid}>
+        <label className={styles.offsetLabel}>
           offset
           <input
-            className="w-8 text-center"
+            className={styles.offsetInput}
             placeholder="0"
             type="numeric"
             {...register('offset')}
@@ -118,18 +119,13 @@ export function PluralVariableEditor({
         <Popover.Root>
           <Popover.Trigger>Add Option</Popover.Trigger>
           <Popover.Portal>
-            <Popover.Content
-              className="data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto overflow-x-hidden rounded-md border border-border bg-elevation-50 shadow-md data-[state=closed]:animate-out data-[state=open]:animate-in"
-              sideOffset={4}
-            >
-              <div className="flex flex-col">
+            <Popover.Content className={styles.popoverContent} sideOffset={4}>
+              <div className={styles.optionsList}>
                 {NAMED_PLURAL_OPTIONS.filter((option) =>
                   options.fields.every((field) => field.name !== option),
                 ).map((option) => (
                   <Popover.Close
-                    className={cn(
-                      'cursor-pointer border-none bg-transparent px-1 hover:bg-elevation-250',
-                    )}
+                    className={styles.optionItem}
                     key={option}
                     onClick={() => {
                       // TODO ensure the fields are always in the same order as staticPluralOptions
@@ -149,14 +145,14 @@ export function PluralVariableEditor({
                 ))}
               </div>
 
-              <div className="flex items-center justify-between gap-2 border-border border-t p-2">
+              <div className={styles.customInputGroup}>
                 <label htmlFor="customValue">custom</label>
                 <Controller
                   control={control}
                   name="customValue"
                   render={({ field }) => (
                     <input
-                      className="w-8 rounded-sm border-transparent text-center focus:border-border focus:outline-none"
+                      className={styles.customInput}
                       min={0}
                       onChange={({ currentTarget: { value } }) => {
                         const number = Number(value);

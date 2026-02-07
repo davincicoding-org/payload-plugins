@@ -1,0 +1,21 @@
+.tabs {
+  overflow-x: auto;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--theme-border-color);
+  padding-inline: 1rem;
+}
+
+.tab {
+  margin-block: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  font-size: var(--font-size-large);
+}
+
+.tabError {
+  background-color: var(--theme-error-100);
+}
+
+.tabErrorInactive {
+  color: var(--theme-error-400);
+}

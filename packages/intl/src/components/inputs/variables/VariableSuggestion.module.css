@@ -1,0 +1,30 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  border-radius: var(--style-radius-m);
+  background-color: var(--theme-elevation-100);
+}
+
+.list:empty {
+  display: none;
+}
+
+.item {
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 0;
+  border: none;
+  background-color: transparent;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--font-size-large);
+}
+
+.itemSelected {
+  background-color: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+}
+
+.item:not(.itemSelected):hover {
+  background-color: var(--theme-elevation-250);
+}

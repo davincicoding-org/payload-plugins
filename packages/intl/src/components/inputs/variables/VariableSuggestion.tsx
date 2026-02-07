@@ -5,7 +5,7 @@ import type {
 import { useEffect, useImperativeHandle, useState } from 'react';
 import type { VariableMentionNodeAttrs } from '@/types';
 
-import { cn } from '@/utils/cn';
+import styles from './VariableSuggestion.module.css';
 
 export interface VariableSuggestionProps
   extends SuggestionProps<VariableMentionNodeAttrs, VariableMentionNodeAttrs> {
@@ -64,16 +64,15 @@ export function VariableSuggestion({
   }));
 
   return (
-    <div className="flex flex-col overflow-clip rounded-md bg-elevation-100 empty:hidden">
+    <div className={styles.list}>
       {items.map((item, index) => (
         <button
-          className={cn(
-            'cursor-pointer text-nowrap rounded-none border-none bg-transparent px-3 py-1 text-lg',
-            {
-              'bg-elevation-800 text-elevation-0': index === selectedIndex,
-              'hover:bg-elevation-250': index !== selectedIndex,
-            },
-          )}
+          className={[
+            styles.item,
+            index === selectedIndex ? styles.itemSelected : undefined,
+          ]
+            .filter(Boolean)
+            .join(' ')}
           key={index}
           onClick={() => selectItem(index)}
           type="button"

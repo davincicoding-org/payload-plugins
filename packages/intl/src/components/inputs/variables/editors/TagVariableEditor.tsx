@@ -4,6 +4,8 @@ import type { TagElement } from '@/types';
 
 import { parseICUMessage, serializeICUMessage } from '@/utils/icu-tranform';
 
+import styles from './TagVariableEditor.module.css';
+
 export interface TagVariableEditorProps {
   element: TagElement;
   onUpdate: (value: string) => void;
@@ -37,10 +39,6 @@ export function TagVariableEditor({
 
   // TODO add support for variable mentions
   return (
-    <textarea
-      className="p-3 focus:outline-none"
-      {...register('content')}
-      rows={1}
-    />
+    <textarea className={styles.textarea} {...register('content')} rows={1} />
   );
 }

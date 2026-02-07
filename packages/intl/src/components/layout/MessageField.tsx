@@ -1,24 +1,24 @@
 import { useMemo } from 'react';
 import { useMessagesForm } from '@/context/messages-form';
 import type { MessageSchema } from '@/types';
-import { cn } from '@/utils/cn';
 import { parseMessageSchema } from '@/utils/schema';
 import { createValidator } from '@/utils/validate';
 
 import { MessageController } from '../MessageController';
+import styles from './MessageField.module.css';
 
 interface MessageFieldProps {
   schema: MessageSchema;
   messageKey: string;
   path: string;
-  className?: string;
+  hidden?: boolean;
 }
 
 export function MessageField({
   schema,
   messageKey,
   path,
-  className,
+  hidden,
 }: MessageFieldProps): React.ReactNode {
   const { locales } = useMessagesForm();
 
@@ -30,12 +30,11 @@ export function MessageField({
   );
 
   return (
-    <div className={cn('', className)}>
+    <div style={{ display: hidden ? 'none' : undefined }}>
       {config.description && <p>{config.description}</p>}
 
       {locales.length === 1 ? (
         <MessageController
-          className={className}
           locale={locales[0]}
           name={[locales[0], path, messageKey].join('.')}
           type={config.type}
@@ -44,14 +43,16 @@ export function MessageField({
         />
       ) : (
         <div
-          className={cn('-mx-3 flex min-w-0 gap-4 px-3', {
-            'overflow-x-auto': config.type === 'icu',
-            // "flex-col": config.type === "rich",
-          })}
+          className={[
+            styles.localeRow,
+            config.type === 'icu' ? styles.localeRowScrollable : undefined,
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           {locales.map((locale) => (
             <MessageController
-              className="flex-1"
+              className={styles.localeItem}
               key={locale}
               label={locale.toUpperCase()}
               locale={locale}

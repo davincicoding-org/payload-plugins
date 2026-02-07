@@ -1,0 +1,41 @@
+.form {
+  display: flex;
+  height: calc(100vh - var(--app-header-height));
+  flex-direction: column;
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--theme-bg);
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.saveButton {
+  margin-block: 0;
+}
+
+.content {
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}

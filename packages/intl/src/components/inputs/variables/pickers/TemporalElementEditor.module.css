@@ -1,0 +1,27 @@
+.toggleGroup {
+  display: flex;
+  background-color: var(--theme-elevation-100);
+}
+
+.toggleItem {
+  flex: 1;
+  border: none;
+}
+
+.toggleItem[data-state='off'] {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.toggleItem[data-state='off']:hover {
+  opacity: 1;
+}
+
+.toggleItem[data-state='on'] {
+  background-color: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+}
+
+.content {
+  padding: 0.75rem;
+}
