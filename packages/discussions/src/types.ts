@@ -1,10 +1,6 @@
-import { type Entity, entityIdSchema } from '@repo/common';
+import { entityIdSchema } from '@repo/common';
 import { z } from 'zod/mini';
-import type { Comment } from '@/payload-types';
-
-export type User = Entity<{
-  mail: string;
-}>;
+import type { Comment, User } from '@/payload-types';
 
 export interface FieldConfig {
   maxDepth: number;

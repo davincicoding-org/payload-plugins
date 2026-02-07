@@ -19,23 +19,19 @@ export function CommentList({
   maxDepth,
 }: CommentListProps) {
   if (isLoading) {
-    return (
-      <div className={styles['comment-list__placeholder']}>
-        Loading comments...
-      </div>
-    );
+    return <div className={styles.placeholder}>Loading comments...</div>;
   }
 
   if (comments.length === 0) {
     return (
-      <div className={styles['comment-list__placeholder']}>
+      <div className={styles.placeholder}>
         No comments yet. Be the first to comment!
       </div>
     );
   }
 
   return (
-    <div className={styles['comment-list']}>
+    <div className={styles.list}>
       {comments.map((comment) => (
         <CommentItem
           comment={comment}

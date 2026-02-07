@@ -1,10 +1,10 @@
-.comment-form {
+.form {
   border: 1px solid var(--theme-elevation-200);
   border-radius: 0.5rem;
   overflow: hidden;
 }
 
-.comment-form__textarea {
+.textarea {
   width: 100%;
   padding: 0.75rem;
   outline: none;
@@ -17,7 +17,7 @@
   scroll-margin-block: -200px;
 }
 
-.comment-form__footer {
+.footer {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
@@ -26,7 +26,7 @@
   padding-bottom: 0.5rem;
 }
 
-.comment-form__cancel-button {
+.cancelButton {
   padding: 0.125rem 0.5rem;
   border: none;
   background-color: transparent;
@@ -34,7 +34,7 @@
   font-size: 0.75rem;
 }
 
-.comment-form__submit-button {
+.submitButton {
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
   border: none;
@@ -44,7 +44,7 @@
   font-size: 0.75rem;
 }
 
-.comment-form__submit-button--disabled {
+.submitButton:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }

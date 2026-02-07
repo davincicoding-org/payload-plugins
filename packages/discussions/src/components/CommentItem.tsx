@@ -1,15 +1,15 @@
 'use client';
 
 import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
-import type { EntityID } from '@repo/common';
 import { useState } from 'react';
+import type { Comment } from '@/payload-types';
 import type { PopulatedComment } from '../types';
 import { CommentForm } from './CommentForm';
 import styles from './CommentItem.module.css';
 export interface CommentItemProps {
   comment: PopulatedComment;
   depth?: number;
-  onReply: (parentId: EntityID, content: string) => Promise<void>;
+  onReply: (parentId: Comment['id'], content: string) => Promise<void>;
   forceCollapse?: boolean;
   maxDepth: number;
 }
@@ -56,21 +56,21 @@ export function CommentItem({
 
   return (
     <div>
-      <div className={styles['comment-item__bubble']}>
-        <div className={styles['comment-item__header']}>
-          <span className={styles['comment-item__author']}>
+      <div className={styles.bubble}>
+        <div className={styles.header}>
+          <span className={styles.author}>
             {comment.author?.name || 'Unknown'}
           </span>
           <span>{formatTimeToNow({ date: comment.createdAt, i18n })}</span>
         </div>
 
-        <div className={styles['comment-item__content']}>{comment.content}</div>
+        <div className={styles.content}>{comment.content}</div>
       </div>
 
       {canReply && !forceCollapse && (
-        <div className={styles['comment-item__actions']}>
+        <div className={styles.actions}>
           <button
-            className={styles['comment-item__action-button']}
+            className={styles.actionButton}
             onClick={handleOpenReplyForm}
             type="button"
           >
@@ -79,7 +79,7 @@ export function CommentItem({
 
           {replies.length > 0 && (
             <button
-              className={styles['comment-item__action-button']}
+              className={styles.actionButton}
               onClick={() => setShowReplies((current) => !current)}
               type="button"
             >
@@ -92,9 +92,9 @@ export function CommentItem({
       )}
 
       {isExpanded && (
-        <div className={styles['comment-item__replies']}>
+        <div className={styles.replies}>
           {replies.length > 0 && showReplies && (
-            <div className={styles['comment-item__replies-list']}>
+            <div className={styles.repliesList}>
               {replies.map((reply) => (
                 <CommentItem
                   comment={reply}

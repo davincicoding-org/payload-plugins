@@ -53,9 +53,9 @@ export function CommentForm({
   const isDisabled = !content.trim() || isSubmitting;
 
   return (
-    <div className={styles['comment-form']}>
+    <div className={styles.form}>
       <textarea
-        className={styles['comment-form__textarea']}
+        className={styles.textarea}
         disabled={isSubmitting}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -63,10 +63,10 @@ export function CommentForm({
         ref={inputRef}
         value={content}
       />
-      <div className={styles['comment-form__footer']}>
+      <div className={styles.footer}>
         {onCancel && (
           <button
-            className={styles['comment-form__cancel-button']}
+            className={styles.cancelButton}
             disabled={isSubmitting}
             onClick={onCancel}
             type="button"
@@ -75,12 +75,7 @@ export function CommentForm({
           </button>
         )}
         <button
-          className={[
-            styles['comment-form__submit-button'],
-            isDisabled ? styles['comment-form__submit-button--disabled'] : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
+          className={styles.submitButton}
           disabled={isDisabled}
           onClick={handleSubmit}
           type="button"

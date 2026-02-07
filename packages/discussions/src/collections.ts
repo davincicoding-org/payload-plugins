@@ -14,6 +14,7 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
     delete: ({ req }) => Boolean(req.user),
   },
   fields: [
+    { name: 'content', type: 'textarea', required: true },
     {
       name: 'author',
       type: 'relationship',

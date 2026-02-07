@@ -146,6 +146,7 @@ export interface User {
  */
 export interface Comment {
   id: number;
+  content: string;
   author?: (number | null) | User;
   replies?: (number | Comment)[] | null;
   updatedAt: string;
@@ -253,6 +254,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "comments_select".
  */
 export interface CommentsSelect<T extends boolean = true> {
+  content?: T;
   author?: T;
   replies?: T;
   updatedAt?: T;

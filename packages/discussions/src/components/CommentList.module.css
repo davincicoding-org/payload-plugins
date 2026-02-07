@@ -1,10 +1,10 @@
-.comment-list {
+.list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.comment-list__placeholder {
+.placeholder {
   padding: 1rem;
   text-align: center;
   color: var(--theme-elevation-500);

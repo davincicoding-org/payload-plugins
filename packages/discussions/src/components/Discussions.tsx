@@ -66,7 +66,7 @@ export function DiscussionsClient({
   );
 
   return (
-    <div className={styles['discussions']}>
+    <div className={styles.root}>
       <CommentForm
         onSubmit={handleCreateComment}
         placeholder="Add a comment..."
