@@ -1,4 +1,5 @@
-import type { CollectionSlug, Endpoint, PayloadRequest } from 'payload';
+import type { CollectionSlug, Endpoint } from 'payload';
+import { APIError, headersWithCors } from 'payload';
 import { ENDPOINT_CONFIG } from '../const';
 import type { SmartCachePluginConfig } from '../index';
 import { revalidateCache } from '../server/revalidate';
@@ -10,9 +11,16 @@ export const createPublishChangesEndpoint = (
   publishHandler: SmartCachePluginConfig['publishHandler'],
 ): Endpoint => ({
   ...ENDPOINT_CONFIG.publish,
-  handler: async ({ payload }: PayloadRequest) => {
+  handler: async (req) => {
+    if (!req.user) {
+      throw new APIError('Unauthorized', 401);
+    }
+
+    const { payload } = req;
+
     const { docs: changesToPublish } = await payload.find({
       collection: 'publish-queue',
+      limit: 0,
       sort: '-updatedAt',
     });
 
@@ -26,13 +34,12 @@ export const createPublishChangesEndpoint = (
 
     const graph = createDependencyGraph(payload);
 
-    for (const change of changesToPublish) {
-      // Delete the change record (it's been processed)
-      await payload.delete({
-        collection: 'publish-queue',
-        id: change.id,
-      });
-    }
+    await payload.delete({
+      collection: 'publish-queue',
+      where: {
+        id: { in: changesToPublish.map((change) => change.id) },
+      },
+    });
 
     async function trackAffectedItems(
       collection: CollectionSlug,
@@ -45,7 +52,6 @@ export const createPublishChangesEndpoint = (
 
       for (const dependent of dependents) {
         if (dependent.entity.type === 'global') {
-          // This causes too many revalidations, but maybe we can skip this completely?
           tagsToInvalidate.add(dependent.entity.slug);
           continue;
         }
@@ -88,7 +94,7 @@ export const createPublishChangesEndpoint = (
           collectionChanges.addItem(dependent.entity.slug, item.id.toString());
         }
 
-        return trackAffectedItems(
+        await trackAffectedItems(
           dependent.entity.slug,
           affectedItems.map((item) => item.id.toString()),
           visited,
@@ -104,12 +110,17 @@ export const createPublishChangesEndpoint = (
       tagsToInvalidate.add(entity);
     }
 
-    for (const tag of tagsToInvalidate) {
-      await revalidateCache(tag);
-    }
+    await Promise.all(
+      Array.from(tagsToInvalidate).map((tag) => revalidateCache(tag)),
+    );
 
     await publishHandler?.(collectionChanges.serialize());
 
-    return new Response('OK');
+    return new Response('OK', {
+      headers: headersWithCors({
+        headers: new Headers(),
+        req,
+      }),
+    });
   },
 });

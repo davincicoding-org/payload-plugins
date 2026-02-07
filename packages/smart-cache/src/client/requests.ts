@@ -12,6 +12,7 @@ export const publishChanges = async (
     const endpointUrl = apiUrl + ENDPOINT_CONFIG.publish.path;
     const response = await fetch(endpointUrl, {
       method: ENDPOINT_CONFIG.publish.method,
+      credentials: 'include',
     });
     if (!response.ok) {
       const { success, data } = z
@@ -53,6 +54,7 @@ export const checkChanges = async (
     const endpointUrl = apiUrl + ENDPOINT_CONFIG.check.path;
     const response = await fetch(endpointUrl, {
       method: ENDPOINT_CONFIG.check.method,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
