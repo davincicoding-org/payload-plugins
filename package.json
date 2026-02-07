@@ -28,6 +28,7 @@
         2,
         "always",
         [
+          "payload-clienthub",
           "payload-discussions",
           "payload-intl",
           "payload-smart-cache",

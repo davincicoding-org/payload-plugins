@@ -1,22 +1,33 @@
-import './styles.css';
-
-import type {
-  CollectionAfterChangeHook,
-  CollectionConfig,
-  Plugin,
-} from 'payload';
+import type { Plugin } from 'payload';
 import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import type { MessagesViewProps } from './exports/view';
-import type { MessagesPluginConfig } from './types.ts';
+import type { MessagesGuard, MessagesHooks, MessagesSchema } from './types.ts';
 import { attachPluginContext, getSupportedLocales } from './utils/config';
+
+export interface MessagesPluginConfig {
+  schema: MessagesSchema;
+  /**
+   * The slug of the collection to use for the messages.
+   *
+   * @default `messages`
+   */
+  collectionSlug?: string;
+  /**
+   * Access control for allowing to edit the messages.
+   *
+   * @default `(req) => req.user !== null // Authenticated users only`
+   */
+  editorAccess?: MessagesGuard;
+  hooks?: MessagesHooks;
+  tabs?: boolean;
+}
 
 export const intlPlugin =
   ({
     schema,
     tabs,
     collectionSlug = 'messages',
-    hooks,
     editorAccess = (req) => req.user !== null,
   }: MessagesPluginConfig): Plugin =>
   (config) => {
@@ -74,32 +85,7 @@ export const intlPlugin =
     // });
 
     config.collections ??= [];
-    config.collections.push({
-      slug: collectionSlug,
-      admin: {
-        hidden: true,
-      },
-      access: {
-        read: () => true,
-      },
-      endpoints: [setMessagesEndpoint, getMessagesEndpoint],
-      fields: [
-        {
-          name: 'locale',
-          type: 'text',
-          required: true,
-        },
-      ],
-      hooks: createHooks(hooks),
-      indexes: [
-        {
-          fields: ['locale'],
-        },
-      ],
-      upload: {
-        mimeTypes: ['application/json'],
-      },
-    });
+    config.collections.push();
 
     config.endpoints ??= [];
     config.endpoints.push(getMessagesEndpoint);
@@ -112,29 +98,5 @@ export { fetchMessages } from './requests/fetchMessages';
 
 export type {
   Messages,
-  MessagesPluginConfig,
   MessagesSchema,
 } from './types.ts';
-
-const createHooks = (
-  hooks: MessagesPluginConfig['hooks'],
-): CollectionConfig['hooks'] => {
-  if (!hooks) {
-    return undefined;
-  }
-  const { afterUpdate, ...rest } = hooks;
-  if (!afterUpdate) {
-    return rest;
-  }
-
-  const afterUpdateHook: CollectionAfterChangeHook = async ({ operation }) => {
-    if (operation === 'update') {
-      await afterUpdate();
-    }
-    return;
-  };
-  return {
-    ...rest,
-    afterChange: [...(rest.afterChange ?? []), afterUpdateHook],
-  };
-};

@@ -1,0 +1,12 @@
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.comment-list__placeholder {
+  padding: 1rem;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-size: 0.875rem;
+}

@@ -5,24 +5,11 @@ import type {
 } from '@formatjs/icu-messageformat-parser';
 import type { CollectionConfig, PayloadRequest } from 'payload';
 import type { DeepPartial } from 'react-hook-form';
+import type { MessagesPluginConfig } from '.';
 
-export interface MessagesPluginConfig {
-  schema: MessagesSchema;
-  /**
-   * The slug of the collection to use for the messages.
-   *
-   * @default `messages`
-   */
-  collectionSlug?: string;
-  /**
-   * Access control for allowing to edit the messages.
-   *
-   * @default `(req) => req.user !== null // Authenticated users only`
-   */
-  editorAccess?: MessagesGuard;
-  hooks?: MessagesHooks;
-  tabs?: boolean;
-}
+export type ResolvedPluginOptions<
+  K extends keyof MessagesPluginConfig = keyof MessagesPluginConfig,
+> = Pick<Required<MessagesPluginConfig>, K>;
 
 export type MessagesHooks = {
   afterUpdate?: () => Promise<void> | void;

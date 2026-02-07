@@ -1,10 +1,11 @@
 'use client';
 
 import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
+import type { EntityID } from '@repo/common';
 import { useState } from 'react';
-import type { EntityID } from '@/utils';
 import type { PopulatedComment } from '../types';
 import { CommentForm } from './CommentForm';
+import styles from './CommentItem.module.css';
 export interface CommentItemProps {
   comment: PopulatedComment;
   depth?: number;
@@ -55,62 +56,22 @@ export function CommentItem({
 
   return (
     <div>
-      <div
-        style={{
-          border: '1px solid var(--theme-elevation-200)',
-          borderRadius: '0.5rem',
-          paddingInline: '0.75rem',
-          paddingBlock: '0.375rem',
-          backgroundColor: 'var(--theme-elevation-100)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            marginBottom: '0.25rem',
-            fontSize: '0.75rem',
-            color: 'var(--theme-elevation-500)',
-          }}
-        >
-          <span style={{ fontWeight: 600, color: 'var(--theme-text)' }}>
+      <div className={styles['comment-item__bubble']}>
+        <div className={styles['comment-item__header']}>
+          <span className={styles['comment-item__author']}>
             {comment.author?.name || 'Unknown'}
           </span>
           <span>{formatTimeToNow({ date: comment.createdAt, i18n })}</span>
         </div>
 
-        <div
-          style={{
-            fontSize: '1rem',
-            lineHeight: 1.5,
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {comment.content}
-        </div>
+        <div className={styles['comment-item__content']}>{comment.content}</div>
       </div>
 
       {canReply && !forceCollapse && (
-        <div
-          style={{
-            display: 'flex',
-            marginTop: '0.25rem',
-            gap: '0.75rem',
-            justifyContent: 'space-between',
-            paddingInline: '0.5rem',
-          }}
-        >
+        <div className={styles['comment-item__actions']}>
           <button
+            className={styles['comment-item__action-button']}
             onClick={handleOpenReplyForm}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--theme-elevation-500)',
-              cursor: 'pointer',
-              padding: 0,
-              fontSize: 'inherit',
-            }}
             type="button"
           >
             Reply
@@ -118,15 +79,8 @@ export function CommentItem({
 
           {replies.length > 0 && (
             <button
+              className={styles['comment-item__action-button']}
               onClick={() => setShowReplies((current) => !current)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--theme-elevation-500)',
-                cursor: 'pointer',
-                padding: 0,
-                fontSize: 'inherit',
-              }}
               type="button"
             >
               {`${showReplies ? 'Hide Replies' : `Show Replies`} (${
@@ -138,26 +92,9 @@ export function CommentItem({
       )}
 
       {isExpanded && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            marginLeft: '0.5rem',
-            paddingLeft: '1rem',
-            borderLeft: '1px solid var(--theme-elevation-200)',
-            marginTop: '0.75rem',
-            paddingTop: '0.5rem',
-          }}
-        >
+        <div className={styles['comment-item__replies']}>
           {replies.length > 0 && showReplies && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-              }}
-            >
+            <div className={styles['comment-item__replies-list']}>
               {replies.map((reply) => (
                 <CommentItem
                   comment={reply}

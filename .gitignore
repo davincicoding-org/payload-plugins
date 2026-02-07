@@ -4,3 +4,4 @@ node_modules
 .env.*
 dist
 *.tsbuildinfo
+.payload-gen.config.ts

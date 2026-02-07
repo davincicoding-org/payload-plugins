@@ -1,23 +1,9 @@
-import type { TypeWithID } from 'payload';
+import { createCollectionConfigFactory } from '@repo/common';
 import {
   attachAuthor,
   createDeleteRepliesHooks,
   createSoftDeleteRepliesHooks,
 } from './hooks';
-import type { User } from './types';
-import {
-  createCollectionConfigFactory,
-  type Entity,
-  type EntityRelation,
-} from './utils';
-
-export interface Comment
-  extends Entity<{
-    content: string | null;
-    author: EntityRelation<User> | null;
-    replies: EntityRelation<Comment, 'many'> | null;
-    createdAt: string;
-  }> {}
 
 export const Comments = createCollectionConfigFactory(({ slug }) => ({
   trash: true,
@@ -28,7 +14,6 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
     delete: ({ req }) => Boolean(req.user),
   },
   fields: [
-    { name: 'content', type: 'textarea' },
     {
       name: 'author',
       type: 'relationship',

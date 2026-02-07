@@ -1,8 +1,9 @@
 'use client';
 
-import type { EntityID } from '@/utils';
+import type { EntityID } from '@repo/common';
 import type { PopulatedComment } from '../types';
 import { CommentItem } from './CommentItem';
+import styles from './CommentList.module.css';
 
 interface CommentListProps {
   comments: PopulatedComment[];
@@ -19,14 +20,7 @@ export function CommentList({
 }: CommentListProps) {
   if (isLoading) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          textAlign: 'center',
-          color: 'var(--theme-elevation-500)',
-          fontSize: '0.875rem',
-        }}
-      >
+      <div className={styles['comment-list__placeholder']}>
         Loading comments...
       </div>
     );
@@ -34,27 +28,14 @@ export function CommentList({
 
   if (comments.length === 0) {
     return (
-      <div
-        style={{
-          padding: '1rem',
-          textAlign: 'center',
-          color: 'var(--theme-elevation-500)',
-          fontSize: '0.875rem',
-        }}
-      >
+      <div className={styles['comment-list__placeholder']}>
         No comments yet. Be the first to comment!
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1.5rem',
-      }}
-    >
+    <div className={styles['comment-list']}>
       {comments.map((comment) => (
         <CommentItem
           comment={comment}

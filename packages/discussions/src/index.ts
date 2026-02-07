@@ -23,7 +23,7 @@ export interface DiscussionsPluginOptions {
    * The slug to use for the comments collection.
    * @default "comments"
    */
-  collectionSlug?: string;
+  collectionSlug?: CollectionSlug;
 }
 
 export const discussionsPlugin =

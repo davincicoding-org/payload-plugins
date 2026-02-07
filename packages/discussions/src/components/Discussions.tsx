@@ -1,12 +1,13 @@
 'use client';
 
 import { useConfig } from '@payloadcms/ui';
+import type { EntityID } from '@repo/common';
 import { useCallback, useState } from 'react';
-import type { EntityID } from '@/utils';
 import { createComment, createReply } from '../requests';
 import type { PopulatedComment } from '../types';
 import { CommentForm } from './CommentForm';
 import { CommentList } from './CommentList';
+import styles from './Discussions.module.css';
 
 interface DiscussionsClientProps {
   initialComments: PopulatedComment[];
@@ -65,7 +66,7 @@ export function DiscussionsClient({
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className={styles['discussions']}>
       <CommentForm
         onSubmit={handleCreateComment}
         placeholder="Add a comment..."

@@ -1,6 +1,6 @@
+import { type Entity, entityIdSchema } from '@repo/common';
 import { z } from 'zod/mini';
-import { type Entity, entityIdSchema } from '@/utils';
-import type { Comment } from './collections';
+import type { Comment } from '@/payload-types';
 
 export type User = Entity<{
   mail: string;

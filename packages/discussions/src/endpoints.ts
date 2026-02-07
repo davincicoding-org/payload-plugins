@@ -53,6 +53,8 @@ export function createEndpoints({
         await req.payload.update({
           collection: documentCollectionSlug as CollectionSlug,
           id: documentId,
+          // FIXME
+          // @ts-expect-error - discussions field is not typed
           data: { discussions: [...existingIds, newComment.id] },
         });
 

@@ -45,6 +45,7 @@
     "build": "vite build",
     "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "vite build --watch",
+    "generate:types": "generate-types",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "vitest run",
