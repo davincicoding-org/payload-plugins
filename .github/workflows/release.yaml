@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
-    # THESE PERMISSIONS ARE REQUIRED FOR OIDC
+    # OIDC permissions for npm trusted publishing (tokenless)
     permissions:
-      id-token: write    # Required for OIDC handshake
-      contents: write    # Required for Changesets to push version updates
+      id-token: write      # Required for npm OIDC trusted publishing
+      contents: write      # Required for Changesets to push version updates
       pull-requests: write # Required for Changesets to open the PR
 
     steps:
@@ -33,4 +33,3 @@ jobs:
           publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
