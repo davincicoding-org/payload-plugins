@@ -1,8 +1,9 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
+// @ts-check
 import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Command, InvalidArgumentError } from 'commander';
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
 
 const cwd = process.cwd();
 
@@ -16,14 +17,14 @@ const program = new Command()
   .option(
     '-o, --opt <key=value>',
     'plugin option (repeatable)',
-    (val, acc): Record<string, string> => {
+    (val, acc) => {
       const eq = val.indexOf('=');
       if (eq === -1)
         throw new InvalidArgumentError(`expected key=value, got "${val}"`);
       acc[val.slice(0, eq)] = val.slice(eq + 1);
       return acc;
     },
-    {} as Record<string, string>,
+    /** @type {Record<string, string>} */ ({}),
   )
   .parse();
 
@@ -35,7 +36,8 @@ try {
   cleanup(configPath);
 }
 
-async function resolvePlugin(): Promise<{ exportName: string; call: string }> {
+/** @returns {Promise<{ exportName: string; call: string }>} */
+async function resolvePlugin() {
   const opts = program.opts();
   const explicit = opts.export != null;
   const exportName = opts.export ?? deriveExportName();
@@ -68,20 +70,23 @@ async function resolvePlugin(): Promise<{ exportName: string; call: string }> {
   };
 }
 
-function deriveExportName(): string {
+/** @returns {string} */
+function deriveExportName() {
   const pkg = JSON.parse(
     fs.readFileSync(path.join(cwd, 'package.json'), 'utf-8'),
   );
-  const name: string = pkg.name.replace(/^payload-/, '');
-  return `${name}-plugin`.replace(/-([a-z])/g, (_, c: string) =>
+  /** @type {string} */
+  const name = pkg.name.replace(/^payload-/, '');
+  return `${name}-plugin`.replace(/-([a-z])/g, (_, /** @type {string} */ c) =>
     c.toUpperCase(),
   );
 }
 
-function generateMinimalPayloadConfig(plugin: {
-  exportName: string;
-  call: string;
-}): string {
+/**
+ * @param {{ exportName: string; call: string }} plugin
+ * @returns {string}
+ */
+function generateMinimalPayloadConfig(plugin) {
   const importPath = path.join(cwd, 'src/index').replaceAll('\\', '/');
   const configPath = path.join(cwd, '.payload-gen.config.ts');
 
@@ -107,7 +112,8 @@ export default buildConfig({
   return configPath;
 }
 
-function generateTypes(configPath: string): void {
+/** @param {string} configPath */
+function generateTypes(configPath) {
   execSync('npx payload generate:types', {
     stdio: 'inherit',
     cwd,
@@ -119,6 +125,7 @@ function generateTypes(configPath: string): void {
   });
 }
 
-function cleanup(configPath: string): void {
+/** @param {string} configPath */
+function cleanup(configPath) {
   fs.rmSync(configPath);
 }

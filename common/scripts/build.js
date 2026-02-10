@@ -1,7 +1,8 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
+// @ts-check
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Command } from 'commander';
+import { Command } from '@commander-js/extra-typings';
 import { build, loadConfigFromFile, mergeConfig } from 'vite';
 import { configureBuild } from '../vite.config.js';
 
@@ -11,7 +12,7 @@ const program = new Command()
   .option('-w, --watch', 'run in watch mode')
   .parse();
 
-const opts = program.opts<{ watch?: boolean }>();
+const opts = program.opts();
 const cwd = process.cwd();
 
 let config = configureBuild();

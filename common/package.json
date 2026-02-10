@@ -10,15 +10,16 @@
     "./*": "./src/*.ts"
   },
   "bin": {
-    "generate-types": "./scripts/generate-types.ts",
-    "plugin-build": "./scripts/build.ts"
+    "generate-types": "./scripts/generate-types.js",
+    "plugin-build": "./scripts/build.js"
   },
   "scripts": {
     "clean": "rm -rf node_modules",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "commander": "^13.0.0",
+    "@commander-js/extra-typings": "^14.0.0",
+    "commander": "^14.0.2",
     "tsx": "^4.0.0",
     "zod": "catalog:"
   },
