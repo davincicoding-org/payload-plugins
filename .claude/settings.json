@@ -47,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/suggest-compact.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/suggest-compact.cjs\""
           }
         ],
         "description": "Suggest manual compaction at logical intervals"
@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/pre-compact.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/pre-compact.cjs\""
           }
         ],
         "description": "Save state before context compaction"
@@ -71,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/session-start.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/session-start.cjs\""
           }
         ],
         "description": "Load previous context and detect package manager on new session"
@@ -137,7 +137,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/check-console-log.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/check-console-log.cjs\""
           }
         ],
         "description": "Check for console.log in modified files after each response"
@@ -149,7 +149,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/session-end.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/session-end.cjs\""
           }
         ],
         "description": "Persist session state on end"
@@ -159,7 +159,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/scripts/hooks/evaluate-session.cjs\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.claude/scripts/hooks/evaluate-session.cjs\""
           }
         ],
         "description": "Evaluate session for extractable patterns"
