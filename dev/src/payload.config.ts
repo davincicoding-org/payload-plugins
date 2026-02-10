@@ -43,11 +43,7 @@ export default buildConfig({
     intlPlugin({
       schema: messages,
     }),
-    smartCachePlugin({
-      collections: {
-        users: false,
-      },
-    }),
+    smartCachePlugin({}),
     localFileStoragePlugin(),
   ],
 });
