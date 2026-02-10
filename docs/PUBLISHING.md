@@ -13,14 +13,9 @@ This monorepo uses [Changesets](https://github.com/changesets/changesets) for ve
 npm trusted publishing requires the package to already exist on the registry. For a brand new package, you must do a **one-time manual publish** from your local machine:
 
 ```sh
-# 1. Log in to npm (needs publish access to the org/scope)
 npm login
-
-# 2. Build the package
-pnpm --filter <package-name> build
-
-# 3. Publish it manually
 cd packages/<directory>
+pnpm build
 npm publish --access public
 ```
 
