@@ -1,20 +1,12 @@
-import type { Endpoint } from 'payload';
+import { defineProcedure } from '@repo/common';
 
-import type { CollectionOperation } from './types';
-
-export const ENDPOINT_CONFIG = {
-  publish: {
+export const ENDPOINTS = {
+  publishChanges: defineProcedure({
     path: '/smart-cache/publish',
     method: 'post',
-  },
-  check: {
+  }),
+  checkChanges: defineProcedure({
     path: '/smart-cache/check',
     method: 'get',
-  },
-} satisfies Record<string, Pick<Endpoint, 'path' | 'method'>>;
-
-export const DEFAULT_OPERATIONS: CollectionOperation[] = [
-  'create',
-  'update',
-  'delete',
-];
+  }).returns<{ hasChanges: boolean }>(),
+};

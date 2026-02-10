@@ -1,8 +1,8 @@
 import type { CollectionSlug, Plugin } from 'payload';
+import type { MessagesViewProps } from './components/MessagesView';
 import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
-import type { MessagesViewProps } from './exports/view';
 import type { MessagesGuard, MessagesHooks, MessagesSchema } from './types.ts';
 import { attachPluginContext, getSupportedLocales } from './utils/config';
 

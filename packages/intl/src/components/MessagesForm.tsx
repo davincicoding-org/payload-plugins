@@ -4,8 +4,8 @@ import { Button, toast, useStepNav } from '@payloadcms/ui';
 import { isEqual } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { FormValues } from '@/context/messages-form';
-import { MessagesFormProvider } from '@/context/messages-form';
+import type { FormValues } from '@/components/MessageFormContext';
+import { MessagesFormProvider } from '@/components/MessageFormContext';
 import type {
   DeepPartial,
   Locales,

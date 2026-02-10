@@ -132,6 +132,8 @@ export const Settings: GlobalConfig = {
   ],
 };
 
+// MARK: Collections
+
 export const Clients = createCollectionConfigFactory({
   admin: {
     group: 'Invoicing',

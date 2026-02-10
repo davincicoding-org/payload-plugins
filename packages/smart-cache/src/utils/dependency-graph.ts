@@ -27,6 +27,7 @@ interface FieldRelation {
   field: string;
   collection: CollectionSlug;
   hasMany: boolean;
+  polymorphic: boolean;
 }
 
 type StringifiedEntityReference =
@@ -48,6 +49,7 @@ export class EntitiesGraph extends Graph<
   {
     field: string;
     hasMany: boolean;
+    polymorphic: boolean;
   }[]
 > {
   static parseEntityReference(
@@ -93,12 +95,20 @@ export class EntitiesGraph extends Graph<
     switch (field.type) {
       case 'upload':
       case 'relationship':
-        if (Array.isArray(field.relationTo)) return [];
+        if (Array.isArray(field.relationTo)) {
+          return field.relationTo.map((slug) => ({
+            field: fieldPath.join('.'),
+            collection: slug,
+            hasMany: field.hasMany ?? false,
+            polymorphic: true,
+          }));
+        }
         return [
           {
             field: fieldPath.join('.'),
             collection: field.relationTo,
             hasMany: field.hasMany ?? false,
+            polymorphic: false,
           },
         ];
       case 'array':
@@ -126,7 +136,7 @@ export class EntitiesGraph extends Graph<
     );
     return Array.from(collectionRelations?.entries() ?? []).map<{
       entity: EntityReference;
-      fields: { field: string; hasMany: boolean }[];
+      fields: { field: string; hasMany: boolean; polymorphic: boolean }[];
     }>(([entity, fields]) => ({
       entity: EntitiesGraph.parseEntityReference(entity),
       fields,
@@ -142,7 +152,11 @@ export class EntitiesGraph extends Graph<
       groupBy(fieldRelations, 'collection'),
     ).map(([collection, fields]) => ({
       collection: collection as CollectionSlug,
-      fields: fields.map(({ field, hasMany }) => ({ field, hasMany })),
+      fields: fields.map(({ field, hasMany, polymorphic }) => ({
+        field,
+        hasMany,
+        polymorphic,
+      })),
     }));
 
     for (const { collection, fields } of fieldRelationsByCollection) {

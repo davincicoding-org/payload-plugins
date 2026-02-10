@@ -1,9 +1,9 @@
 import type { Endpoint } from 'payload';
 import { APIError } from 'payload';
-import { ENDPOINT_CONFIG, SETTINGS_SLUG } from '@/const';
-import { processClientInvoice } from '@/handlers/process-client-invoice';
+import { ENDPOINTS, SETTINGS_SLUG } from '@/const';
 import type { ResolvedPluginOptions } from '@/types';
-import { getAuthentication } from '@/utils';
+import { getAuthentication } from '@/utils/authentication';
+import { processClientInvoice } from '@/utils/process-client-invoice';
 
 export const createProcessAllClientsEndpoint = (
   options: ResolvedPluginOptions<
@@ -12,9 +12,8 @@ export const createProcessAllClientsEndpoint = (
     | 'servicesCollectionSlug'
     | 'onError'
   >,
-): Endpoint => ({
-  ...ENDPOINT_CONFIG.processAllClients,
-  handler: async (req) => {
+): Endpoint =>
+  ENDPOINTS.processAllClients.endpoint(async (req) => {
     const authentication = getAuthentication(req, options.cronSecret);
     if (authentication === null) {
       throw new APIError('Unauthorized', 401);
@@ -73,9 +72,8 @@ export const createProcessAllClientsEndpoint = (
       }
     }
 
-    return Response.json({
+    return {
       message: 'Invoice generation completed',
       results,
-    });
-  },
-});
+    };
+  });

@@ -1,19 +1,18 @@
 import type { Endpoint, File, PayloadRequest } from 'payload';
-import { ENDPOINT_CONFIG } from '@/const';
+import { ENDPOINTS } from '@/const';
 import type { Messages, Translations } from '@/types';
 import { getPluginContext, getSupportedLocales } from '@/utils/config';
 
-export const setMessagesEndpoint: Endpoint = {
-  ...ENDPOINT_CONFIG.setMessages,
-  handler: async (req: PayloadRequest) => {
+export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
+  async (req: PayloadRequest) => {
     const { user } = await req.payload.auth({ headers: req.headers });
     if (!user) {
-      throw new Error('Unauthorized');
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const data = (await req.json?.()) as Translations<Messages> | undefined;
     if (!data) {
-      throw new Error('No data provided');
+      return Response.json({ error: 'No data provided' }, { status: 400 });
     }
 
     const supportedLocales = getSupportedLocales(
@@ -55,6 +54,6 @@ export const setMessagesEndpoint: Endpoint = {
       }
     }
 
-    return Response.json({ success: true });
+    return { success: true };
   },
-};
+);

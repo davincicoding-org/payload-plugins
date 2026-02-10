@@ -94,7 +94,7 @@ import { ${plugin.exportName} } from '${importPath}';
 export default buildConfig({
   secret: '',
   db: {
-    defaultIDType: 'number',
+    defaultIDType: 'text',
     init: () => {
       throw new Error('Not implemented');
     },

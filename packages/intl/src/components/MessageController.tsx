@@ -1,13 +1,11 @@
 import { Controller } from 'react-hook-form';
-import { useMessagesForm } from '@/context/messages-form';
+import { useMessagesForm } from '@/components/MessageFormContext';
 import type { TemplateVariable } from '@/types';
-import type { MessageType } from '@/utils/schema';
 import type { MessageValidator } from '@/utils/validate';
 
 import { MessageInput } from './inputs/MessageInput';
 
 interface MessageControllerProps {
-  type: MessageType;
   label?: string;
   locale: string;
   name: string;
@@ -17,7 +15,6 @@ interface MessageControllerProps {
 }
 
 export function MessageController({
-  type,
   name,
   variables,
   label,
@@ -26,29 +23,6 @@ export function MessageController({
   className,
 }: MessageControllerProps): React.ReactNode {
   const { control } = useMessagesForm();
-
-  // if (type === "rich") {
-  //   return (
-  //     <Controller
-  //       control={control}
-  //       name={name}
-  //       render={({ field, fieldState }) => (
-  //         <LexicalInput
-  //           className={className}
-  //           error={fieldState.error}
-  //           label={label}
-  //           lang={locale}
-  //           onChange={field.onChange}
-  //           onBlur={field.onBlur}
-  //           value={(field.value as unknown as string) || ""}
-  //         />
-  //       )}
-  //       rules={{
-  //         required: true,
-  //       }}
-  //     />
-  //   );
-  // }
 
   return (
     <Controller

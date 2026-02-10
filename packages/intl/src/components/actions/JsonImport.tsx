@@ -2,7 +2,7 @@ import { Button } from '@payloadcms/ui';
 import { IconBraces } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 
-import { useMessagesForm } from '@/context/messages-form';
+import { useMessagesForm } from '@/components/MessageFormContext';
 
 import styles from './JsonImport.module.css';
 

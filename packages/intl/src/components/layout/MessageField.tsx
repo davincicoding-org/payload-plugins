@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useMessagesForm } from '@/context/messages-form';
+import { useMessagesForm } from '@/components/MessageFormContext';
 import type { MessageSchema } from '@/types';
 import { parseMessageSchema } from '@/utils/schema';
 import { createValidator } from '@/utils/validate';
@@ -37,16 +37,12 @@ export function MessageField({
         <MessageController
           locale={locales[0]}
           name={[locales[0], path, messageKey].join('.')}
-          type={config.type}
           validate={validator}
           variables={config.variables}
         />
       ) : (
         <div
-          className={[
-            styles.localeRow,
-            config.type === 'icu' ? styles.localeRowScrollable : undefined,
-          ]
+          className={[styles.localeRow, styles.localeRowScrollable]
             .filter(Boolean)
             .join(' ')}
         >
@@ -57,7 +53,6 @@ export function MessageField({
               label={locale.toUpperCase()}
               locale={locale}
               name={[locale, path, messageKey].join('.')}
-              type={config.type}
               validate={validator}
               variables={config.variables}
             />

@@ -28,7 +28,7 @@ export type Messages<T = string> = {
   [key: string]: Messages<T> | T;
 };
 
-export type MessageSchema = (string & {}) | '$RICH$';
+export type MessageSchema = string;
 export type MessagesSchema = Messages<MessageSchema>;
 
 export interface VariableMentionNodeAttrs {

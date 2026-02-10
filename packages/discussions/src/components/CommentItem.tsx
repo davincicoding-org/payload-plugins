@@ -59,7 +59,7 @@ export function CommentItem({
       <div className={styles.bubble}>
         <div className={styles.header}>
           <span className={styles.author}>
-            {comment.author?.name || 'Unknown'}
+            {comment.author?.displayName || 'Unknown'}
           </span>
           <span>{formatTimeToNow({ date: comment.createdAt, i18n })}</span>
         </div>

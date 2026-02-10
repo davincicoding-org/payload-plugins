@@ -1,0 +1,71 @@
+# payload-invitations
+
+<!-- One-sentence tagline: explain what this plugin does in plain language -->
+
+[![npm version](https://img.shields.io/npm/v/payload-invitations)](https://www.npmjs.com/package/payload-invitations)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Overview
+
+<!-- 2-4 sentences: what problem does this solve, what approach does it take, what are the key integration points -->
+
+**Features**
+
+<!-- 4-8 bullet points. Each starts with a **bold keyword** followed by a brief explanation. Sourced from the plugin's actual capabilities in src/index.ts -->
+
+- **Feature** -- explanation
+- ...
+
+## Installation
+
+```sh
+pnpm add payload-invitations
+```
+
+## Usage
+
+<!-- Show the most common setup: importing the plugin, adding it to payload.config.ts, and the primary use case. Code must match actual exports. -->
+
+```ts
+// payload.config.ts
+```
+
+### Options
+
+<!-- Table of all config options from the plugin's TypeScript interface. Source from src/index.ts config type and destructured defaults. -->
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| | | | |
+
+## Contributing
+
+This plugin lives in the [payload-plugins](https://github.com/davincicoding-org/payload-plugins) monorepo.
+
+### Development
+
+```sh
+pnpm install
+
+# watch this plugin for changes
+pnpm --filter payload-invitations dev
+
+# run the Payload dev app (in a second terminal)
+pnpm --filter dev dev
+```
+
+The `dev/` directory is a Next.js + Payload app that imports plugins via `workspace:*` — use it to test changes locally.
+
+### Code quality
+
+- **Formatting & linting** — handled by [Biome](https://biomejs.dev/), enforced on commit via husky + lint-staged.
+- **Commits** — must follow [Conventional Commits](https://www.conventionalcommits.org/) with a valid scope (e.g. `fix(payload-invitations): ...`).
+- **Changesets** — please include a [changeset](https://github.com/changesets/changesets) in your PR by running `pnpm release`.
+
+### Issues & PRs
+
+Bug reports and feature requests are welcome — [open an issue](https://github.com/davincicoding-org/payload-plugins/issues).
+
+## License
+
+MIT

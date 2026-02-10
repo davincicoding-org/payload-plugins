@@ -1,12 +1,15 @@
-import type { Endpoint } from 'payload';
+import { defineProcedure } from '@repo/common';
+import { z } from 'zod';
+import type { Messages } from './types';
 
-export const ENDPOINT_CONFIG = {
-  setMessages: {
-    path: '/intl-plugin',
-    method: 'put',
-  },
-  getMessages: {
+export const ENDPOINTS = {
+  getMessages: defineProcedure({
     path: '/intl-plugin/:locale',
     method: 'get',
-  },
-} satisfies Record<string, Pick<Endpoint, 'path' | 'method'>>;
+    input: z.object({ locale: z.string() }),
+  }).returns<Messages>(),
+  setMessages: defineProcedure({
+    path: '/intl-plugin',
+    method: 'put',
+  }).returns<{ success: boolean }>(),
+};

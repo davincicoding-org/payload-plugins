@@ -1,2 +1,2 @@
-export { MessagesLink } from './link';
-export { MessagesView } from './view';
+export { MessagesLink } from '../components/MessagesLink';
+export { MessagesView } from '../components/MessagesView';

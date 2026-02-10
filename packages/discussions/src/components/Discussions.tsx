@@ -3,7 +3,7 @@
 import { useConfig } from '@payloadcms/ui';
 import type { EntityID } from '@repo/common';
 import { useCallback, useState } from 'react';
-import { createComment, createReply } from '../requests';
+import { ENDPOINTS } from '@/procedures';
 import type { PopulatedComment } from '../types';
 import { CommentForm } from './CommentForm';
 import { CommentList } from './CommentList';
@@ -30,8 +30,7 @@ export function DiscussionsClient({
   const [comments, setComments] = useState(initialComments);
 
   const handleCreateComment = async (content: string) => {
-    const populated = await createComment({
-      apiRoute,
+    const populated = await ENDPOINTS.createComment.call(apiRoute, {
       documentCollectionSlug,
       documentId,
       content,
@@ -41,8 +40,7 @@ export function DiscussionsClient({
 
   const handleReply = useCallback(
     async (parentId: EntityID, content: string) => {
-      const populated = await createReply({
-        apiRoute,
+      const populated = await ENDPOINTS.createReply.call(apiRoute, {
         parentId,
         content,
       });

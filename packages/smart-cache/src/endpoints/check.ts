@@ -1,11 +1,10 @@
 import type { Endpoint } from 'payload';
 import { APIError, headersWithCors } from 'payload';
 
-import { ENDPOINT_CONFIG } from '../const';
+import { ENDPOINTS } from '@/const';
 
-export const checkEndpoint: Endpoint = {
-  ...ENDPOINT_CONFIG.check,
-  handler: async (req) => {
+export const checkEndpoint: Endpoint = ENDPOINTS.checkChanges.endpoint(
+  async (req) => {
     if (!req.user) {
       throw new APIError('Unauthorized', 401);
     }
@@ -27,4 +26,4 @@ export const checkEndpoint: Endpoint = {
       },
     );
   },
-};
+);

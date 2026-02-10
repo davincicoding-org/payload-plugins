@@ -1,29 +1,50 @@
-import type { CollectionSlug, Plugin } from 'payload';
-import { PublishQueue } from './collections';
-import { DEFAULT_OPERATIONS } from './const';
-import { checkEndpoint } from './endpoints/check';
-import { createPublishChangesEndpoint } from './endpoints/publish';
+import type { CollectionSlug, GlobalSlug, Plugin } from 'payload';
+import { checkEndpoint } from '@/endpoints/check';
+import { createPublishChangesEndpoint } from '@/endpoints/publish';
+import { PublishQueue } from '@/entities';
 import {
   trackCollectionChange,
   trackCollectionDelete,
-} from './server/track-changes';
-import type {
-  ChangedDocuments,
-  CollectionChangeOperation,
-  CollectionOperation,
-} from './types';
+  trackGlobalChange,
+} from '@/hooks';
+import type { ChangedDocuments } from '@/types';
+import { getTrackedCollections } from '@/utils/tracked-collections';
 
 export interface SmartCachePluginConfig {
-  collections?: Partial<Record<CollectionSlug, CollectionOperation[] | false>>;
+  /**
+   * The collections to track changes for.
+   * By default, collections referenced via relationship or upload fields
+   * are automatically tracked as well.
+   */
+  collections?: CollectionSlug[];
+  /**
+   * The globals to track changes for.
+   * Collections referenced by these globals via relationship or upload
+   * fields are automatically tracked as well.
+   */
+  globals?: GlobalSlug[];
+  /**
+   * Disable automatic tracking of collections referenced by the configured ones.
+   * @default false
+   */
+  disableAutoTracking?: boolean;
   publishHandler?: (changes: ChangedDocuments) => void | Promise<void>;
 }
 
 export const smartCachePlugin =
   ({
-    collections: collectionOperations = {},
+    collections = [],
+    globals = [],
     publishHandler,
+    disableAutoTracking,
   }: SmartCachePluginConfig): Plugin =>
   (config) => {
+    if (collections.length + globals.length === 0) {
+      console.warn(
+        '[payload-smart-cache] No collections or globals are configured to track changes for, hence this plugin will have no effect.',
+      );
+      return config;
+    }
     config.admin ??= {};
     config.admin.components ??= {};
     config.admin.components.actions ??= [];
@@ -31,45 +52,29 @@ export const smartCachePlugin =
       path: 'payload-smart-cache/rsc#PublishButton',
     });
 
+    config.globals ??= [];
+    for (const global of config.globals) {
+      if (!globals.includes(global.slug as GlobalSlug)) continue;
+      global.hooks ??= {};
+      global.hooks.afterChange ??= [];
+      global.hooks.afterChange.push(trackGlobalChange);
+    }
+
     config.collections ??= [];
-    config.collections.forEach((collection) => {
-      const operations =
-        collectionOperations[collection.slug as CollectionSlug] ??
-        DEFAULT_OPERATIONS;
-      if (operations === false) return;
-      if (operations.length === 0) return;
-
-      collection.hooks ??= {};
-
-      const { hasDeleteOperation, changeOperations } = operations.reduce<{
-        hasDeleteOperation: boolean;
-        changeOperations: CollectionChangeOperation[];
-      }>(
-        (acc, operation) => {
-          if (operation === 'delete') {
-            acc.hasDeleteOperation = true;
-          } else {
-            acc.changeOperations.push(operation);
-          }
-          return acc;
-        },
-        {
-          hasDeleteOperation: false,
-          changeOperations: [],
-        },
-      );
-
-      if (changeOperations.length > 0) {
-        collection.hooks.afterChange ??= [];
-        collection.hooks.afterChange.push(
-          trackCollectionChange(changeOperations),
+    const collectionsToTrack = disableAutoTracking
+      ? new Set(collections)
+      : getTrackedCollections(
+          { collections, globals },
+          { collections: config.collections, globals: config.globals },
         );
-      }
-      if (hasDeleteOperation) {
-        collection.hooks.afterDelete ??= [];
-        collection.hooks.afterDelete.push(trackCollectionDelete);
-      }
-    });
+    for (const collection of config.collections) {
+      if (!collectionsToTrack.has(collection.slug as CollectionSlug)) continue;
+      collection.hooks ??= {};
+      collection.hooks.afterChange ??= [];
+      collection.hooks.afterChange.push(trackCollectionChange);
+      collection.hooks.afterDelete ??= [];
+      collection.hooks.afterDelete.push(trackCollectionDelete);
+    }
 
     config.collections.push(PublishQueue);
 
@@ -80,5 +85,5 @@ export const smartCachePlugin =
     return config;
   };
 
-export { createRequestHandler } from './server/request';
+export { createRequestHandler } from './exports/create-request';
 export type { ChangedDocuments } from './types';

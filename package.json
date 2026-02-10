@@ -1,8 +1,8 @@
 {
   "name": "payload-plugins",
   "private": true,
-  "license": "ISC",
-  "author": "",
+  "license": "MIT",
+  "author": "DAVINCI CODING GmbH",
   "scripts": {
     "build": "pnpm -r build",
     "check": "biome check --write .",
@@ -31,6 +31,7 @@
           "payload-clienthub",
           "payload-discussions",
           "payload-intl",
+          "payload-invitations",
           "payload-smart-cache",
           "root"
         ]

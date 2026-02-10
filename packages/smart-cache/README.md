@@ -1,215 +1,95 @@
 # payload-smart-cache
 
-**payload-smart-cache** manages cache invalidation for your Payload CMS collections.
+Intelligent, dependency-aware cache invalidation for Next.js + Payload CMS applications.
 
-1. Automatically tracks changes to your collections (create, update, delete).
-2. Queues changes for publishing and invalidates cache tags when ready.
+[![npm version](https://img.shields.io/npm/v/payload-smart-cache)](https://www.npmjs.com/package/payload-smart-cache)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Overview
+
+payload-smart-cache tracks document changes in a publish queue and builds a dependency graph from your collection relationships. When you publish, it walks the graph and revalidates all affected Next.js cache tags — including indirectly related documents. A publish button in the admin UI shows when unpublished changes exist.
 
 **Features**
 
-- Automatic change tracking for configured collections
-- Publish queue to batch cache invalidations
-- Dependency-aware cache invalidation across related collections
-- Next.js cache tag revalidation integration
-- Publish button in admin panel for manual publishing
-- Configurable operations per collection (create, update, delete)
+- **Deferred publishing** — changes are queued and only pushed to the cache when you explicitly publish.
+- **Dependency graph** — automatically discovers relationships between collections, so changing a referenced document revalidates its dependents.
+- **Tag-based revalidation** — precise, granular cache invalidation via Next.js `revalidateTag()`.
+- **Request caching utility** — `createRequestHandler` wraps data-fetching functions with entity-level cache tags for automatic revalidation.
 
-## Getting Started
+## Installation
 
-```bash
-# pnpm
+```sh
 pnpm add payload-smart-cache
-# yarn
-yarn add payload-smart-cache
-# npm
-npm install payload-smart-cache
 ```
 
-### 1) Configure Payload
+## Usage
 
-Add the plugin to your `payload.config.ts`:
-
-```typescript
-import { buildConfig } from "payload";
-import { smartCachPlugin } from "payload-smart-cache";
-
-export default buildConfig({
-  collections: [Posts, Categories, Users],
-  plugins: [
-    smartCachPlugin({
-      collections: {
-        posts: ["create", "update", "delete"],
-        categories: ["create", "update"],
-        // users: false, // Disable tracking for users
-      },
-      publishHandler: async (changes) => {
-        // Optional: Custom handler for published changes
-        console.log("Published changes:", changes);
-      },
-    }),
-  ],
-});
-```
-
-### 2) Use the Publish Button
-
-The plugin automatically adds a **Publish** button to your admin panel header. Click it to process all queued changes and invalidate cache tags.
-
-### 3) Programmatic Publishing
-
-You can also trigger publishing programmatically:
-
-**Node.js:**
-
-```typescript
-import config from "@payload-config";
-import { getPayload } from "payload";
-
-const payload = await getPayload({ config });
-const response = await fetch(`${process.env.PAYLOAD_API_URL}/cache-plugin/publish`, {
-  method: "POST",
-});
-```
-
-**Edge runtime:**
-
-```typescript
-const response = await fetch(`${process.env.PAYLOAD_API_URL}/cache-plugin/publish`, {
-  method: "POST",
-});
-```
-
-## Plugin Options
-
-The `smartCachPlugin` accepts the following configuration:
-
-| Option            | Default                    | Description                                                                 |
-| ----------------- | -------------------------- | --------------------------------------------------------------------------- |
-| `collections`     | All collections tracked    | Per-collection configuration for which operations to track                  |
-| `publishHandler` | -                          | Optional callback function called after changes are published               |
-
-### Collection Configuration
-
-You can configure tracking per collection:
-
-```typescript
-smartCachPlugin({
-  collections: {
-    // Track all operations (create, update, delete)
-    posts: ["create", "update", "delete"],
-    
-    // Track only updates
-    categories: ["update"],
-    
-    // Disable tracking completely
-    users: false,
-    
-    // Use default operations (create, update, delete)
-    // If not specified, defaults to all operations
-  },
-})
-```
-
-## How It Works
-
-1. **Change Tracking**: When documents are created, updated, or deleted, the plugin automatically adds them to a publish queue.
-
-2. **Dependency Resolution**: When publishing, the plugin analyzes relationships between collections and invalidates cache tags for dependent documents.
-
-3. **Cache Invalidation**: Uses Next.js `revalidateTag` to invalidate cache tags for affected collections.
-
-4. **Publish Queue**: Changes are queued until you explicitly publish them, allowing you to batch invalidations.
-
-## Example Usage
-
-Here's a complete example showing how to integrate payload-smart-cache:
-
-```typescript
+```ts
 // payload.config.ts
-import { buildConfig } from "payload";
-import { smartCachPlugin } from "payload-smart-cache";
-
-import { Posts } from "./collections/Posts";
-import { Categories } from "./collections/Categories";
+import { buildConfig } from 'payload';
+import { smartCachePlugin } from 'payload-smart-cache';
 
 export default buildConfig({
-  collections: [Posts, Categories],
+  // ...
   plugins: [
-    smartCachPlugin({
-      collections: {
-        posts: ["create", "update", "delete"],
-        categories: ["update"], // Only track updates for categories
-      },
-      publishHandler: async (changes) => {
-        // Optional: Send webhook, update external cache, etc.
-        await fetch("https://api.example.com/webhook", {
-          method: "POST",
-          body: JSON.stringify(changes),
-        });
-      },
+    smartCachePlugin({
+      collections: ['pages', 'posts'],
+      globals: ['site-settings'],
     }),
   ],
 });
 ```
 
-```typescript
-// app/api/revalidate/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import config from "@payload-config";
-import { getPayload } from "payload";
+Wrap your data-fetching functions with `createRequestHandler` so they are cached by entity tags and automatically revalidated on publish:
 
-export async function POST(request: NextRequest) {
-  const payload = await getPayload({ config });
-  
-  const response = await fetch(
-    `${process.env.PAYLOAD_API_URL}/cache-plugin/publish`,
-    {
-      method: "POST",
-    }
-  );
+```ts
+import { createRequestHandler } from 'payload-smart-cache';
 
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "Failed to publish changes" },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({ success: true });
-}
+const getPosts = createRequestHandler(
+  async () => {
+    const payload = await getPayload({ config });
+    return payload.find({ collection: 'posts' });
+  },
+  ['posts'], // cache tags — revalidated when posts change
+);
 ```
 
-## API Endpoints
+### Options
 
-The plugin provides two endpoints:
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `collections` | `CollectionSlug[]` | `[]` | Collections to track changes for. Referenced collections are auto-tracked. |
+| `globals` | `GlobalSlug[]` | `[]` | Globals to track changes for. Referenced collections are auto-tracked. |
+| `disableAutoTracking` | `boolean` | `false` | Disable automatic tracking of collections referenced via relationship/upload fields. |
+| `publishHandler` | `(changes: ChangedDocuments) => void \| Promise<void>` | — | Custom handler called when changes are published. Receives a record mapping collection slugs to arrays of changed document IDs. |
 
-### POST `/cache-plugin/publish`
+## Contributing
 
-Publishes all queued changes and invalidates cache tags.
+This plugin lives in the [payload-plugins](https://github.com/davincicoding-org/payload-plugins) monorepo.
 
-**Response:**
-- `200 OK` - Changes published successfully
-- `200 OK` with message "No changes to publish" - Queue is empty
+### Development
 
-### GET `/cache-plugin/check`
-
-Checks the status of the publish queue.
-
-## Development
-
-```bash
-# Install dependencies
+```sh
 pnpm install
 
-# Start development server
-pnpm dev
+# watch this plugin for changes
+pnpm --filter payload-smart-cache dev
 
-# Build the plugin
-pnpm build
-
-# Run tests
-pnpm test
+# run the Payload dev app (in a second terminal)
+pnpm --filter dev dev
 ```
+
+The `dev/` directory is a Next.js + Payload app that imports plugins via `workspace:*` — use it to test changes locally.
+
+### Code quality
+
+- **Formatting & linting** — handled by [Biome](https://biomejs.dev/), enforced on commit via husky + lint-staged.
+- **Commits** — must follow [Conventional Commits](https://www.conventionalcommits.org/) with a valid scope (e.g. `fix(payload-smart-cache): ...`).
+- **Changesets** — please include a [changeset](https://github.com/changesets/changesets) in your PR by running `pnpm release`.
+
+### Issues & PRs
+
+Bug reports and feature requests are welcome — [open an issue](https://github.com/davincicoding-org/payload-plugins/issues).
 
 ## License
 

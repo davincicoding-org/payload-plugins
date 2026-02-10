@@ -5,3 +5,4 @@ node_modules
 dist
 *.tsbuildinfo
 .payload-gen.config.ts
+.claude/settings.local.json

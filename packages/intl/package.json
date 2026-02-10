@@ -20,7 +20,7 @@
     "directory": "packages/intl"
   },
   "license": "MIT",
-  "author": "Michael Zeltner",
+  "author": "DAVINCI CODING GmbH",
   "type": "module",
   "exports": {
     ".": {
@@ -33,6 +33,11 @@
       "import": "./dist/exports/rsc.js",
       "default": "./dist/exports/rsc.js"
     },
+    "./client": {
+      "types": "./dist/exports/client.d.ts",
+      "import": "./dist/exports/client.js",
+      "default": "./dist/exports/client.js"
+    },
     "./styles.css": "./dist/styles.css"
   },
   "main": "./dist/index.js",
@@ -42,9 +47,9 @@
   ],
   "scripts": {
     "prebuild": "pnpm typecheck",
-    "build": "vite build",
+    "build": "plugin-build",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "vite build --watch",
+    "dev": "plugin-build --watch",
     "generate:types": "generate-types",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -54,12 +59,6 @@
   },
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "^2.11.2",
-    "@radix-ui/react-dropdown-menu": "^2.1.15",
-    "@radix-ui/react-hover-card": "^1.1.14",
-    "@radix-ui/react-popover": "^1.1.14",
-    "@radix-ui/react-select": "^2.2.5",
-    "@radix-ui/react-toggle-group": "^1.1.10",
-    "@radix-ui/react-toolbar": "^1.1.10",
     "@tabler/icons-react": "^3.36.1",
     "lexical-beautiful-mentions": "^0.1.48",
     "lodash-es": "^4.17.21",
@@ -79,11 +78,8 @@
     "payload": "catalog:payload-stack",
     "react": "catalog:payload-stack",
     "react-dom": "catalog:payload-stack",
-    "rollup-preserve-directives": "catalog:vite",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",
-    "vite-plugin-dts": "catalog:vite",
-    "vite-tsconfig-paths": "catalog:vite",
     "vitest": "^3.1.2"
   },
   "peerDependencies": {

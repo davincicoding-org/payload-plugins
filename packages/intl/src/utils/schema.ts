@@ -10,8 +10,6 @@ export const parseMessageSchema = (schema: MessageSchema): MessageConfig => {
 
   return {
     description: description?.slice(1, -1),
-    // type: schema === "$RICH$" ? "rich" : "icu",
-    type: 'icu',
     variables: extractTemplateVariables(schema),
   };
 };
@@ -50,9 +48,7 @@ const collectTemplateVariables = (
 
 // MARK: Types
 
-export type MessageType = 'icu'; // "rich";
 export type MessageConfig = {
   description: string | undefined;
-  type: MessageType;
   variables: TemplateVariable[];
 };

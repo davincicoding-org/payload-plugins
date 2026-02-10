@@ -90,7 +90,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   fallbackLocale: null;
   globals: {
@@ -131,7 +131,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -155,7 +155,7 @@ export interface User {
  * via the `definition` "clients".
  */
 export interface Client {
-  id: number;
+  id: string;
   code: string;
   name: string;
   address: string;
@@ -181,11 +181,11 @@ export interface Client {
  * via the `definition` "services".
  */
 export interface Service {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
   cost: number;
-  client: number | Client;
+  client: string | Client;
   recurrence: 'one-time' | 'monthly' | 'yearly';
   startDate: string;
   lastInvoicedAt?: string | null;
@@ -197,7 +197,7 @@ export interface Service {
  * via the `definition` "invoice-pdfs".
  */
 export interface InvoicePdf {
-  id: number;
+  id: string;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -215,17 +215,17 @@ export interface InvoicePdf {
  * via the `definition` "invoices".
  */
 export interface Invoice {
-  id: number;
+  id: string;
   invoiceNumber: string;
-  client: number | Client;
+  client: string | Client;
   items: {
-    service: number | Service;
+    service: string | Service;
     cost: number;
     id?: string | null;
   }[];
   total: number;
   date: string;
-  pdf?: (number | null) | InvoicePdf;
+  pdf?: (string | null) | InvoicePdf;
   status: 'generated' | 'sent' | 'paid';
   sentAt?: string | null;
   updatedAt: string;
@@ -236,7 +236,7 @@ export interface Invoice {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: number;
+  id: string;
   key: string;
   data:
     | {
@@ -253,32 +253,32 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'clients';
-        value: number | Client;
+        value: string | Client;
       } | null)
     | ({
         relationTo: 'services';
-        value: number | Service;
+        value: string | Service;
       } | null)
     | ({
         relationTo: 'invoice-pdfs';
-        value: number | InvoicePdf;
+        value: string | InvoicePdf;
       } | null)
     | ({
         relationTo: 'invoices';
-        value: number | Invoice;
+        value: string | Invoice;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -288,10 +288,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   key?: string | null;
   value?:
@@ -311,7 +311,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -462,7 +462,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "clienthub-settings".
  */
 export interface PluginSettings {
-  id: number;
+  id: string;
   company: {
     /**
      * Company logo for invoice header

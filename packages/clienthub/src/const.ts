@@ -1,10 +1,13 @@
-import type { Endpoint } from 'payload';
+import { defineProcedure } from '@repo/common';
 
 export const SETTINGS_SLUG = 'clienthub-settings';
 
-export const ENDPOINT_CONFIG = {
-  processAllClients: {
+export const ENDPOINTS = {
+  processAllClients: defineProcedure({
     path: '/plugin-invoices/process-all-clients',
     method: 'get',
-  },
-} satisfies Record<string, Pick<Endpoint, 'path' | 'method'>>;
+  }).returns<{
+    message: string;
+    results: { client: string; invoiceNumber?: string; error?: string }[];
+  }>(),
+};

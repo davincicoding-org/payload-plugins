@@ -1,17 +1,16 @@
+import { revalidateTag } from 'next/cache';
 import type { CollectionSlug, Endpoint } from 'payload';
 import { APIError, headersWithCors } from 'payload';
-import { ENDPOINT_CONFIG } from '../const';
+import { ENDPOINTS } from '@/const';
 import type { SmartCachePluginConfig } from '../index';
-import { revalidateCache } from '../server/revalidate';
-import type { EntitySlug, PublishQueue } from '../types';
-import { CollectionChanges } from '../utils/CollectionChanges';
+import type { EntitySlug } from '../types';
+import { CollectionChanges } from '../utils/collection-changes';
 import { createDependencyGraph } from '../utils/dependency-graph';
 
 export const createPublishChangesEndpoint = (
   publishHandler: SmartCachePluginConfig['publishHandler'],
-): Endpoint => ({
-  ...ENDPOINT_CONFIG.publish,
-  handler: async (req) => {
+): Endpoint =>
+  ENDPOINTS.publishChanges.endpoint(async (req) => {
     if (!req.user) {
       throw new APIError('Unauthorized', 401);
     }
@@ -30,16 +29,15 @@ export const createPublishChangesEndpoint = (
     const tagsToInvalidate = new Set<EntitySlug>();
     const collectionChanges = new CollectionChanges();
 
-    collectionChanges.initialize(changesToPublish as PublishQueue[]);
+    for (const change of changesToPublish) {
+      if (typeof change.entityId !== 'string') {
+        tagsToInvalidate.add(change.entityType as EntitySlug);
+      }
+    }
+
+    collectionChanges.initialize(changesToPublish);
 
     const graph = createDependencyGraph(payload);
-
-    await payload.delete({
-      collection: 'publish-queue',
-      where: {
-        id: { in: changesToPublish.map((change) => change.id) },
-      },
-    });
 
     async function trackAffectedItems(
       collection: CollectionSlug,
@@ -71,11 +69,18 @@ export const createPublishChangesEndpoint = (
         for (const field of dependent.fields) {
           const { docs } = await payload.find({
             collection: dependent.entity.slug,
-            where: {
-              [field.field]: {
-                in: ids,
-              },
-            },
+            where: field.polymorphic
+              ? {
+                  and: [
+                    { [`${field.field}.relationTo`]: { equals: collection } },
+                    { [`${field.field}.value`]: { in: ids } },
+                  ],
+                }
+              : {
+                  [field.field]: {
+                    in: ids,
+                  },
+                },
           });
 
           // Use a Map keyed by ID to deduplicate results
@@ -102,19 +107,30 @@ export const createPublishChangesEndpoint = (
       }
     }
 
-    for (const [collection, ids] of collectionChanges.entries()) {
-      await trackAffectedItems(collection, Array.from(ids), new Set<string>());
+    const initialCollections = Array.from(collectionChanges.entries()).map(
+      ([slug, ids]) => [slug, Array.from(ids)] as const,
+    );
+
+    for (const [collection, ids] of initialCollections) {
+      await trackAffectedItems(collection, ids, new Set<string>());
     }
 
     for (const entity of collectionChanges.keys()) {
       tagsToInvalidate.add(entity);
     }
 
-    await Promise.all(
-      Array.from(tagsToInvalidate).map((tag) => revalidateCache(tag)),
-    );
+    for (const tag of tagsToInvalidate) {
+      revalidateTag(tag);
+    }
 
     await publishHandler?.(collectionChanges.serialize());
+
+    await payload.delete({
+      collection: 'publish-queue',
+      where: {
+        id: { in: changesToPublish.map((change) => change.id) },
+      },
+    });
 
     return new Response('OK', {
       headers: headersWithCors({
@@ -122,5 +138,4 @@ export const createPublishChangesEndpoint = (
         req,
       }),
     });
-  },
-});
+  });

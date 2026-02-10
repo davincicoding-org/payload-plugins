@@ -1,267 +1,109 @@
 # payload-intl
 
-**payload-intl** moves translations out of your codebase.
+Schema-driven internationalization for Payload CMS using ICU MessageFormat.
 
-1. Define message keys (and their arguments) in TypeScript.
-2. Translate them in Payload’s admin panel — no code required.
+[![npm version](https://img.shields.io/npm/v/payload-intl)](https://www.npmjs.com/package/payload-intl)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+## Overview
+
+Define your message keys as a typed schema using ICU MessageFormat syntax, then manage translations across locales in a rich admin UI with validation, autocompletion, and support for plurals, selects, dates, and tags. Messages can be fetched server-side or client-side.
 
 **Features**
 
-- Define message schema in code; edit translations in a rich admin UI
-- Compatible with [next-intl](https://next-intl.dev/) and any ICU consumer
-- Automatic runtime validation of message arguments
-- Autocomplete to quickly insert and configure valid ICU arguments
-- Add optional descriptions to each message so editors understand the context
-- Visual tree & tabbed editor for quick navigation
-<!-- - Support for Rich Text messages -->
-<!-- - Import/export JSON, copy messages between paths -->
+- **ICU MessageFormat** — variables, plurals, selects, number/date/time formatting, and XML-like tags.
+- **Schema-driven** — define message keys and templates in a typed schema with automatic validation.
+- **Rich editor UI** — message editor with variable chips, autocompletion, and inline ICU element editors.
+- **JSON import** — bulk-import translations from JSON files directly in the admin UI.
+- **Flexible fetching** — works with a Payload instance (server-side) or a config object (client-side API fetch).
 
-## Getting Started
+## Installation
 
-```bash
-# pnpm
+```sh
 pnpm add payload-intl
-# yarn
-yarn add payload-intl
-# npm
-npm install payload-intl
 ```
 
-### 1) Define messages
+## Usage
 
-Organize messages in a hierarchical structure using ICU MessageFormat:
-
-```typescript
-// messages.ts
-export default {
-  UserProfile: {
-    title: "Hello {firstName}",
-    description:
-      "Welcome back, {firstName}! You have {count, plural, =0 {no messages} one {# message} other {# messages}}.",
-    status:
-      "Your account is {status, select, active {active} inactive {inactive} pending {pending} other {unknown}}.",
-  },
-  Navigation: {
-    home: "Home",
-    about: "About",
-  },
-} as const;
-```
-
-You can also use JSON files, but additional steps are required for type-safe arguments with next-intl. See the [next-intl documentation](https://next-intl.dev/docs/workflows/typescript#messages-arguments) for details.
-
-### 2) Configure Payload
-
-Add the plugin to your `payload.config.ts`:
-
-```typescript
-import { buildConfig } from "payload";
-import { intlPlugin } from "payload-intl";
-
-import messages from "./messages";
-
-export default buildConfig({
-  // the plugin reads locales from this config
-  localization: {
-    locales: ["en", "de", "fr"],
-    defaultLocale: "en",
-  },
-  plugins: [
-    // add the plugin
-    intlPlugin({
-      schema: messages,
-    }),
-    // add the "messages" collection to your storage adapter
-  ],
-});
-```
-
-### 3) Fetch messages in your app
-
-**Node.js:**
-
-```typescript
-import config from "@payload-config";
-import { getPayload } from "payload";
-import { fetchMessages } from "payload-intl/requests";
-
-const payload = await getPayload({ config });
-const messages = await fetchMessages(payload, "en");
-```
-
-**Edge runtime:**
-
-```typescript
-const response = await fetch(`${process.env.PAYLOAD_API_URL}/intl-plugin/en`);
-const messages = await response.json();
-```
-
-## Plugin Options
-
-The `intlPlugin` accepts the following configuration:
-
-| Option                  | Default                  | Description                                             |
-| ----------------------- | ------------------------ | ------------------------------------------------------- |
-| `schema`                | **Required**             | Your messages schema definition                         |
-| `collectionSlug`        | `"messages"`             | Custom collection slug                                  |
-| `editorAccess`          | Authenticated users only | Access control for editing messages                     |
-| `hooks`                 | -                        | Collection hooks with and additional `afterUpdate` hook |
-| `tabs`                  | -                        | Enable tabbed interface                                 |
-
-<!-- ## Storage Adapter Requirements
-
-The plugin creates a "messages" upload collection that stores translations as JSON files.
-
-You must ensure that the storage provider returns the direct URL to the uploaded files and read access is guaranteed. -->
-
-<!-- ## Message Schema Definition
-
-### Message Descriptions
-
-Add context for editors using the syntax `"[Description] message"`:
-
-```typescript
-export default {
-  UserProfile: {
-    title: "[Greeting shown at the top of user profile page] Hello {firstName}",
-    description:
-      "[Subtitle with user's name and message count] Welcome back, {firstName}! You have {count} new messages.",
-  },
-} as const;
-``` -->
-
-<!-- ### Rich Text Messages
-
-Use `"$RICH$"` as the message value to enable rich text editing. Note that rich text messages do not support ICU arguments.
-
-```typescript
-export default {
-  Content: {
-    welcome: "$RICH$", // Rich text editor will be used
-    terms: "$RICH$", // Rich text editor will be used
-  },
-} as const;
-``` -->
-
-## Example Usage
-
-Here's a complete example showing how to integrate payload-intl using next-intl and S3 storage:
-
-```typescript
+```ts
 // payload.config.ts
-import { s3Storage } from "@payloadcms/storage-s3";
-import { revalidateTag } from "next/cache";
-import { buildConfig } from "payload";
-import { intlPlugin } from "payload-intl";
-
-import { messages } from "./i18n/messages";
+import { buildConfig } from 'payload';
+import { intlPlugin } from 'payload-intl';
 
 export default buildConfig({
+  serverURL: 'http://localhost:3000',
   localization: {
-    locales: ["en", "de", "fr"],
-    defaultLocale: "en",
-  },
-  plugins: [
-    intlPlugin({
-      schema: messages,
-      hooks: {
-        afterUpdate: () => revalidateTag("messages"), // or anything else you want
-      },
-    }),
-    s3Storage({
-      collections: {
-        messages: {
-          prefix: "messages", // or anything else you want
-        },
-      },
-    }),
-  ],
-});
-```
-
-```typescript
-// i18n/messages.ts
-export const messages = {
-  UserProfile: {
-    title: "Hello {firstName}",
-    description:
-      "Welcome back, {firstName}! You have {count, plural, =0 {no messages} one {# message} other {# messages}}.",
+    locales: ['en', 'de', 'fr'],
+    defaultLocale: 'en',
   },
   // ...
-} as const;
-```
-
-```typescript
-// i18n/global.ts
-import type messages from "./messages";
-
-declare module "next-intl" {
-  interface AppConfig {
-    Messages: typeof messages;
-    // ...
-  }
-}
-```
-
-```typescript
-// i18n/request.ts
-import { getRequestConfig } from "next-intl/server";
-
-import { fetchCachedMessages } from "./server/messages";
-
-export default getRequestConfig(async ({ locale }) => {
-  const messages = await fetchCachedMessages(locale);
-
-  return {
-    locale,
-    messages,
-  };
+  plugins: [
+    intlPlugin({
+      schema: {
+        common: {
+          greeting: '[Main greeting] Hello {name}!',
+          items: '{count, plural, one {# item} other {# items}}',
+        },
+        auth: {
+          login: 'Sign in',
+          logout: 'Sign out',
+        },
+      },
+      tabs: true,
+    }),
+  ],
 });
 ```
 
-```typescript
-// server.ts
-"use server";
+Fetch messages in your application:
 
-import config from "@payload-config";
-import { unstable_cache } from "next/cache";
-import { getPayload } from "payload";
-import { fetchMessages } from "payload-intl";
+```ts
+import { fetchMessages } from 'payload-intl';
 
-export const fetchCachedMessages = unstable_cache(
-  async (locale: string) => {
-    // Node.js
-    const payload = await getPayload({ config });
-    return await fetchMessages(payload, locale);
+// Server-side — pass the Payload instance directly
+const messages = await fetchMessages(payload, 'en');
 
-    // Edge runtime
-    const response = await fetch(
-      `${process.env.PAYLOAD_API_URL}/intl-plugin/en`,
-    );
-    return await response.json();
-  },
-  ["messages"],
-  {
-    revalidate: false,
-  },
-);
+// Client-side — pass a config object to fetch from the REST API
+const messages = await fetchMessages({ serverUrl: 'http://localhost:3000' }, 'en');
 ```
 
-## Development
+### Options
 
-```bash
-# Install dependencies
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `schema` | `MessagesSchema` | — | Required. Nested object defining message keys and ICU templates. Leaf values are ICU MessageFormat strings, optionally prefixed with a `[description]`. |
+| `collectionSlug` | `CollectionSlug` | `'messages'` | Slug of the collection used to store translation files. |
+| `editorAccess` | `(req: PayloadRequest) => boolean \| Promise<boolean>` | `(req) => req.user !== null` | Access control function that determines who can edit messages. |
+| `hooks` | `MessagesHooks` | `{}` | Collection hooks. Extends Payload's collection hooks with an additional `afterUpdate` callback fired when translations are saved. |
+| `tabs` | `boolean` | `false` | When enabled, top-level keys in the schema are rendered as tabs in the admin UI. |
+
+## Contributing
+
+This plugin lives in the [payload-plugins](https://github.com/davincicoding-org/payload-plugins) monorepo.
+
+### Development
+
+```sh
 pnpm install
 
-# Start development server
-pnpm dev
+# watch this plugin for changes
+pnpm --filter payload-intl dev
 
-# Build the plugin
-pnpm build
-
-# Run tests
-pnpm test
+# run the Payload dev app (in a second terminal)
+pnpm --filter dev dev
 ```
+
+The `dev/` directory is a Next.js + Payload app that imports plugins via `workspace:*` — use it to test changes locally.
+
+### Code quality
+
+- **Formatting & linting** — handled by [Biome](https://biomejs.dev/), enforced on commit via husky + lint-staged.
+- **Commits** — must follow [Conventional Commits](https://www.conventionalcommits.org/) with a valid scope (e.g. `fix(payload-intl): ...`).
+- **Changesets** — please include a [changeset](https://github.com/changesets/changesets) in your PR by running `pnpm release`.
+
+### Issues & PRs
+
+Bug reports and feature requests are welcome — [open an issue](https://github.com/davincicoding-org/payload-plugins/issues).
 
 ## License
 

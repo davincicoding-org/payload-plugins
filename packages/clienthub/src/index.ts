@@ -1,8 +1,8 @@
 import type { CollectionSlug, Plugin } from 'payload';
 import { deepMerge } from 'payload';
-import { createProcessAllClientsEndpoint } from './endpoints/process-all-clients';
-import { Clients, InvoicePdfs, Invoices, Services, Settings } from './entities';
-import { invoiceTranslations } from './translations';
+import { createProcessAllClientsEndpoint } from '@/endpoints/process-all-clients';
+import { Clients, InvoicePdfs, Invoices, Services, Settings } from '@/entities';
+import { invoiceTranslations } from '@/translations';
 
 export interface ClienthubPluginOptions {
   cronSecret: string;

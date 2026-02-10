@@ -1,6 +1,7 @@
 import type { CollectionSlug, Field, GlobalSlug, Plugin } from 'payload';
-import { Comments } from './collections';
-import { createEndpoints } from './endpoints';
+import { createCommentEndpoint } from './endpoints/create-comment';
+import { createReplyEndpoint } from './endpoints/create-reply';
+import { Comments } from './entities';
 import {
   attachAuthor,
   createDeleteCommentsHooks,
@@ -12,7 +13,15 @@ import {
 import type { FieldConfig } from './types';
 
 export interface DiscussionsPluginOptions {
+  /**
+   * The collections to add the discussions field to.
+   * @default []
+   */
   collections?: CollectionSlug[];
+  /**
+   * The globals to add the discussions field to.
+   * @default []
+   */
   globals?: GlobalSlug[];
   /**
    * The maximum depth of the comments.
@@ -60,7 +69,8 @@ export const discussionsPlugin =
     };
 
     config.endpoints ??= [];
-    config.endpoints.push(...createEndpoints({ collectionSlug }));
+    config.endpoints.push(createCommentEndpoint({ collectionSlug }));
+    config.endpoints.push(createReplyEndpoint({ collectionSlug }));
 
     config.collections ??= [];
     config.collections.push(Comments({ slug: commentsSlug }));

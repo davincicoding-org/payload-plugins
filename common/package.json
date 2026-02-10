@@ -10,7 +10,8 @@
     "./*": "./src/*.ts"
   },
   "bin": {
-    "generate-types": "./scripts/generate-types.ts"
+    "generate-types": "./scripts/generate-types.ts",
+    "plugin-build": "./scripts/build.ts"
   },
   "scripts": {
     "clean": "rm -rf node_modules",
@@ -22,6 +23,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@payloadcms/ui": "catalog:payload-stack",
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "rollup-preserve-directives": "catalog:vite",

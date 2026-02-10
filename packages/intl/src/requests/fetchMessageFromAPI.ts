@@ -1,4 +1,4 @@
-import { ENDPOINT_CONFIG } from '@/const';
+import { ENDPOINTS } from '@/const';
 
 export interface MessagesRequestConfig {
   serverUrl: string;
@@ -15,7 +15,7 @@ export async function fetchMessagesFromAPI(
 ) {
   const cleanApiRoute = apiRoute.replace(/^\/|\/$/g, '');
 
-  const relativePath = ENDPOINT_CONFIG.getMessages.path
+  const relativePath = ENDPOINTS.getMessages.path
     .replace(/^\/|\/$/g, '')
     .replace(':locale', locale);
 
