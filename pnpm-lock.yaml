@@ -129,97 +129,6 @@ importers:
         specifier: catalog:vite
         version: 5.1.4(typescript@5.7.3)(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
 
-  dev:
-    dependencies:
-      '@payloadcms/db-postgres':
-        specifier: catalog:payload-stack
-        version: 3.72.0(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))
-      '@payloadcms/next':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
-      '@payloadcms/richtext-lexical':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
-      '@payloadcms/ui':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
-      '@t3-oss/env-nextjs':
-        specifier: ^0.13.10
-        version: 0.13.10(typescript@5.7.3)(zod@4.3.5)
-      cross-env:
-        specifier: ^7.0.3
-        version: 7.0.3
-      dotenv:
-        specifier: 16.4.7
-        version: 16.4.7
-      graphql:
-        specifier: ^16.8.1
-        version: 16.12.0
-      next:
-        specifier: catalog:payload-stack
-        version: 15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
-      next-intl:
-        specifier: ^4.7.0
-        version: 4.7.0(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(typescript@5.7.3)
-      payload:
-        specifier: catalog:payload-stack
-        version: 3.72.0(graphql@16.12.0)(typescript@5.7.3)
-      payload-intl:
-        specifier: workspace:*
-        version: link:../packages/intl
-      payload-smart-cache:
-        specifier: workspace:*
-        version: link:../packages/smart-cache
-      react:
-        specifier: catalog:payload-stack
-        version: 19.2.1
-      react-dom:
-        specifier: catalog:payload-stack
-        version: 19.2.1(react@19.2.1)
-      sharp:
-        specifier: 0.34.2
-        version: 0.34.2
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.5
-    devDependencies:
-      '@playwright/test':
-        specifier: 1.56.1
-        version: 1.56.1
-      '@testing-library/react':
-        specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.1(@types/react@19.2.1))(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@types/node':
-        specifier: ^22.5.4
-        version: 22.19.7
-      '@types/react':
-        specifier: catalog:payload-stack
-        version: 19.2.1
-      '@types/react-dom':
-        specifier: catalog:payload-stack
-        version: 19.2.1(@types/react@19.2.1)
-      '@vitejs/plugin-react':
-        specifier: 4.5.2
-        version: 4.5.2(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
-      jsdom:
-        specifier: 26.1.0
-        version: 26.1.0
-      playwright:
-        specifier: 1.56.1
-        version: 1.56.1
-      playwright-core:
-        specifier: 1.56.1
-        version: 1.56.1
-      typescript:
-        specifier: catalog:payload-stack
-        version: 5.7.3
-      vite-tsconfig-paths:
-        specifier: 5.1.4
-        version: 5.1.4(typescript@5.7.3)(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
-      vitest:
-        specifier: 3.2.3
-        version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
-
   packages/clienthub:
     dependencies:
       '@payloadcms/next':
@@ -487,6 +396,97 @@ importers:
         version: 7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
       vitest:
         specifier: ^3.1.2
+        version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
+
+  sandbox:
+    dependencies:
+      '@payloadcms/db-postgres':
+        specifier: catalog:payload-stack
+        version: 3.72.0(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))
+      '@payloadcms/next':
+        specifier: catalog:payload-stack
+        version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
+      '@payloadcms/richtext-lexical':
+        specifier: catalog:payload-stack
+        version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
+      '@payloadcms/ui':
+        specifier: catalog:payload-stack
+        version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
+      '@t3-oss/env-nextjs':
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.7.3)(zod@4.3.5)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
+      dotenv:
+        specifier: 16.4.7
+        version: 16.4.7
+      graphql:
+        specifier: ^16.8.1
+        version: 16.12.0
+      next:
+        specifier: catalog:payload-stack
+        version: 15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
+      next-intl:
+        specifier: ^4.7.0
+        version: 4.7.0(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(react@19.2.1)(typescript@5.7.3)
+      payload:
+        specifier: catalog:payload-stack
+        version: 3.72.0(graphql@16.12.0)(typescript@5.7.3)
+      payload-intl:
+        specifier: workspace:*
+        version: link:../packages/intl
+      payload-smart-cache:
+        specifier: workspace:*
+        version: link:../packages/smart-cache
+      react:
+        specifier: catalog:payload-stack
+        version: 19.2.1
+      react-dom:
+        specifier: catalog:payload-stack
+        version: 19.2.1(react@19.2.1)
+      sharp:
+        specifier: 0.34.2
+        version: 0.34.2
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.5
+    devDependencies:
+      '@playwright/test':
+        specifier: 1.56.1
+        version: 1.56.1
+      '@testing-library/react':
+        specifier: 16.3.0
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.1(@types/react@19.2.1))(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@types/node':
+        specifier: ^22.5.4
+        version: 22.19.7
+      '@types/react':
+        specifier: catalog:payload-stack
+        version: 19.2.1
+      '@types/react-dom':
+        specifier: catalog:payload-stack
+        version: 19.2.1(@types/react@19.2.1)
+      '@vitejs/plugin-react':
+        specifier: 4.5.2
+        version: 4.5.2(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
+      jsdom:
+        specifier: 26.1.0
+        version: 26.1.0
+      playwright:
+        specifier: 1.56.1
+        version: 1.56.1
+      playwright-core:
+        specifier: 1.56.1
+        version: 1.56.1
+      typescript:
+        specifier: catalog:payload-stack
+        version: 5.7.3
+      vite-tsconfig-paths:
+        specifier: 5.1.4
+        version: 5.1.4(typescript@5.7.3)(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
+      vitest:
+        specifier: 3.2.3
         version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
 
 packages:

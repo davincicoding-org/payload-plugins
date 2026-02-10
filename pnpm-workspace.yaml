@@ -1,7 +1,7 @@
 packages:
   - common
   - packages/*
-  - dev
+  - sandbox
 
 
 catalog:

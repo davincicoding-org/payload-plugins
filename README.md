@@ -9,7 +9,7 @@ A collection of open-source plugins for [Payload CMS](https://payloadcms.com).
 ```
 payload-plugins/
   common/              Shared build tooling, Vite config, and utilities
-  dev/                 Next.js + Payload dev app for local testing
+  sandbox/             Next.js + Payload dev app for local testing
   docs/                Project documentation
   packages/            Each subdirectory is a standalone published plugin
   plop-templates/      Scaffolding templates for new plugins
@@ -32,14 +32,14 @@ pnpm install
 
 ### Development
 
-The `dev/` directory is a Next.js + Payload app that imports all plugins via `workspace:*`. Use it to test changes locally:
+The `sandbox/` directory is a Next.js + Payload app that imports all plugins via `workspace:*`. Use it to test changes locally:
 
 ```sh
 # watch a plugin for changes
 pnpm --filter payload-intl dev
 
 # run the dev app (in a second terminal)
-pnpm --filter dev dev
+pnpm --filter sandbox dev
 ```
 
 ### Code quality
