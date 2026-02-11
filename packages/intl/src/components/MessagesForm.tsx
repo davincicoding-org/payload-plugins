@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, toast, useStepNav } from '@payloadcms/ui';
+import { Button, toast, useDocumentEvents, useStepNav } from '@payloadcms/ui';
 import { isEqual } from 'lodash-es';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -36,6 +36,7 @@ export function MessagesForm({
   endpointUrl,
 }: MessagesFormProps): React.ReactNode {
   const { setStepNav } = useStepNav();
+  const { reportUpdate } = useDocumentEvents();
   useEffect(() => {
     setStepNav([{ label: 'Intl Messages', url: '/intl' }]);
   }, [setStepNav]);
@@ -72,6 +73,11 @@ export function MessagesForm({
       }
 
       form.reset(currentValues);
+      reportUpdate({
+        entitySlug: 'messages',
+        operation: 'update',
+        updatedAt: new Date().toISOString(),
+      });
       toast.success('Saved', { id: toastId });
     } catch (error) {
       toast.error(
