@@ -32,7 +32,7 @@ for (const dir of dirs) {
 
   console.log(`Publishing ${pkgJson.name}@${pkgJson.version}...`)
   try {
-    execSync('npm publish --provenance --access public', {
+    execSync('pnpm publish --no-git-checks --provenance --access public', {
       cwd: join(packagesDir, dir),
       stdio: 'inherit',
     })
