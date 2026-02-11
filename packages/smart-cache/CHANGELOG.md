@@ -1,5 +1,11 @@
 # payload-smart-cache
 
+## 1.1.0
+
+### Minor Changes
+
+- [`4a33929`](https://github.com/davincicoding-org/payload-plugins/commit/4a3392949890b1f49a2e24695a0cf9874a211fea) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Change default collection behavior: only explicitly included collections are now cached (previously all collections were cached unless excluded). Add
+
 ## 1.0.1
 
 ### Patch Changes
