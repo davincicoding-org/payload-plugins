@@ -1,4 +1,4 @@
-import { uncaughtSwitchCase } from '@repo/common';
+import { findFields, uncaughtSwitchCase } from '@repo/common';
 import type { CollectionSlug, Config, Field, GlobalSlug } from 'payload';
 import type { ResolvedPluginOptions } from '@/types';
 
@@ -50,43 +50,9 @@ export function getTrackedCollections(
   }
 
   function findRelationships(fields: Field[]): CollectionSlug[] {
-    return fields.flatMap<CollectionSlug>((field) => {
-      if ('relationTo' in field) {
-        if (Array.isArray(field.relationTo)) {
-          return field.relationTo;
-        }
-        return [field.relationTo];
-      }
-
-      if ('fields' in field) {
-        return findRelationships(field.fields);
-      }
-
-      switch (field.type) {
-        case 'blocks':
-          return field.blocks.flatMap((block) =>
-            findRelationships(block.fields),
-          );
-        case 'tabs':
-          return field.tabs.flatMap((tab) => findRelationships(tab.fields));
-        case 'text':
-        case 'richText':
-        case 'number':
-        case 'checkbox':
-        case 'date':
-        case 'email':
-        case 'select':
-        case 'json':
-        case 'code':
-        case 'join':
-        case 'point':
-        case 'radio':
-        case 'textarea':
-        case 'ui':
-          return [];
-        default:
-          return uncaughtSwitchCase(field);
-      }
-    });
+    return findFields(fields, (field) => 'relationTo' in field).flatMap(
+      ({ relationTo }) =>
+        Array.isArray(relationTo) ? relationTo : [relationTo],
+    );
   }
 }
