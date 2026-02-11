@@ -1,14 +1,12 @@
-import type { Config, LocalizationConfig, SanitizedConfig } from 'payload';
+import type { Config, SanitizedConfig } from 'payload';
 import { z } from 'zod/v4-mini';
-import type { Locales } from '@/types';
+import type { Locale } from '../types';
 
 export const getSupportedLocales = (
-  localization: false | LocalizationConfig | undefined,
-): Locales => {
+  localization: Config['localization'],
+): Locale[] => {
   if (!localization) {
-    throw new Error(
-      'You need to enable "localization" in your Payload config.',
-    );
+    return [];
   }
   if (localization.locales.length === 0) {
     return [localization.defaultLocale];
@@ -18,7 +16,7 @@ export const getSupportedLocales = (
       return locale;
     }
     return locale.code;
-  }) as Locales;
+  });
 };
 
 const PLUGIN_KEY = 'intl-plugin';

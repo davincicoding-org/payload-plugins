@@ -9,7 +9,7 @@ export async function fetchMessagesFromPayload(
   const {
     docs: [doc],
   } = await payload.find({
-    collection: getPluginContext(payload.config).collectionSlug,
+    collection: getPluginContext(payload.config).collectionSlug as 'messages',
     where: { locale: { equals: locale } },
   });
 

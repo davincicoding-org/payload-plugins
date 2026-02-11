@@ -1,7 +1,7 @@
 import { Button } from '@payloadcms/ui';
+import { getAdminURL } from '@repo/common';
 import { IconWorld } from '@tabler/icons-react';
 import type { PayloadRequest } from 'payload';
-
 import type { MessagesGuard } from '@/types';
 
 export interface MessagesLinkProps {
@@ -20,7 +20,7 @@ export async function MessagesLink({
     <Button
       buttonStyle="tab"
       el="link"
-      to={`${req.payload.getAdminURL()}/intl`}
+      to={getAdminURL({ req, path: '/intl' })}
     >
       <IconWorld />
     </Button>

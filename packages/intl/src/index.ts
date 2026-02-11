@@ -33,13 +33,14 @@ export const intlPlugin =
     editorAccess = (req) => req.user !== null,
   }: MessagesPluginConfig): Plugin =>
   (config) => {
-    const locales = getSupportedLocales(config.localization);
-
-    if (!config.serverURL) {
-      throw new Error(
-        'serverURL is required in your payload.config.ts file for payload-intl to work.',
+    if (!config.localization) {
+      console.warn(
+        '[payload-intl] You have not set the localization option in your Payload config, so this plugin will have no effect.',
       );
+      return config;
     }
+
+    const locales = getSupportedLocales(config.localization);
 
     config.admin ??= {};
     config.admin.components ??= {};

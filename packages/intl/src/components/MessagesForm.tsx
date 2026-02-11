@@ -8,7 +8,7 @@ import type { FormValues } from '@/components/MessageFormContext';
 import { MessagesFormProvider } from '@/components/MessageFormContext';
 import type {
   DeepPartial,
-  Locales,
+  Locale,
   Messages,
   MessagesSchema,
   Translations,
@@ -21,7 +21,7 @@ import { MessagesTree } from './layout/MessagesTree';
 import styles from './MessagesForm.module.css';
 
 interface MessagesFormProps {
-  locales: Locales;
+  locales: Locale[];
   schema: MessagesSchema;
   tabs?: boolean;
   values: Translations<DeepPartial<Messages>>;

@@ -1,13 +1,13 @@
 import { Controller } from 'react-hook-form';
 import { useMessagesForm } from '@/components/MessageFormContext';
-import type { TemplateVariable } from '@/types';
+import type { Locale, TemplateVariable } from '@/types';
 import type { MessageValidator } from '@/utils/validate';
 
 import { MessageInput } from './inputs/MessageInput';
 
 interface MessageControllerProps {
   label?: string;
-  locale: string;
+  locale: Locale;
   name: string;
   className?: string;
   variables: TemplateVariable[];

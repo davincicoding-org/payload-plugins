@@ -19,8 +19,7 @@ export type MessagesGuard = (req: PayloadRequest) => boolean | Promise<boolean>;
 
 /* MARK: Messages */
 
-type Locale = string;
-export type Locales = [Locale, ...Locale[]];
+export type Locale = string;
 
 export type Translations<T> = Record<Locale, T>;
 

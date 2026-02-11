@@ -3,18 +3,18 @@
 import { createContext, use } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { FormProvider, useFormContext } from 'react-hook-form';
-import type { Locales, Messages, Translations } from '@/types';
+import type { Locale, Messages, Translations } from '@/types';
 
 export type FormValues = Translations<Messages>;
 
 const MessagesFormContext = createContext<{
-  locales: Locales;
+  locales: Locale[];
 }>({
   locales: ['en'],
 });
 
 interface MessagesFormProviderProps {
-  locales: Locales;
+  locales: Locale[];
   form: UseFormReturn<FormValues>;
 }
 
