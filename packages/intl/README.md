@@ -31,7 +31,6 @@ import { buildConfig } from 'payload';
 import { intlPlugin } from 'payload-intl';
 
 export default buildConfig({
-  serverURL: 'http://localhost:3000',
   localization: {
     locales: ['en', 'de', 'fr'],
     defaultLocale: 'en',

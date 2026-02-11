@@ -40,14 +40,14 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
       };
 
       const { docs } = await req.payload.update({
-        collection: collectionSlug,
+        collection: collectionSlug as 'messages',
         data: {},
         file,
         where: { locale: { equals: locale } },
       });
       if (docs.length === 0) {
         await req.payload.create({
-          collection: collectionSlug,
+          collection: collectionSlug as 'messages',
           data: { locale },
           file,
         });

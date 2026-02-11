@@ -1,21 +1,21 @@
 import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
+import { getAdminURL } from '@repo/common';
 import { RedirectType, redirect } from 'next/navigation';
 import type { AdminViewServerProps } from 'payload';
 import type {
   DeepPartial,
-  Locales,
+  Locale,
   Messages,
   MessagesGuard,
   Translations,
 } from '@/types';
-
 import { sanitizeMessages } from '@/utils/sanitize';
 import { fetchMessages } from '../requests/fetchMessages';
 import { MessagesForm } from './MessagesForm';
 
 export interface MessagesViewProps {
-  locales: Locales;
+  locales: Locale[];
   schema: Messages;
   tabs: boolean | undefined;
   access: MessagesGuard;
@@ -23,7 +23,7 @@ export interface MessagesViewProps {
 
 export async function MessagesView({
   access,
-  initPageResult,
+  initPageResult: { req, locale, permissions, visibleEntities },
   locales,
   params,
   payload,
@@ -36,8 +36,8 @@ export async function MessagesView({
     ? `${apiUrl}intl-plugin`
     : `${apiUrl}/intl-plugin`;
 
-  const hasAccess = await access(initPageResult.req);
-  if (!hasAccess) redirect(payload.getAdminURL(), RedirectType.replace);
+  const hasAccess = await access(req);
+  if (!hasAccess) redirect(getAdminURL({ req }), RedirectType.replace);
 
   const translations: Translations<DeepPartial<Messages>> = {};
 
@@ -49,20 +49,20 @@ export async function MessagesView({
 
   return (
     <DefaultTemplate
-      i18n={initPageResult.req.i18n}
-      locale={initPageResult.locale}
+      i18n={req.i18n}
+      locale={locale}
       params={params}
-      payload={initPageResult.req.payload}
-      permissions={initPageResult.permissions}
+      payload={req.payload}
+      permissions={permissions}
       searchParams={searchParams}
-      user={initPageResult.req.user || undefined}
+      user={req.user || undefined}
       viewActions={payload.config.admin.components.actions.filter((action) => {
         if (typeof action !== 'object') {
           return true;
         }
         return action.exportName !== 'MessagesLink';
       })}
-      visibleEntities={initPageResult.visibleEntities}
+      visibleEntities={visibleEntities}
     >
       <Gutter>
         <MessagesForm

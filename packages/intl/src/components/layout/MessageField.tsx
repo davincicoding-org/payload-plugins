@@ -29,14 +29,18 @@ export function MessageField({
     [config.variables],
   );
 
+  const [firstLocale, ...otherLocales] = locales;
+
+  if (!firstLocale) return null;
+
   return (
     <div style={{ display: hidden ? 'none' : undefined }}>
       {config.description && <p>{config.description}</p>}
 
-      {locales.length === 1 ? (
+      {otherLocales.length === 0 ? (
         <MessageController
-          locale={locales[0]}
-          name={[locales[0], path, messageKey].join('.')}
+          locale={firstLocale}
+          name={[firstLocale, path, messageKey].join('.')}
           validate={validator}
           variables={config.variables}
         />
