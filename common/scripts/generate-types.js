@@ -1,5 +1,34 @@
 #!/usr/bin/env node
 // @ts-check
+
+// tsx v4 requires --import flag. If not already loaded with tsx,
+// respawn this script with the proper flag.
+if (!process.env.__GEN_TYPES_TSX) {
+  const { execFileSync } = await import('node:child_process');
+  const { fileURLToPath, pathToFileURL } = await import('node:url');
+  const { createRequire } = await import('node:module');
+
+  const require = createRequire(import.meta.url);
+  const tsxPath = pathToFileURL(require.resolve('tsx')).href;
+
+  process.env.__GEN_TYPES_TSX = '1';
+  try {
+    execFileSync(
+      process.execPath,
+      [
+        '--import',
+        tsxPath,
+        fileURLToPath(import.meta.url),
+        ...process.argv.slice(2),
+      ],
+      { stdio: 'inherit' },
+    );
+  } catch (e) {
+    process.exit(/** @type {any} */ (e).status ?? 1);
+  }
+  process.exit(0);
+}
+
 import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -103,6 +132,15 @@ export default buildConfig({
     init: () => {
       throw new Error('Not implemented');
     },
+  },
+  email: ({ payload }) => ({
+    defaultFromAddress: '',
+    defaultFromName: '',
+    name: '',
+    sendEmail: async () => void 0,
+  }),
+  admin: {
+    user: 'users',
   },
   collections: [{ slug: 'users', auth: true, fields: [] }],
   plugins: [${plugin.call}],

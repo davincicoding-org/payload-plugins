@@ -21,10 +21,7 @@ catalogs:
     react-dom: 19.2.1
     typescript: 5.7.3
   vite:
-    rollup-preserve-directives: 1.1.3
     vite: 7.0.6
-    vite-plugin-dts: 4.5.4
-    vite-tsconfig-paths: 5.1.4
 
 onlyBuiltDependencies:
   - '@parcel/watcher'
