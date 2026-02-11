@@ -1,5 +1,11 @@
 # payload-smart-cache
 
+## 1.1.1
+
+### Patch Changes
+
+- [`a7772b9`](https://github.com/davincicoding-org/payload-plugins/commit/a7772b9b6fdf5ee0a4d8dd8d5adc48d998f4692b) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Fix @repo/common resolution error — common utilities are now bundled into the package
+
 ## 1.1.0
 
 ### Minor Changes
