@@ -1,5 +1,11 @@
 # payload-intl
 
+## 1.2.0
+
+### Minor Changes
+
+- [`4a33929`](https://github.com/davincicoding-org/payload-plugins/commit/4a3392949890b1f49a2e24695a0cf9874a211fea) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Remove required styles import — styles are now bundled automatically
+
 ## 1.1.0
 
 ### Minor Changes
