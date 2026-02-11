@@ -16,7 +16,19 @@ jobs:
       pull-requests: write # Required for Changesets to open the PR
 
     steps:
+      # Generate a GitHub App token so that PRs created by changesets/action
+      # trigger CI workflows (GITHUB_TOKEN events don't trigger other workflows).
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -33,10 +45,11 @@ jobs:
       - name: Publish packages to npm
         run: pnpm ci:publish
 
-      # Handle version PRs (changesets without publish — publishing is done above)
+      # Handle version PRs (changesets without publish — publishing is done above).
+      # Uses the App token so the PR triggers CI workflows.
       - name: Create Release PR
         uses: changesets/action@v1
         with:
           commit: "chore(release): version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
