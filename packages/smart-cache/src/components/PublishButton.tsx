@@ -1,18 +1,21 @@
 'use client';
 
 import { Button, toast, useConfig, useDocumentEvents } from '@payloadcms/ui';
+import { formatAdminURL } from 'payload/shared';
 import { useEffect, useState } from 'react';
-
 import { ENDPOINTS } from '@/const';
 
 export function PublishButton() {
-  const { config } = useConfig();
+  const {
+    config: {
+      routes: { api: apiRoute },
+    },
+  } = useConfig();
   const { mostRecentUpdate } = useDocumentEvents();
-
-  const apiUrl = config.serverURL + config.routes.api;
 
   const [hasChanges, setHasChanges] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const apiUrl = formatAdminURL({ apiRoute });
 
   useEffect(() => {
     ENDPOINTS.checkChanges
