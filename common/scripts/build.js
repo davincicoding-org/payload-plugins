@@ -1,35 +1,118 @@
 #!/usr/bin/env node
 // @ts-check
-import * as fs from 'node:fs';
+import { execSync, spawn } from 'node:child_process';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  watch,
+} from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Command } from '@commander-js/extra-typings';
-import { build, loadConfigFromFile, mergeConfig } from 'vite';
-import { configureBuild } from '../vite.config.js';
 
 const program = new Command()
   .name('plugin-build')
-  .description('Build a Payload plugin using Vite')
+  .description('Build a Payload plugin using SWC + tsc')
   .option('-w, --watch', 'run in watch mode')
   .parse();
 
 const opts = program.opts();
 const cwd = process.cwd();
+const commonDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+const swcrc = path.join(commonDir, '.swcrc');
 
-let config = configureBuild();
+// Local bin first (package's own tsc), then common bin (swc, tsc-alias)
+const localBin = path.join(cwd, 'node_modules', '.bin');
+const commonBin = path.join(commonDir, 'node_modules', '.bin');
+process.env.PATH = [localBin, commonBin, process.env.PATH].join(path.delimiter);
 
-const localConfigPath = path.join(cwd, 'vite.config.ts');
-if (fs.existsSync(localConfigPath)) {
-  const loaded = await loadConfigFromFile(
-    { command: 'build', mode: 'production' },
-    localConfigPath,
-  );
-  if (loaded) {
-    config = mergeConfig(config, loaded.config);
+const ASSET_RE = /\.(css|scss|html|json|ttf|woff|woff2|eot|svg|jpg|png)$/;
+const TEST_IGNORE = '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx';
+const tsconfig = existsSync(path.join(cwd, 'tsconfig.build.json'))
+  ? 'tsconfig.build.json'
+  : 'tsconfig.json';
+
+/** @param {string} cmd @param {import('node:child_process').ExecSyncOptions} [o] */
+const exec = (cmd, o) => execSync(cmd, { cwd, stdio: 'inherit', ...o });
+
+function copyAssets() {
+  const srcDir = path.join(cwd, 'src');
+  if (!existsSync(srcDir)) return;
+  for (const entry of readdirSync(srcDir, { recursive: true })) {
+    const file = String(entry);
+    if (!ASSET_RE.test(file)) continue;
+    const dest = path.join(cwd, 'dist', file);
+    mkdirSync(path.dirname(dest), { recursive: true });
+    copyFileSync(path.join(srcDir, file), dest);
   }
 }
 
 if (opts.watch) {
-  config.build = { ...config.build, watch: {} };
-}
+  /** @type {import('node:child_process').ChildProcess[]} */
+  const children = [];
+  const cleanup = () => {
+    for (const c of children) c.kill();
+  };
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+  process.on('exit', cleanup);
 
-await build(config);
+  /** @param {string} cmd @param {string[]} args */
+  const start = (cmd, args) => {
+    const child = spawn(cmd, args, { cwd, stdio: 'inherit', shell: true });
+    child.on('error', (err) => {
+      process.stderr.write(`[${cmd}] ${err.message}\n`);
+      process.exit(1);
+    });
+    children.push(child);
+  };
+
+  copyAssets();
+
+  const srcDir = path.join(cwd, 'src');
+  watch(srcDir, { recursive: true }, (_event, filename) => {
+    if (!filename || !ASSET_RE.test(filename)) return;
+    const src = path.join(srcDir, filename);
+    if (!existsSync(src)) return;
+    const dest = path.join(cwd, 'dist', filename);
+    mkdirSync(path.dirname(dest), { recursive: true });
+    copyFileSync(src, dest);
+  });
+
+  start('swc', [
+    'src',
+    '-d',
+    'dist',
+    '--config-file',
+    swcrc,
+    '--strip-leading-paths',
+    '--ignore',
+    TEST_IGNORE,
+    '--watch',
+  ]);
+  start('tsc', [
+    '-p',
+    tsconfig,
+    '--emitDeclarationOnly',
+    '--watch',
+    '--preserveWatchOutput',
+  ]);
+  start('tsc-alias', ['-p', tsconfig, '--watch']);
+} else {
+  if (existsSync(path.join(cwd, 'dist')))
+    rmSync(path.join(cwd, 'dist'), { recursive: true, force: true });
+  for (const f of ['tsconfig.tsbuildinfo', 'tsconfig.build.tsbuildinfo']) {
+    const p = path.join(cwd, f);
+    if (existsSync(p)) rmSync(p);
+  }
+
+  copyAssets();
+  exec(
+    `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${TEST_IGNORE}"`,
+  );
+  exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
+  exec(`tsc-alias -p ${tsconfig}`);
+}

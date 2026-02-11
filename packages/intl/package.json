@@ -37,8 +37,7 @@
       "types": "./dist/exports/client.d.ts",
       "import": "./dist/exports/client.js",
       "default": "./dist/exports/client.js"
-    },
-    "./styles.css": "./dist/styles.css"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
