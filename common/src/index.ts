@@ -1,4 +1,9 @@
-import type { CollectionConfig, CollectionSlug, TypeWithID } from 'payload';
+import type {
+  CollectionConfig,
+  CollectionSlug,
+  PayloadRequest,
+  TypeWithID,
+} from 'payload';
 import z from 'zod';
 
 // MARK: Types
@@ -34,10 +39,6 @@ export function assertPopulated<T extends TypeWithID | null>(
 
 // MARK: Utilities
 
-export const uncaughtSwitchCase = (value: never) => {
-  throw new Error(`Unhandled switch case: ${value}`);
-};
-
 export const createCollectionConfigFactory =
   <T extends Record<string, unknown>>(
     factory:
@@ -54,10 +55,10 @@ export const createCollectionConfigFactory =
 export const resolveForeignKey = (entity: TypeWithID['id'] | TypeWithID) =>
   typeof entity === 'object' ? entity.id : entity;
 
-// MARK: Procedures
-
 export {
   defineProcedure,
   type Procedure,
   type ProcedureBuilder,
 } from './procedure';
+export { getAdminURL, getApiURL, getServerURL } from './urls';
+export { findFields, uncaughtSwitchCase } from './utils';

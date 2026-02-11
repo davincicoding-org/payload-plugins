@@ -1,5 +1,4 @@
 import type { Endpoint, PayloadRequest } from 'payload';
-import { addDataAndFileToRequest } from 'payload';
 
 type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
@@ -13,19 +12,19 @@ interface ZodLike<TOutput = unknown> {
 type InferOutput<T> = T extends ZodLike<infer O> ? O : never;
 
 interface ProcedureConfig<TSchema extends ZodLike | undefined = undefined> {
-  path: string;
+  path: `/${string}`;
   method: Method;
   input?: TSchema;
 }
 
 export interface Procedure<TInput, TOutput> {
-  path: string;
+  path: `/${string}`;
   method: Method;
   endpoint(
     handler: (
       req: PayloadRequest,
       ...args: TInput extends void ? [] : [input: TInput]
-    ) => Promise<TOutput | Response>,
+    ) => Promise<unknown | Response>,
   ): Endpoint;
   call(
     apiUrl: string,
@@ -65,7 +64,7 @@ function createProcedure<TInput, TOutput>(
       return {
         path: config.path,
         method: config.method,
-        handler: async (req: PayloadRequest) => {
+        handler: async (req) => {
           if (inputSchema) {
             if (config.method === 'get') {
               const routeParams = req.routeParams ?? {};
@@ -81,6 +80,9 @@ function createProcedure<TInput, TOutput>(
               return wrapOutput(output);
             }
 
+            const { addDataAndFileToRequest } = await import(
+              /* webpackIgnore: true */ 'payload'
+            );
             await addDataAndFileToRequest(req);
             const result = inputSchema.safeParse(req.data);
             if (!result.success) {
@@ -108,7 +110,7 @@ function createProcedure<TInput, TOutput>(
               resolvedPath = resolvedPath.replace(
                 `:${key}`,
                 encodeURIComponent(String(value)),
-              );
+              ) as `/${string}`;
             } else {
               queryParams[key] = String(value);
             }
@@ -163,7 +165,7 @@ export function defineProcedure<
     returns<TOutput>(): Procedure<TInput, TOutput> {
       return createProcedure<TInput, TOutput>(config, config.input);
     },
-    endpoint: proc.endpoint as ProcedureBuilder<TInput>['endpoint'],
+    endpoint: proc.endpoint as unknown as ProcedureBuilder<TInput>['endpoint'],
     call: proc.call as ProcedureBuilder<TInput>['call'],
   };
 }
