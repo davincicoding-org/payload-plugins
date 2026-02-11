@@ -22,12 +22,6 @@ jobs:
         with:
           node-version: 24
           cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
-
-      # Remove _authToken from .npmrc so npm uses OIDC for authentication
-      # (setup-node creates _authToken=${NODE_AUTH_TOKEN} which resolves to
-      # an empty token that blocks OIDC auth)
-      - run: npm config delete //registry.npmjs.org/:_authToken
 
       - run: pnpm install --frozen-lockfile
 
@@ -39,3 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
+          NODE_AUTH_TOKEN: ''
