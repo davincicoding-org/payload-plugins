@@ -1,5 +1,11 @@
 # payload-smart-cache
 
+## 1.1.3
+
+### Patch Changes
+
+- [`b84e2a4`](https://github.com/davincicoding-org/payload-plugins/commit/b84e2a4d25a178207e79f379ec73e80a14d40928) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Fix request responses
+
 ## 1.1.2
 
 ### Patch Changes
