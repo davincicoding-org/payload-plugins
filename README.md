@@ -39,7 +39,9 @@ The `sandbox/` directory is a Next.js + Payload app that imports all plugins via
 pnpm --filter payload-intl dev
 
 # run the dev app (in a second terminal)
-pnpm --filter sandbox dev
+cd sandbox
+bash start-database.sh
+pnpm dev
 ```
 
 ### Code quality
