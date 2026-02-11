@@ -1,9 +1,4 @@
-import type {
-  CollectionConfig,
-  CollectionSlug,
-  PayloadRequest,
-  TypeWithID,
-} from 'payload';
+import type { CollectionConfig, CollectionSlug, TypeWithID } from 'payload';
 import z from 'zod';
 
 // MARK: Types

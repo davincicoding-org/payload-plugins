@@ -96,15 +96,13 @@ export function PluralVariableEditor({
           </Fragment>
         ))}
 
-        <>
-          <label htmlFor="other">other</label>
-          {/* // TODO add support for variable mentions */}
-          <input
-            className={styles.inputSpan2}
-            type="text"
-            {...register('other', { required: true })}
-          />
-        </>
+        <label htmlFor="other">other</label>
+        {/* // TODO add support for variable mentions */}
+        <input
+          className={styles.inputSpan2}
+          type="text"
+          {...register('other', { required: true })}
+        />
       </fieldset>
       <div className={styles.controlsGrid}>
         <label className={styles.offsetLabel}>
@@ -156,7 +154,7 @@ export function PluralVariableEditor({
                       min={0}
                       onChange={({ currentTarget: { value } }) => {
                         const number = Number(value);
-                        if (isNaN(number)) return;
+                        if (Number.isNaN(number)) return;
                         if (number < 0) return;
                         field.onChange(number);
                       }}

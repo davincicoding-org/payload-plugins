@@ -1,4 +1,4 @@
-import { findFields, uncaughtSwitchCase } from '@repo/common';
+import { findFields } from '@repo/common';
 import type { CollectionSlug, Config, Field, GlobalSlug } from 'payload';
 import type { ResolvedPluginOptions } from '@/types';
 

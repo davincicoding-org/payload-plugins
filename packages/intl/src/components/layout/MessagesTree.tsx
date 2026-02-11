@@ -49,7 +49,7 @@ export function MessagesTree({
           key={key}
           style={
             {
-              ['--nesting-level']: nestingLevel,
+              '--nesting-level': nestingLevel,
             } as React.CSSProperties
           }
         >

@@ -76,6 +76,7 @@ function createProcedure<TInput, TOutput>(
               if (!result.success) {
                 return Response.json({ error: result.error }, { status: 400 });
               }
+              // biome-ignore lint/complexity/noBannedTypes: ugly type cast
               const output = await (handler as Function)(req, result.data);
               return wrapOutput(output);
             }
@@ -88,10 +89,11 @@ function createProcedure<TInput, TOutput>(
             if (!result.success) {
               return Response.json({ error: result.error }, { status: 400 });
             }
+            // biome-ignore lint/complexity/noBannedTypes: ugly type cast
             const output = await (handler as Function)(req, result.data);
             return wrapOutput(output);
           }
-
+          // biome-ignore lint/complexity/noBannedTypes: ugly type cast
           const output = await (handler as Function)(req);
           return wrapOutput(output);
         },
@@ -156,7 +158,7 @@ export function defineProcedure<
 >(
   config: ProcedureConfig<TSchema>,
 ): ProcedureBuilder<TSchema extends ZodLike ? InferOutput<TSchema> : void> {
-  type TInput = TSchema extends ZodLike ? InferOutput<TSchema> : void;
+  type TInput = TSchema extends ZodLike ? InferOutput<TSchema> : undefined;
   const proc = createProcedure<TInput, unknown>(config, config.input);
 
   return {

@@ -3,7 +3,6 @@ import type { CollectionSlug, Endpoint } from 'payload';
 import { z } from 'zod';
 import { ENDPOINTS } from '@/procedures';
 import { populateComment } from '@/utitls/populate-comment';
-import type { PopulatedComment } from '../types';
 
 export const createCommentEndpoint = ({
   collectionSlug,

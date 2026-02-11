@@ -7,7 +7,6 @@ import {
   IconHash,
   IconLayoutList,
 } from '@tabler/icons-react';
-import type { TemplateVariable } from '@/types';
 
 export interface VariableIconProps extends Omit<IconProps, 'type'> {
   type: TYPE;

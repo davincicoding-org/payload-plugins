@@ -82,7 +82,7 @@ export default buildConfig({
     intlPlugin({
       schema: messages,
     }),
-    // smartCachePlugin({}),
+    smartCachePlugin({ collections: ['media'] }),
     localFileStoragePlugin(),
   ],
 });
