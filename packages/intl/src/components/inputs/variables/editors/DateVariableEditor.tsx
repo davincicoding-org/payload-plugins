@@ -7,11 +7,7 @@ export interface DateVariableEditorProps {
   ref: React.Ref<{ getValue: () => string }>;
 }
 
-export function DateVariableEditor({
-  name,
-  element,
-  ref,
-}: DateVariableEditorProps) {
+export function DateVariableEditor({ ref }: DateVariableEditorProps) {
   useImperativeHandle(ref, () => ({
     getValue: () => {
       // TODO

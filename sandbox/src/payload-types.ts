@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     messages: Message;
+    'publish-queue': PublishQueue;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
+    'publish-queue': PublishQueueSelect<false> | PublishQueueSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -188,6 +190,20 @@ export interface Message {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "publish-queue".
+ */
+export interface PublishQueue {
+  id: number;
+  entityType: string;
+  /**
+   * ID of the changed entity
+   */
+  entityId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -221,6 +237,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'messages';
         value: number | Message;
+      } | null)
+    | ({
+        relationTo: 'publish-queue';
+        value: number | PublishQueue;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -327,6 +347,16 @@ export interface MessagesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "publish-queue_select".
+ */
+export interface PublishQueueSelect<T extends boolean = true> {
+  entityType?: T;
+  entityId?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

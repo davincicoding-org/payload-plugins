@@ -7,11 +7,7 @@ export interface TimeElementEditorProps {
   ref: React.Ref<{ getValue: () => string }>;
 }
 
-export function TimeElementEditor({
-  name,
-  element,
-  ref,
-}: TimeElementEditorProps) {
+export function TimeElementEditor({ ref }: TimeElementEditorProps) {
   useImperativeHandle(ref, () => ({
     getValue: () => {
       // TODO

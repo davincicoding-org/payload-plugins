@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 test.describe('Frontend', () => {
+  // biome-ignore lint/correctness/noUnusedVariables: nevermind
   let page: Page;
 
   test.beforeAll(async ({ browser }) => {

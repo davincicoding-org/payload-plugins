@@ -4,12 +4,12 @@ import { parseMessageSchema } from './schema';
 
 describe('schema', () => {
   describe('parseMessageSchema', () => {
-    test('should extract example', () => {
+    test('should extract variables', () => {
       const schema = 'Hello {name}';
       const metadata = parseMessageSchema(schema);
       expect(metadata).toEqual({
         description: undefined,
-        example: 'Hello {name}',
+        variables: [{ type: 1, value: 'name' }],
       });
     });
 
@@ -18,16 +18,19 @@ describe('schema', () => {
       const metadata = parseMessageSchema(schema);
       expect(metadata).toEqual({
         description: 'Some description',
-        example: 'Hello {name}',
+        variables: [{ type: 1, value: 'name' }],
       });
     });
 
-    test('should ignore optional variables', () => {
+    test('should extract all variables including optional', () => {
       const schema = '[Some description] Hello {name} | {_variable}';
       const metadata = parseMessageSchema(schema);
       expect(metadata).toEqual({
         description: 'Some description',
-        example: 'Hello {name}',
+        variables: [
+          { type: 1, value: 'name' },
+          { type: 1, value: '_variable' },
+        ],
       });
     });
   });

@@ -16,11 +16,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Full Quality Check
+      - name: Lint & Format
         run: pnpm ci:check
 
-      - name: Production Build
+      - name: Build
         run: pnpm ci:build
 
-      - name: Run Tests
-        run: pnpm test
+      - name: Typecheck
+        run: pnpm ci:typecheck
+
+      - name: Test
+        run: pnpm ci:test

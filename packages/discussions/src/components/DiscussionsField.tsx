@@ -1,4 +1,4 @@
-import type { CollectionSlug, ServerComponentProps } from 'payload';
+import type { ServerComponentProps } from 'payload';
 import { populateComment } from '@/utitls/populate-comment';
 import type { FieldConfig, PopulatedComment } from '../types';
 import { DiscussionsClient } from './Discussions';

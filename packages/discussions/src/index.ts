@@ -3,12 +3,9 @@ import { createCommentEndpoint } from './endpoints/create-comment';
 import { createReplyEndpoint } from './endpoints/create-reply';
 import { Comments } from './entities';
 import {
-  attachAuthor,
   createDeleteCommentsHooks,
-  createDeleteRepliesHooks,
   createRestoreCommentsHooks,
   createSoftDeleteCommentsHooks,
-  createSoftDeleteRepliesHooks,
 } from './hooks';
 import type { FieldConfig } from './types';
 
