@@ -1,13 +1,14 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
+import { resendAdapter } from '@payloadcms/email-resend';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import { intlPlugin } from 'payload-intl';
+import { invitationsPlugin } from 'payload-invitations';
 import { smartCachePlugin } from 'payload-smart-cache';
 import sharp from 'sharp';
-import { Media } from './cms/collections/Media';
-import { Users } from './cms/collections/Users';
+
 import { localFileStoragePlugin } from './cms/dev-plugins';
 import { env } from './env';
 import { messages } from './i18n/messages';
@@ -17,7 +18,7 @@ const dirname = path.dirname(filename);
 
 export default buildConfig({
   admin: {
-    user: Users.slug,
+    user: 'users',
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -27,7 +28,44 @@ export default buildConfig({
     locales: ['en'],
     defaultLocale: 'en',
   },
-  collections: [Users, Media],
+  collections: [
+    {
+      slug: 'users',
+      admin: {
+        useAsTitle: 'email',
+      },
+      auth: true,
+      fields: [
+        { name: 'name', type: 'text' },
+        { name: 'email', type: 'email' },
+        {
+          name: 'role',
+          type: 'select',
+          options: ['admin', 'editor'],
+          defaultValue: 'editor',
+        },
+      ],
+    },
+    {
+      slug: 'media',
+      access: {
+        read: () => true,
+      },
+      fields: [
+        {
+          name: 'alt',
+          type: 'text',
+          required: true,
+        },
+      ],
+      upload: true,
+    },
+  ],
+  email: resendAdapter({
+    defaultFromAddress: 'noreply@davincicoding.ch',
+    defaultFromName: 'Davinci Coding',
+    apiKey: env.RESEND_API_KEY,
+  }),
   editor: lexicalEditor(),
   secret: env.PAYLOAD_SECRET,
   typescript: {
@@ -40,10 +78,11 @@ export default buildConfig({
   }),
   sharp,
   plugins: [
+    invitationsPlugin({}),
     intlPlugin({
       schema: messages,
     }),
-    smartCachePlugin({}),
+    // smartCachePlugin({}),
     localFileStoragePlugin(),
   ],
 });

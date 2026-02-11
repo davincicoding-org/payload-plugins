@@ -70,7 +70,6 @@ export interface Config {
     users: User;
     media: Media;
     messages: Message;
-    'publish-queue': PublishQueue;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,7 +80,6 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
-    'publish-queue': PublishQueueSelect<false> | PublishQueueSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -126,6 +124,10 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
+  _email?: string | null;
+  role?: ('admin' | 'editor') | null;
+  joinedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -133,6 +135,8 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -184,20 +188,6 @@ export interface Message {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "publish-queue".
- */
-export interface PublishQueue {
-  id: number;
-  entityType: string;
-  /**
-   * ID of the changed entity
-   */
-  entityId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -231,10 +221,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'messages';
         value: number | Message;
-      } | null)
-    | ({
-        relationTo: 'publish-queue';
-        value: number | PublishQueue;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -283,6 +269,10 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  _email?: T;
+  role?: T;
+  joinedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -290,6 +280,8 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  _verified?: T;
+  _verificationToken?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -335,16 +327,6 @@ export interface MessagesSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "publish-queue_select".
- */
-export interface PublishQueueSelect<T extends boolean = true> {
-  entityType?: T;
-  entityId?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

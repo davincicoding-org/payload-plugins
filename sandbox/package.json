@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@payloadcms/db-postgres": "catalog:payload-stack",
+    "@payloadcms/email-resend": "^3.76.0",
     "@payloadcms/next": "catalog:payload-stack",
     "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": "catalog:payload-stack",
@@ -30,6 +31,7 @@
     "next-intl": "^4.7.0",
     "payload": "catalog:payload-stack",
     "payload-intl": "workspace:*",
+    "payload-invitations": "workspace:*",
     "payload-smart-cache": "workspace:*",
     "react": "catalog:payload-stack",
     "react-dom": "catalog:payload-stack",
