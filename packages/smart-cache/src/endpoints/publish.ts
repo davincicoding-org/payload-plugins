@@ -24,7 +24,7 @@ export const createPublishChangesEndpoint = (
     });
 
     if (changesToPublish.length === 0)
-      return new Response('No changes to publish', { status: 200 });
+      return Response.json({ message: 'No changes to publish' });
 
     const tagsToInvalidate = new Set<EntitySlug>();
     const collectionChanges = new CollectionChanges();
@@ -132,10 +132,13 @@ export const createPublishChangesEndpoint = (
       },
     });
 
-    return new Response('OK', {
-      headers: headersWithCors({
-        headers: new Headers(),
-        req,
-      }),
-    });
+    return Response.json(
+      { message: 'OK' },
+      {
+        headers: headersWithCors({
+          headers: new Headers(),
+          req,
+        }),
+      },
+    );
   });
