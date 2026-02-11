@@ -1,1 +1,1 @@
-export {};
+export { InvitationPage } from '../components/InvitationPage';

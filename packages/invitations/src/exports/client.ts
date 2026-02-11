@@ -1,1 +1,1 @@
-export {};
+export { HideAuthOnCreate } from '../components/HideAuthOnCreate';
