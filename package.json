@@ -9,7 +9,7 @@
     "ci": "pnpm ci:check && pnpm ci:build && pnpm ci:typecheck && pnpm ci:test",
     "ci:build": "pnpm --filter='./packages/**' build",
     "ci:check": "biome ci . && pnpm format:pkg --check",
-    "ci:publish": "pnpm ci:build && changeset publish --cmd \"pnpm publish --access public --no-git-checks --provenance\"",
+    "ci:publish": "pnpm ci:build && node .github/scripts/publish.mjs",
     "ci:test": "pnpm --filter='./packages/**' test",
     "ci:typecheck": "pnpm --filter sandbox typecheck",
     "clean": "pnpm -r clean && rm -rf node_modules && pnpm install",

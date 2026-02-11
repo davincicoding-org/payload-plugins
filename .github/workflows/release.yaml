@@ -22,14 +22,21 @@ jobs:
         with:
           node-version: 24
           cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
+          # Do NOT set registry-url — it creates .npmrc with _authToken
+          # that blocks OIDC authentication (actions/setup-node#1445)
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Create Release PR or Publish
+      # Publish packages that have new versions via npm OIDC trusted publishing.
+      # This runs BEFORE changesets/action because the action creates an .npmrc
+      # with _authToken=${NODE_AUTH_TOKEN} that blocks OIDC.
+      - name: Publish packages to npm
+        run: pnpm ci:publish
+
+      # Handle version PRs (changesets without publish — publishing is done above)
+      - name: Create Release PR
         uses: changesets/action@v1
         with:
           commit: "chore(release): version packages"
-          publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
