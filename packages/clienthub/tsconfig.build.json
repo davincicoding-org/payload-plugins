@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@repo/common": ["./src/_common/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "src/_common/**/*.test.ts"]
+}

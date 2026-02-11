@@ -4,9 +4,12 @@ import { execSync, spawn } from 'node:child_process';
 import {
   copyFileSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   readdirSync,
   rmSync,
+  symlinkSync,
+  unlinkSync,
   watch,
 } from 'node:fs';
 import * as path from 'node:path';
@@ -35,6 +38,29 @@ const tsconfig = existsSync(path.join(cwd, 'tsconfig.build.json'))
   ? 'tsconfig.build.json'
   : 'tsconfig.json';
 
+// @repo/common inlining via symlink
+const commonSrc = path.join(commonDir, 'src');
+const symlinkPath = path.join(cwd, 'src', '_common');
+
+function ensureCommonSymlink() {
+  try {
+    lstatSync(symlinkPath);
+    unlinkSync(symlinkPath);
+  } catch {
+    // symlink doesn't exist yet — fine
+  }
+  const target = path.relative(path.join(cwd, 'src'), commonSrc);
+  symlinkSync(target, symlinkPath, 'dir');
+}
+
+function removeCommonSymlink() {
+  try {
+    unlinkSync(symlinkPath);
+  } catch {
+    // already removed — fine
+  }
+}
+
 /** @param {string} cmd @param {import('node:child_process').ExecSyncOptions} [o] */
 const exec = (cmd, o) => execSync(cmd, { cwd, stdio: 'inherit', ...o });
 
@@ -55,6 +81,7 @@ if (opts.watch) {
   const children = [];
   const cleanup = () => {
     for (const c of children) c.kill();
+    removeCommonSymlink();
   };
   process.on('SIGINT', cleanup);
   process.on('SIGTERM', cleanup);
@@ -70,6 +97,7 @@ if (opts.watch) {
     children.push(child);
   };
 
+  ensureCommonSymlink();
   copyAssets();
 
   const srcDir = path.join(cwd, 'src');
@@ -109,10 +137,15 @@ if (opts.watch) {
     if (existsSync(p)) rmSync(p);
   }
 
-  copyAssets();
-  exec(
-    `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${TEST_IGNORE}"`,
-  );
-  exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
-  exec(`tsc-alias -p ${tsconfig}`);
+  ensureCommonSymlink();
+  try {
+    copyAssets();
+    exec(
+      `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${TEST_IGNORE}"`,
+    );
+    exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
+    exec(`tsc-alias -p ${tsconfig}`);
+  } finally {
+    removeCommonSymlink();
+  }
 }

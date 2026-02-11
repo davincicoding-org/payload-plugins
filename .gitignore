@@ -6,3 +6,5 @@ dist
 *.tsbuildinfo
 .payload-gen.config.ts
 .claude/settings.local.json
+# Build-time symlink for @repo/common inlining
+**/src/_common
