@@ -40,7 +40,7 @@ const tsconfig = existsSync(path.join(cwd, 'tsconfig.build.json'))
 
 // @repo/common inlining via symlink
 const commonSrc = path.join(commonDir, 'src');
-const symlinkPath = path.join(cwd, 'src', '_common');
+const symlinkPath = path.join(cwd, 'src', 'internals');
 
 function ensureCommonSymlink() {
   try {

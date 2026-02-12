@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rm -f src/_common 2>/dev/null; pnpm typecheck",
+    "prebuild": "rm -f src/internals 2>/dev/null; pnpm typecheck",
     "build": "plugin-build",
     "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "plugin-build --watch",
