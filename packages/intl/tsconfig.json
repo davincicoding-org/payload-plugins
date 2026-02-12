@@ -8,6 +8,10 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/components/inputs/ReferencePop"
+  ],
   "exclude": ["node_modules", "dist", "src/internals/**/*.test.ts"]
 }

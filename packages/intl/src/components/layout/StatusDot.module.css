@@ -1,0 +1,16 @@
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.translated {
+  background-color: var(--theme-success-500);
+}
+
+.missing {
+  background-color: var(--theme-error-500);
+}

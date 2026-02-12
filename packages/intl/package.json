@@ -57,12 +57,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@base-ui/react": "^1.1.0",
     "@formatjs/icu-messageformat-parser": "^2.11.2",
     "@tabler/icons-react": "^3.36.1",
     "clsx": "^2.1.1",
     "lexical-beautiful-mentions": "^0.1.48",
     "lodash-es": "^4.17.21",
-    "radix-ui": "^1.4.2",
     "react-hook-form": "^7.58.1",
     "zod": "catalog:"
   },

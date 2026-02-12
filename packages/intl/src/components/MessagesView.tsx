@@ -39,12 +39,21 @@ export async function MessagesView({
   const hasAccess = await access(req);
   if (!hasAccess) redirect(getAdminURL({ req }), RedirectType.replace);
 
+  if (!payload.config.localization) {
+    return null;
+  }
+  const defaultLocale = payload.config.localization.defaultLocale;
+  const activeLocale =
+    typeof locale === 'string' ? locale : (locale?.code ?? defaultLocale);
+
   const translations: Translations<DeepPartial<Messages>> = {};
 
-  for (const locale of locales) {
-    const messages = await fetchMessages(payload, locale);
+  for (const loc of locales) {
+    const messages = await fetchMessages(payload, loc);
 
-    translations[locale] = sanitizeMessages(schema, messages);
+    translations[loc] = sanitizeMessages(schema, messages, {
+      useSchemaDefaults: loc === defaultLocale,
+    });
   }
 
   return (
@@ -66,6 +75,8 @@ export async function MessagesView({
     >
       <Gutter>
         <MessagesForm
+          activeLocale={activeLocale}
+          defaultLocale={defaultLocale}
           endpointUrl={endpointUrl}
           locales={locales}
           schema={schema}

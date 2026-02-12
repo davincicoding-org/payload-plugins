@@ -8,16 +8,16 @@
   border: none;
 }
 
-.toggleItem[data-state="off"] {
+.toggleItem:not([data-pressed]) {
   cursor: pointer;
   opacity: 0.5;
 }
 
-.toggleItem[data-state="off"]:hover {
+.toggleItem:not([data-pressed]):hover {
   opacity: 1;
 }
 
-.toggleItem[data-state="on"] {
+.toggleItem[data-pressed] {
   background-color: var(--theme-elevation-800);
   color: var(--theme-elevation-0);
 }

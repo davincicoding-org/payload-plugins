@@ -1,8 +1,9 @@
 import { Button } from '@payloadcms/ui';
+import clsx from 'clsx';
 import { get } from 'lodash-es';
 import { useCallback } from 'react';
 import { useFormState } from 'react-hook-form';
-import { useMessagesForm } from '@/components/MessageFormContext';
+import { useMessagesForm } from '@/components/MessagesFormProvider';
 import type { MessagesSchema } from '@/types';
 import { toWords } from '@/utils/format';
 import styles from './MessagesTabs.module.css';
@@ -34,16 +35,11 @@ export function MessagesTabs({
       {Object.keys(schema).map((key) => (
         <Button
           buttonStyle={activeTab === key ? 'pill' : 'tab'}
-          className={[
+          className={clsx(
             styles.tab,
-            hasErrors(key)
-              ? activeTab === key
-                ? styles.tabError
-                : styles.tabErrorInactive
-              : undefined,
-          ]
-            .filter(Boolean)
-            .join(' ')}
+            hasErrors(key) && activeTab === key && styles.tabError,
+            hasErrors(key) && activeTab !== key && styles.tabErrorInactive,
+          )}
           key={key}
           onClick={() => setActiveTab(key)}
           size="large"

@@ -8,22 +8,12 @@
 
 .fieldset {
   margin-inline: 0;
+  padding: 0;
+  border: none;
   flex: 1;
-  border-radius: var(--style-radius-m);
-  overflow: visible;
-}
-
-.fieldset:focus-within {
-  border-color: var(--theme-elevation-400);
-}
-
-.fieldsetError {
-  border: 1px solid var(--theme-error-400);
-  background-color: var(--theme-error-100);
 }
 
 .legend {
-  margin-left: -0.5rem;
   padding-inline: 0.375rem;
   font-size: var(--font-size-base);
 }

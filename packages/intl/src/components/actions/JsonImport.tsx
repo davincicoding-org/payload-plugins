@@ -1,19 +1,21 @@
 import { Button } from '@payloadcms/ui';
 import { IconBraces } from '@tabler/icons-react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
-import { useMessagesForm } from '@/components/MessageFormContext';
+import { useMessagesForm } from '@/components/MessagesFormProvider';
 
 import styles from './JsonImport.module.css';
 
-export function JsonImport() {
-  const { locales, setValue } = useMessagesForm();
+export interface JsonImportProps {
+  activeLocale: string;
+}
+export function JsonImport({ activeLocale }: JsonImportProps) {
+  const { setValue } = useMessagesForm();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedLocale, setSelectedLocale] = useState<string>();
 
   const handleImportJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!selectedLocale || !file) {
+    if (!file) {
       event.target.value = '';
       return;
     }
@@ -22,12 +24,10 @@ export function JsonImport() {
     reader.onload = (readerEvent) => {
       const text = readerEvent.target?.result as string;
       const data = JSON.parse(text);
-      // FIMXE this does not cause the form to re-render
-      setValue(selectedLocale, data, {
+      setValue(activeLocale, data, {
         shouldDirty: true,
         shouldValidate: true,
       });
-      setSelectedLocale(undefined);
       // Clear the input value to allow re-selection of the same or different file
       event.target.value = '';
     };
@@ -48,24 +48,7 @@ export function JsonImport() {
         className={styles.button}
         icon={<IconBraces className={styles.icon} />}
         iconPosition="left"
-        SubMenuPopupContent={({ close }) => (
-          <div className={styles.submenu}>
-            {locales.map((locale) => (
-              <Button
-                buttonStyle="subtle"
-                key={locale}
-                onClick={() => {
-                  setSelectedLocale(locale);
-                  inputRef.current?.click();
-                  close();
-                }}
-                size="small"
-              >
-                {locale}.json
-              </Button>
-            ))}
-          </div>
-        )}
+        onClick={() => inputRef.current?.click()}
       >
         Import
       </Button>

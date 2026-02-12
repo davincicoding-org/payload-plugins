@@ -59,4 +59,33 @@ describe('sanitizeMessages', () => {
     const result = sanitizeMessages(config, ['not', 'an', 'object']);
     expect(result).toEqual({});
   });
+
+  test('falls back to schema values when useSchemaDefaults is true', () => {
+    const config = { greeting: 'Hello', farewell: 'Bye' };
+    const data = { greeting: 'Hi' };
+    const result = sanitizeMessages(config, data, { useSchemaDefaults: true });
+    expect(result).toEqual({ greeting: 'Hi', farewell: 'Bye' });
+  });
+
+  test('falls back to schema values for nested structures', () => {
+    const config = { group: { title: 'Title', subtitle: 'Subtitle' } };
+    const data = { group: { title: 'Custom' } };
+    const result = sanitizeMessages(config, data, { useSchemaDefaults: true });
+    expect(result).toEqual({
+      group: { title: 'Custom', subtitle: 'Subtitle' },
+    });
+  });
+
+  test('does not fall back to schema values when useSchemaDefaults is false', () => {
+    const config = { greeting: 'Hello', farewell: 'Bye' };
+    const data = { greeting: 'Hi' };
+    const result = sanitizeMessages(config, data, { useSchemaDefaults: false });
+    expect(result).toEqual({ greeting: 'Hi' });
+  });
+
+  test('fills all leaves from schema when data is empty and useSchemaDefaults is true', () => {
+    const config = { greeting: 'Hello', group: { msg: 'World' } };
+    const result = sanitizeMessages(config, null, { useSchemaDefaults: true });
+    expect(result).toEqual({ greeting: 'Hello', group: { msg: 'World' } });
+  });
 });

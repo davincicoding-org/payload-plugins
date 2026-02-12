@@ -1,27 +1,31 @@
 import { Controller } from 'react-hook-form';
-import { useMessagesForm } from '@/components/MessageFormContext';
+import { useMessagesForm } from '@/components/MessagesFormProvider';
 import type { Locale, TemplateVariable } from '@/types';
 import type { MessageValidator } from '@/utils/validate';
 
 import { MessageInput } from './inputs/MessageInput';
 
-interface MessageControllerProps {
+interface MessageFormFieldProps {
   label?: string;
   locale: Locale;
   name: string;
   className?: string;
   variables: TemplateVariable[];
   validate: MessageValidator;
+  multiline?: boolean;
+  reference?: string;
 }
 
-export function MessageController({
+export function MessageFormField({
   name,
   variables,
   label,
   locale,
   validate,
   className,
-}: MessageControllerProps): React.ReactNode {
+  multiline,
+  reference,
+}: MessageFormFieldProps): React.ReactNode {
   const { control } = useMessagesForm();
 
   return (
@@ -34,8 +38,10 @@ export function MessageController({
           error={fieldState.error}
           label={label}
           lang={locale}
+          multiline={multiline}
           onBlur={field.onBlur}
           onChange={field.onChange}
+          reference={reference}
           value={(field.value as unknown as string) || ''}
           variables={variables}
         />

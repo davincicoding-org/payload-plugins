@@ -1,11 +1,10 @@
 'use client';
 
-import { Button, toast, useDocumentEvents, useStepNav } from '@payloadcms/ui';
-import { isEqual } from 'lodash-es';
+import { Button, useStepNav } from '@payloadcms/ui';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { FormValues } from '@/components/MessageFormContext';
-import { MessagesFormProvider } from '@/components/MessageFormContext';
+import type { FormValues } from '@/components/MessagesFormProvider';
+import { MessagesFormProvider } from '@/components/MessagesFormProvider';
 import type {
   DeepPartial,
   Locale,
@@ -13,8 +12,8 @@ import type {
   MessagesSchema,
   Translations,
 } from '@/types';
-import { getErrorMessage } from '@/utils/error-handling';
 import { JsonImport } from './actions/JsonImport';
+import { useMessagesFormSubmit } from './hooks/useMessagesFormSubmit';
 import { MessageField } from './layout/MessageField';
 import { MessagesTabs } from './layout/MessagesTabs';
 import { MessagesTree } from './layout/MessagesTree';
@@ -22,6 +21,8 @@ import styles from './MessagesForm.module.css';
 
 interface MessagesFormProps {
   locales: Locale[];
+  defaultLocale: Locale;
+  activeLocale: Locale;
   schema: MessagesSchema;
   tabs?: boolean;
   values: Translations<DeepPartial<Messages>>;
@@ -30,71 +31,53 @@ interface MessagesFormProps {
 
 export function MessagesForm({
   locales,
+  defaultLocale,
+  activeLocale,
   schema,
   tabs = false,
   values,
   endpointUrl,
 }: MessagesFormProps): React.ReactNode {
   const { setStepNav } = useStepNav();
-  const { reportUpdate } = useDocumentEvents();
   useEffect(() => {
     setStepNav([{ label: 'Intl Messages', url: '/intl' }]);
   }, [setStepNav]);
 
   const form = useForm<FormValues>({
     defaultValues: values,
-    reValidateMode: 'onChange',
+    reValidateMode: 'onBlur',
   });
   const [activeTab, setActiveTab] = useState(Object.keys(schema)[0]);
 
-  const handleSubmit = async (currentValues: FormValues) => {
-    const toastId = toast.loading('Saving...');
-    const changes = Object.entries(currentValues).reduce<
-      Translations<Messages>
-    >((acc, [locale, value]) => {
-      const hasChanged = !isEqual(value, values[locale]);
-      if (!hasChanged) return acc;
-      acc[locale] = value;
-      return acc;
-    }, {});
-
-    try {
-      const response = await fetch(endpointUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(changes),
-      });
-
-      if (!response.ok) {
-        const error = await getErrorMessage(response);
-        throw new Error(error);
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (form.formState.isDirty) {
+        e.preventDefault();
       }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [form]);
 
-      form.reset(currentValues);
-      reportUpdate({
-        entitySlug: 'messages',
-        operation: 'update',
-        updatedAt: new Date().toISOString(),
-      });
-      toast.success('Saved', { id: toastId });
-    } catch (error) {
-      toast.error(
-        `Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        { id: toastId },
-      );
-    }
-  };
+  const handleSubmit = useMessagesFormSubmit({
+    endpointUrl,
+    defaultValues: values,
+    form,
+  });
 
   return (
-    <MessagesFormProvider form={form} locales={locales}>
+    <MessagesFormProvider
+      activeLocale={activeLocale}
+      defaultLocale={defaultLocale}
+      form={form}
+      locales={locales}
+    >
       <form className={styles.form} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className={styles.stickyHeader}>
           <header className={styles.header}>
             <h1 className={styles.title}>Messages</h1>
             <div className={styles.actions}>
-              <JsonImport />
+              <JsonImport activeLocale={activeLocale} />
               <Button
                 className={styles.saveButton}
                 disabled={!form.formState.isDirty}

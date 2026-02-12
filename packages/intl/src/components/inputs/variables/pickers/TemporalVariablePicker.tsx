@@ -1,26 +1,26 @@
-import { ToggleGroup } from 'radix-ui';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { useEffect, useRef, useState } from 'react';
 import type { DateElement, TimeElement } from '@/types';
 
 import { isDateElement, isTimeElement } from '@/utils/guards';
 
-import { DateVariableEditor } from '../editors/DateVariableEditor';
-import { TimeElementEditor } from '../editors/TimeVariableEditor';
-import styles from './TemporalElementEditor.module.css';
+import { TemporalVariableEditor } from '../editors/TemporalVariableEditor';
+import styles from './TemporalVariablePicker.module.css';
 
 const TEMPORAL_TYPES = ['date', 'time'] as const;
 
 type TemporalType = (typeof TEMPORAL_TYPES)[number];
 
-export interface TemporalElementEditorProps {
+export interface TemporalVariablePickerProps {
   element: DateElement | TimeElement;
   onUpdate: (value: string) => void;
 }
 
-export function TemporalElementEditor({
+export function TemporalVariablePicker({
   element,
   onUpdate,
-}: TemporalElementEditorProps) {
+}: TemporalVariablePickerProps) {
   const [type, setType] = useState<TemporalType | undefined>(() => {
     if (isDateElement(element)) return 'date';
     if (isTimeElement(element)) return 'time';
@@ -38,36 +38,37 @@ export function TemporalElementEditor({
 
   return (
     <div>
-      <ToggleGroup.Root
+      <ToggleGroup
         className={styles.toggleGroup}
-        onValueChange={(value) => setType(value as TemporalType)}
-        type="single"
-        value={type}
+        onValueChange={(newValue) => {
+          if (newValue.length === 0) return;
+          const next = newValue.find((v) => v !== type);
+          if (next) setType(next as TemporalType);
+        }}
+        value={type ? [type] : []}
       >
         {TEMPORAL_TYPES.map((type) => (
-          <ToggleGroup.Item
-            className={styles.toggleItem}
-            key={type}
-            value={type}
-          >
+          <Toggle className={styles.toggleItem} key={type} value={type}>
             {type}
-          </ToggleGroup.Item>
+          </Toggle>
         ))}
-      </ToggleGroup.Root>
+      </ToggleGroup>
 
       <div className={styles.content}>
-        {type === 'date' && (
-          <DateVariableEditor
-            element={isDateElement(element) ? element : undefined}
+        {type && (
+          <TemporalVariableEditor
+            element={
+              type === 'date'
+                ? isDateElement(element)
+                  ? element
+                  : undefined
+                : isTimeElement(element)
+                  ? element
+                  : undefined
+            }
             name={element.value}
             ref={getValueRef}
-          />
-        )}
-        {type === 'time' && (
-          <TimeElementEditor
-            element={isTimeElement(element) ? element : undefined}
-            name={element.value}
-            ref={getValueRef}
+            type={type}
           />
         )}
       </div>

@@ -2,13 +2,13 @@ import { Button } from '@payloadcms/ui';
 import { IconBraces } from '@tabler/icons-react';
 import { get } from 'lodash-es';
 
-import { useMessagesForm } from '@/components/MessageFormContext';
+import { useMessagesForm } from '@/components/MessagesFormProvider';
 
-import styles from './Move.module.css';
+import styles from './CopyMessages.module.css';
 
-export function Move() {
+export function CopyMessages() {
   const { getValues, setValue, locales } = useMessagesForm();
-  const handleMove = () => {
+  const handleCopy = () => {
     const sourcePath = prompt('Source path');
     if (!sourcePath) {
       return;
@@ -29,7 +29,7 @@ export function Move() {
       className={styles.button}
       icon={<IconBraces className={styles.icon} />}
       iconPosition="left"
-      onClick={handleMove}
+      onClick={handleCopy}
     >
       Copy
     </Button>

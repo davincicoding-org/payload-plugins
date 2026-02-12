@@ -25,7 +25,7 @@ export default buildConfig({
   },
   serverURL: env.BASE_URL,
   localization: {
-    locales: ['en'],
+    locales: ['en', 'de'],
     defaultLocale: 'en',
   },
   collections: [
@@ -81,8 +81,9 @@ export default buildConfig({
     invitationsPlugin({}),
     intlPlugin({
       schema: messages,
+      tabs: true,
     }),
-    smartCachePlugin({ collections: ['media'] }),
+    smartCachePlugin({ collections: ['media', 'messages'] }),
     localFileStoragePlugin(),
   ],
 });

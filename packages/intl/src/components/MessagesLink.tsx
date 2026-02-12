@@ -22,7 +22,7 @@ export async function MessagesLink({
       el="link"
       to={getAdminURL({ req, path: '/intl' })}
     >
-      <IconWorld />
+      <IconWorld size={20} strokeWidth={1.5} />
     </Button>
   );
 }

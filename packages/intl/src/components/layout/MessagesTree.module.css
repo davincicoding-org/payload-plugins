@@ -1,12 +1,14 @@
 .grid {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .item {
   display: grid;
   min-width: 0;
 }
+
+/* Group accordion */
 
 .collapsible {
   min-width: 0;
@@ -16,18 +18,21 @@
   border-color: var(--theme-border-color);
 }
 
-.collapsible > .collapsible__toggle-wrap {
+.collapsible > :global(.collapsible__toggle-wrap) {
   position: sticky;
   border-bottom: 1px solid var(--theme-border-color);
-  top: calc(var(--nesting-level) * 40px - 26px);
+  top: calc(var(--nesting-level) * 36px - 26px);
   z-index: calc(9 - var(--nesting-level));
+  padding-block: 0.5rem;
 }
 
-.collapsible .collapsible__content {
-  padding: 0.75rem;
+.collapsible :global(.collapsible__content) {
+  padding: 1rem;
 }
 
 .header {
+  display: inline-flex;
+  align-items: center;
   font-size: var(--font-size-large);
 }
 

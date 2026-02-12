@@ -68,9 +68,9 @@
 
 .popoverContent {
   z-index: 50;
-  max-height: var(--radix-dropdown-menu-content-available-height);
+  max-height: var(--available-height);
   min-width: 8rem;
-  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  transform-origin: var(--transform-origin);
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: var(--style-radius-m);
@@ -81,11 +81,11 @@
     0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
-.popoverContent[data-state="open"] {
+.popoverContent[data-open] {
   animation: popoverIn 150ms ease-out;
 }
 
-.popoverContent[data-state="closed"] {
+.popoverContent[data-closed] {
   animation: popoverOut 150ms ease-in;
 }
 

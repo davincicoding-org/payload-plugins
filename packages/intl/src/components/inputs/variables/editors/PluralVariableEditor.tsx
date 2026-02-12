@@ -1,6 +1,6 @@
+import { Popover } from '@base-ui/react/popover';
 import { TYPE } from '@formatjs/icu-messageformat-parser';
 import { IconX } from '@tabler/icons-react';
-import { Popover } from 'radix-ui';
 import { Fragment, useImperativeHandle, useMemo } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type { PluralElement } from '@/types';
@@ -117,74 +117,76 @@ export function PluralVariableEditor({
         <Popover.Root>
           <Popover.Trigger>Add Option</Popover.Trigger>
           <Popover.Portal>
-            <Popover.Content className={styles.popoverContent} sideOffset={4}>
-              <div className={styles.optionsList}>
-                {NAMED_PLURAL_OPTIONS.filter((option) =>
-                  options.fields.every((field) => field.name !== option),
-                ).map((option) => (
-                  <Popover.Close
-                    className={styles.optionItem}
-                    key={option}
-                    onClick={() => {
-                      // TODO ensure the fields are always in the same order as staticPluralOptions
-                      options.append(
-                        {
-                          name: option,
-                          content: '',
-                        },
-                        {
-                          shouldFocus: true,
-                        },
-                      );
-                    }}
-                  >
-                    {option}
-                  </Popover.Close>
-                ))}
-              </div>
-
-              <div className={styles.customInputGroup}>
-                <label htmlFor="customValue">custom</label>
-                <Controller
-                  control={control}
-                  name="customValue"
-                  render={({ field }) => (
-                    <input
-                      className={styles.customInput}
-                      min={0}
-                      onChange={({ currentTarget: { value } }) => {
-                        const number = Number(value);
-                        if (Number.isNaN(number)) return;
-                        if (number < 0) return;
-                        field.onChange(number);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key !== 'Enter') return;
-                        if (field.value === undefined) return;
-                        const isUnique = !options.fields.some(
-                          (existingField) =>
-                            existingField.name === `=${field.value}`,
-                        );
-                        if (!isUnique) return; // TODO maybe show error?
+            <Popover.Positioner sideOffset={4}>
+              <Popover.Popup className={styles.popoverContent}>
+                <div className={styles.optionsList}>
+                  {NAMED_PLURAL_OPTIONS.filter((option) =>
+                    options.fields.every((field) => field.name !== option),
+                  ).map((option) => (
+                    <Popover.Close
+                      className={styles.optionItem}
+                      key={option}
+                      onClick={() => {
+                        // TODO ensure the fields are always in the same order as staticPluralOptions
                         options.append(
                           {
-                            name: `=${field.value}`,
+                            name: option,
                             content: '',
                           },
                           {
                             shouldFocus: true,
                           },
                         );
-                        field.onChange(undefined);
                       }}
-                      placeholder="=0"
-                      type="numeric"
-                      value={field.value ?? ''}
-                    />
-                  )}
-                />
-              </div>
-            </Popover.Content>
+                    >
+                      {option}
+                    </Popover.Close>
+                  ))}
+                </div>
+
+                <div className={styles.customInputGroup}>
+                  <label htmlFor="customValue">custom</label>
+                  <Controller
+                    control={control}
+                    name="customValue"
+                    render={({ field }) => (
+                      <input
+                        className={styles.customInput}
+                        min={0}
+                        onChange={({ currentTarget: { value } }) => {
+                          const number = Number(value);
+                          if (Number.isNaN(number)) return;
+                          if (number < 0) return;
+                          field.onChange(number);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key !== 'Enter') return;
+                          if (field.value === undefined) return;
+                          const isUnique = !options.fields.some(
+                            (existingField) =>
+                              existingField.name === `=${field.value}`,
+                          );
+                          if (!isUnique) return; // TODO maybe show error?
+                          options.append(
+                            {
+                              name: `=${field.value}`,
+                              content: '',
+                            },
+                            {
+                              shouldFocus: true,
+                            },
+                          );
+                          field.onChange(undefined);
+                        }}
+                        placeholder="=0"
+                        type="numeric"
+                        value={field.value ?? ''}
+                      />
+                    )}
+                  />
+                </div>
+              </Popover.Popup>
+            </Popover.Positioner>
           </Popover.Portal>
         </Popover.Root>
       </div>

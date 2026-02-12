@@ -1,10 +1,11 @@
 'use client';
 
+import { Popover } from '@base-ui/react/popover';
 import type { NodeKey } from '@payloadcms/richtext-lexical/lexical';
 import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical';
 import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext';
+import clsx from 'clsx';
 import type { BeautifulMentionNode } from 'lexical-beautiful-mentions';
-import { Popover } from 'radix-ui';
 import { useMemo } from 'react';
 
 import {
@@ -18,8 +19,8 @@ import { parseICUMessage } from '@/utils/icu-tranform';
 
 import { SelectVariableEditor } from './editors/SelectVariableEditor';
 import { TagVariableEditor } from './editors/TagVariableEditor';
-import { NumericVariablePicker } from './pickers/NumericVariablePicker';
-import { TemporalElementEditor } from './pickers/TemporalElementEditor';
+import { NumericVariableEditor } from './pickers/NumericVariableEditor';
+import { TemporalVariablePicker } from './pickers/TemporalVariablePicker';
 import styles from './VariableChip.module.css';
 
 const TEMPORAL_ELEMENTS_FLAG = false;
@@ -62,40 +63,43 @@ export function VariableChip({ name, label, icu, nodeKey }: VariableChipProps) {
 
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>
-        <button
-          className={[styles.chip, isDisabled ? styles.chipDisabled : undefined]
-            .filter(Boolean)
-            .join(' ')}
-          data-icu={icu}
-          data-variable={name}
-          type="button"
-        >
-          {/* <VariableIcon type={element.type} className="size-4" /> */}
-          {label}
-        </button>
+      <Popover.Trigger
+        render={
+          <button
+            className={clsx(styles.chip, isDisabled && styles.chipDisabled)}
+            data-icu={icu}
+            data-variable={name}
+            type="button"
+          />
+        }
+      >
+        {/* <VariableIcon type={element.type} className="size-4" /> */}
+        {label}
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content
-          align="start"
-          className={styles.popoverContent}
-          side="bottom"
-          sideOffset={5}
-        >
-          {isNumericElement(element) && (
-            <NumericVariablePicker element={element} onUpdate={handleUpdate} />
-          )}
-          {isSelectElement(element) && (
-            <SelectVariableEditor element={element} onUpdate={handleUpdate} />
-          )}
-          {TEMPORAL_ELEMENTS_FLAG && isTemporalElement(element) && (
-            <TemporalElementEditor element={element} onUpdate={handleUpdate} />
-          )}
+        <Popover.Positioner align="start" side="bottom" sideOffset={5}>
+          <Popover.Popup className={styles.popoverContent}>
+            {isNumericElement(element) && (
+              <NumericVariableEditor
+                element={element}
+                onUpdate={handleUpdate}
+              />
+            )}
+            {isSelectElement(element) && (
+              <SelectVariableEditor element={element} onUpdate={handleUpdate} />
+            )}
+            {TEMPORAL_ELEMENTS_FLAG && isTemporalElement(element) && (
+              <TemporalVariablePicker
+                element={element}
+                onUpdate={handleUpdate}
+              />
+            )}
 
-          {isTagElement(element) && (
-            <TagVariableEditor element={element} onUpdate={handleUpdate} />
-          )}
-        </Popover.Content>
+            {isTagElement(element) && (
+              <TagVariableEditor element={element} onUpdate={handleUpdate} />
+            )}
+          </Popover.Popup>
+        </Popover.Positioner>
       </Popover.Portal>
     </Popover.Root>
   );

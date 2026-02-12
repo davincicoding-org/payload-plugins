@@ -90,10 +90,10 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'en' | 'en'[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'de') | ('en' | 'de')[];
   globals: {};
   globalsSelect: {};
-  locale: 'en';
+  locale: 'en' | 'de';
   user: User & {
     collection: 'users';
   };

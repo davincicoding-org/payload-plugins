@@ -1,7 +1,18 @@
 .editor {
   position: relative;
+  display: grid;
+  align-items: center;
   min-height: 2rem;
   font-size: var(--font-size-large);
+}
+
+.readOnly {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.multiline {
+  min-height: 4rem;
 }
 
 .menuAnchor {
@@ -10,16 +21,24 @@
 
 .contentEditable {
   outline: none;
+  border-radius: var(--style-radius-m);
+  background-color: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-300);
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  height: 100%;
 }
 
 .contentEditable:focus {
   outline: none;
+  border-color: var(--theme-elevation-600);
 }
 
-.contentEditable > :first-child {
-  margin-top: 0;
+.contentEditableError {
+  border-color: var(--theme-error-400);
+  background-color: var(--theme-error-100);
 }
 
-.contentEditable > :last-child {
-  margin-bottom: 0;
+.contentEditable p {
+  margin: 0;
 }

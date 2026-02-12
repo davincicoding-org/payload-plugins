@@ -9,22 +9,30 @@ export type FormValues = Translations<Messages>;
 
 const MessagesFormContext = createContext<{
   locales: Locale[];
+  defaultLocale: Locale;
+  activeLocale: Locale;
 }>({
   locales: ['en'],
+  defaultLocale: 'en',
+  activeLocale: 'en',
 });
 
 interface MessagesFormProviderProps {
   locales: Locale[];
+  defaultLocale: Locale;
+  activeLocale: Locale;
   form: UseFormReturn<FormValues>;
 }
 
 export function MessagesFormProvider({
   locales,
+  defaultLocale,
+  activeLocale,
   form,
   children,
 }: React.PropsWithChildren<MessagesFormProviderProps>) {
   return (
-    <MessagesFormContext value={{ locales }}>
+    <MessagesFormContext value={{ locales, defaultLocale, activeLocale }}>
       <FormProvider {...form}>{children}</FormProvider>
     </MessagesFormContext>
   );

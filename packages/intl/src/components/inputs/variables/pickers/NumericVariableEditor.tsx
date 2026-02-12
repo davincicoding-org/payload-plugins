@@ -1,11 +1,12 @@
-import { ToggleGroup } from 'radix-ui';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { useEffect, useRef, useState } from 'react';
 import type { NumberElement, PluralElement } from '@/types';
 
 import { isNumberElement, isPluralElement } from '@/utils/guards';
 
 import { PluralVariableEditor } from '../editors/PluralVariableEditor';
-import styles from './NumericVariablePicker.module.css';
+import styles from './NumericVariableEditor.module.css';
 
 const NUMERIC_TYPES = [
   'number',
@@ -15,15 +16,15 @@ const NUMERIC_TYPES = [
 
 type NumericType = (typeof NUMERIC_TYPES)[number];
 
-export interface NumericVariablePickerProps {
+export interface NumericVariableEditorProps {
   element: NumberElement | PluralElement;
   onUpdate: (value: string) => void;
 }
 
-export function NumericVariablePicker({
+export function NumericVariableEditor({
   element,
   onUpdate,
-}: NumericVariablePickerProps) {
+}: NumericVariableEditorProps) {
   const [type, setType] = useState<NumericType | undefined>(() => {
     if (isNumberElement(element)) return 'number';
     if (isPluralElement(element)) return 'plural';
@@ -41,22 +42,21 @@ export function NumericVariablePicker({
 
   return (
     <div>
-      <ToggleGroup.Root
+      <ToggleGroup
         className={styles.toggleGroup}
-        onValueChange={(value) => setType(value as NumericType)}
-        type="single"
-        value={type}
+        onValueChange={(newValue) => {
+          if (newValue.length === 0) return;
+          const next = newValue.find((v) => v !== type);
+          if (next) setType(next as NumericType);
+        }}
+        value={type ? [type] : []}
       >
         {NUMERIC_TYPES.map((type) => (
-          <ToggleGroup.Item
-            className={styles.toggleItem}
-            key={type}
-            value={type}
-          >
+          <Toggle className={styles.toggleItem} key={type} value={type}>
             {type}
-          </ToggleGroup.Item>
+          </Toggle>
         ))}
-      </ToggleGroup.Root>
+      </ToggleGroup>
 
       <div className={styles.content}>
         {type === 'plural' && (

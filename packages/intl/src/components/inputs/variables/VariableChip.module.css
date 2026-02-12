@@ -20,7 +20,7 @@
 .popoverContent {
   z-index: 50;
   display: grid;
-  transform-origin: var(--radix-hover-card-content-transform-origin);
+  transform-origin: var(--transform-origin);
   overflow: clip;
   border-radius: var(--style-radius-m);
   border: 1px solid var(--theme-border-color);
@@ -35,11 +35,11 @@
   display: none;
 }
 
-.popoverContent[data-state="open"] {
+.popoverContent[data-open] {
   animation: popoverIn 150ms ease-out;
 }
 
-.popoverContent[data-state="closed"] {
+.popoverContent[data-closed] {
   animation: popoverOut 150ms ease-in;
 }
 

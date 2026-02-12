@@ -3,18 +3,18 @@
 import type { EditorState } from '@payloadcms/richtext-lexical/lexical';
 import { $getRoot } from '@payloadcms/richtext-lexical/lexical';
 import { LexicalComposer } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@payloadcms/richtext-lexical/lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@payloadcms/richtext-lexical/lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@payloadcms/richtext-lexical/lexical/react/LexicalHistoryPlugin';
 import { OnChangePlugin } from '@payloadcms/richtext-lexical/lexical/react/LexicalOnChangePlugin';
 import { PlainTextPlugin } from '@payloadcms/richtext-lexical/lexical/react/LexicalPlainTextPlugin';
+import clsx from 'clsx';
 import {
   BeautifulMentionNode,
-  type BeautifulMentionsMenuItemProps,
-  type BeautifulMentionsMenuProps,
   BeautifulMentionsPlugin,
 } from 'lexical-beautiful-mentions';
-import { forwardRef, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import type { TemplateVariable } from '@/types';
 
 import { formatVariableLabel } from '@/utils/format';
@@ -24,55 +24,43 @@ import {
   serializeICUMessage,
 } from '@/utils/icu-tranform';
 
-import type { InputWrapperProps } from './InputWrapper';
-import { InputWrapper } from './InputWrapper';
+import type { FieldWrapperProps } from './FieldWrapper';
+import { FieldWrapper } from './FieldWrapper';
 import styles from './MessageInput.module.css';
+import { SingleLinePlugin } from './SingleLinePlugin';
 import { VariableMentionNode } from './variables/VariableNode';
-import suggestionStyles from './variables/VariableSuggestion.module.css';
+import { MentionMenu, MentionMenuItem } from './variables/VariableSuggestion';
 
-export interface MessageInputProps extends InputWrapperProps {
+function SyncValuePlugin({ value }: { value: string }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    const currentText = editor
+      .getEditorState()
+      .read(() => $getRoot().getTextContent());
+    if (value !== currentText) {
+      queueMicrotask(() => {
+        const newState = editor.parseEditorState(
+          JSON.stringify(parseIcuToLexicalState(value)),
+        );
+        editor.setEditorState(newState);
+      });
+    }
+  }, [value, editor]);
+
+  return null;
+}
+
+export interface MessageInputProps extends FieldWrapperProps {
   value: string;
   lang: string;
   variables: TemplateVariable[];
   onChange: (value: string) => void;
   onBlur: () => void;
+  readOnly?: boolean;
+  multiline?: boolean;
+  reference?: string;
 }
-
-const MentionMenu = forwardRef<HTMLUListElement, BeautifulMentionsMenuProps>(
-  ({ loading: _, ...props }, ref) => (
-    <ul {...props} className={suggestionStyles.list} ref={ref} />
-  ),
-);
-
-const MentionMenuItem = forwardRef<
-  HTMLLIElement,
-  BeautifulMentionsMenuItemProps
->((props, ref) => (
-  <li
-    aria-selected={props.selected}
-    className={[
-      suggestionStyles.item,
-      props.selected ? suggestionStyles.itemSelected : undefined,
-    ]
-      .filter(Boolean)
-      .join(' ')}
-    onClick={props.onClick}
-    onKeyDown={props.onKeyDown}
-    onMouseDown={props.onMouseDown}
-    onMouseEnter={props.onMouseEnter}
-    ref={ref}
-    // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: standard WAI-ARIA listbox/option pattern
-    role="option"
-    tabIndex={-1}
-  >
-    {typeof props.item.data?.label === 'string'
-      ? props.item.data.label
-      : props.item.displayValue}
-  </li>
-));
-
-// TODO add variable editor (style, options, etc)
-// TODO add tooltip to show all variables
 
 export function MessageInput({
   label,
@@ -83,6 +71,8 @@ export function MessageInput({
   onChange,
   onBlur,
   className,
+  multiline,
+  reference,
 }: MessageInputProps) {
   const handleChange = useCallback(
     (editorState: EditorState) => {
@@ -107,37 +97,59 @@ export function MessageInput({
     };
   }, [variables]);
 
-  const initialConfig = {
-    namespace: 'ICUMessageEditor',
-    nodes: [
-      VariableMentionNode,
-      {
-        replace: BeautifulMentionNode,
-        with: (node: BeautifulMentionNode) =>
-          new VariableMentionNode(
-            node.getTrigger(),
-            node.getValue(),
-            node.getData(),
-          ),
-      },
-    ],
-    editorState: JSON.stringify(parseIcuToLexicalState(value)),
-    onError: console.error,
-  };
+  // biome-ignore lint/correctness/useExhaustiveDependencies: LexicalComposer only reads initialConfig on mount
+  const initialConfig = useMemo(
+    () => ({
+      namespace: 'ICUMessageEditor',
+      nodes: [
+        VariableMentionNode,
+        {
+          replace: BeautifulMentionNode,
+          with: (node: BeautifulMentionNode) =>
+            new VariableMentionNode(
+              node.getTrigger(),
+              node.getValue(),
+              node.getData(),
+            ),
+          withKlass: VariableMentionNode,
+        },
+      ],
+      editorState: JSON.stringify(parseIcuToLexicalState(value)),
+      editable: true,
+      onError: console.error,
+    }),
+    [],
+  );
 
   return (
-    <InputWrapper className={className} error={error} label={label}>
+    <FieldWrapper
+      className={className}
+      error={error}
+      label={label}
+      reference={reference}
+    >
       <LexicalComposer initialConfig={initialConfig}>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: onBlur captures focus-leave from the Lexical contentEditable */}
-        <div className={styles.editor} lang={lang} onBlur={onBlur}>
+        <div
+          className={clsx(styles.editor, multiline && styles.multiline)}
+          lang={lang}
+        >
           <PlainTextPlugin
             contentEditable={
-              <ContentEditable className={styles.contentEditable} />
+              <ContentEditable
+                className={clsx(
+                  styles.contentEditable,
+                  error && styles.contentEditableError,
+                )}
+                onBlur={onBlur}
+              />
             }
             ErrorBoundary={LexicalErrorBoundary}
           />
+          {multiline && <SingleLinePlugin />}
+          <SyncValuePlugin value={value} />
           <OnChangePlugin onChange={handleChange} />
           <HistoryPlugin />
+
           <BeautifulMentionsPlugin
             items={mentionItems}
             menuAnchorClassName={styles.menuAnchor}
@@ -146,6 +158,6 @@ export function MessageInput({
           />
         </div>
       </LexicalComposer>
-    </InputWrapper>
+    </FieldWrapper>
   );
 }
