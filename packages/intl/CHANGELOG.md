@@ -1,5 +1,11 @@
 # payload-intl
 
+## 1.2.3
+
+### Patch Changes
+
+- [`39e96d5`](https://github.com/davincicoding-org/payload-plugins/commit/39e96d52476b2abb8c52fe7e076f77ac26b81008) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Improve UI
+
 ## 1.2.2
 
 ### Patch Changes
