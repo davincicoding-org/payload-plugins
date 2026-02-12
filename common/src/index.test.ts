@@ -82,7 +82,7 @@ describe('assertPopulated', () => {
 
 describe('resolveForeignKey', () => {
   test('extracts ID from a populated object', () => {
-    expect(resolveForeignKey({ id: 5, name: 'Test' })).toBe(5);
+    expect(resolveForeignKey({ id: 5 })).toBe(5);
   });
 
   test('returns number primitive as-is', () => {
@@ -101,7 +101,8 @@ describe('createCollectionConfigFactory', () => {
       fields: [],
     });
 
-    const config = factory({ slug: 'items' as any });
+    // @ts-expect-error - TODO: fix this
+    const config = factory({ slug: 'items' });
     expect(config.slug).toBe('items');
     expect(config.labels).toEqual({ singular: 'Item', plural: 'Items' });
   });

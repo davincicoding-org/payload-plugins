@@ -28,8 +28,8 @@ export default async function HomePage() {
             width={65}
           />
         </picture>
-        {!user && <h1>{t('hello')}</h1>}
-        {user && <h1>{t('hello')}</h1>}
+        {!user && <h1>{t('navigation.main.academy')}</h1>}
+        {user && <h1>{t('navigation.main.academy')}</h1>}
         <div className="links">
           <a
             className="admin"
