@@ -1,0 +1,37 @@
+[
+  {
+    "label": "sandbox",
+    "command": "pnpm --filter sandbox dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
+    "label": "dev:discussions",
+    "command": "pnpm --filter ./packages/discussions dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
+    "label": "dev:intl",
+    "command": "pnpm --filter ./packages/intl dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
+    "label": "dev:invitations",
+    "command": "pnpm --filter ./packages/invitations dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
+    "label": "dev:smart-cache",
+    "command": "pnpm --filter ./packages/smart-cache dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  }
+]
