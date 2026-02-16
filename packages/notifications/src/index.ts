@@ -1,11 +1,16 @@
-import type { CollectionSlug, PayloadRequest, Plugin } from 'payload';
-import { Notifications } from './collections/notifications';
-import { Subscriptions } from './collections/subscriptions';
+import type { PayloadRequest, Plugin } from 'payload';
+import { attachPluginContext, getPluginContext } from './context';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { subscribeEndpoint } from './endpoints/subscribe';
 import { unreadCountEndpoint } from './endpoints/unread-count';
 import { unsubscribeEndpoint } from './endpoints/unsubscribe';
+import { Notifications, Subscriptions } from './entities';
+import {
+  createNotificationDoc,
+  invokeCallback,
+  sendNotificationEmail,
+} from './helpers';
 import type { NotificationsConfig, NotifyInput } from './types';
 import { notifyInputSchema } from './types';
 
@@ -16,180 +21,166 @@ export type {
 } from './types';
 export { notifyInputSchema } from './types';
 
-export interface NotificationsAPI {
-  plugin: () => Plugin;
-  notify: (req: PayloadRequest, input: NotifyInput) => Promise<void>;
-  subscribe: (
-    req: PayloadRequest,
-    userId: string | number,
-    documentId: string,
-    collectionSlug: string,
-    reason?: 'manual' | 'auto',
-  ) => Promise<void>;
-  unsubscribe: (
-    req: PayloadRequest,
-    userId: string | number,
-    documentId: string,
-    collectionSlug: string,
-  ) => Promise<void>;
-  getSubscribers: (
-    req: PayloadRequest,
-    documentId: string,
-    collectionSlug: string,
-  ) => Promise<(string | number)[]>;
-}
+// --- Plugin ---
 
-/**
- * Creates a notifications system with in-app, email, and callback channels.
- *
- * Returns an API handle with `.plugin()` for the Payload plugins array,
- * plus `.notify()`, `.subscribe()`, `.unsubscribe()`, and `.getSubscribers()`.
- */
-export const createNotifications = (
-  config: NotificationsConfig = {},
-): NotificationsAPI => {
-  const {
+export const notificationsPlugin =
+  ({
     notificationsSlug = 'notifications',
     subscriptionsSlug = 'subscriptions',
     pollInterval = 30,
     email,
     onNotify,
-  } = config;
-
-  const notifSlug = notificationsSlug as CollectionSlug;
-  const subsSlug = subscriptionsSlug as CollectionSlug;
-
-  const plugin = (): Plugin => (payloadConfig) => {
-    payloadConfig.collections ??= [];
-    payloadConfig.collections.push(Notifications({ slug: notifSlug }));
-    payloadConfig.collections.push(Subscriptions({ slug: subsSlug }));
-
-    addNotificationPreferences(payloadConfig);
-    registerEndpoints(payloadConfig, notifSlug, subsSlug);
-    registerBellComponent(payloadConfig, pollInterval);
-
-    return payloadConfig;
-  };
-
-  const notify = async (
-    req: PayloadRequest,
-    input: NotifyInput,
-  ): Promise<void> => {
-    const parsed = notifyInputSchema.parse(input);
-    const userSlug = (req.payload.config.admin?.user ??
-      'users') as CollectionSlug;
-
-    const recipient = await req.payload.findByID({
-      collection: userSlug,
-      id: parsed.recipient,
-      depth: 0,
+  }: NotificationsConfig = {}): Plugin =>
+  (config) => {
+    attachPluginContext(config, {
+      notificationsSlug,
+      subscriptionsSlug,
+      pollInterval,
+      email,
+      onNotify,
     });
 
-    const recipientData = recipient as unknown as Record<string, unknown>;
-    const prefs = recipientData.notificationPreferences as
-      | { emailEnabled?: boolean; inAppEnabled?: boolean }
-      | undefined;
+    config.collections ??= [];
+    config.collections.push(Notifications({ slug: notificationsSlug }));
+    config.collections.push(Subscriptions({ slug: subscriptionsSlug }));
 
-    const isEmailEnabled = prefs?.emailEnabled !== false;
-    const isInAppEnabled = prefs?.inAppEnabled !== false;
-    const recipientEmail = recipientData.email as string;
+    addNotificationPreferences(config);
 
-    if (isInAppEnabled) {
-      await createNotificationDoc(req, notifSlug, parsed);
-    }
-
-    if (email && isEmailEnabled && recipientEmail) {
-      await sendNotificationEmail(req, email, parsed, recipientEmail);
-    }
-
-    if (onNotify) {
-      await invokeCallback(onNotify, req, parsed, recipientEmail);
-    }
-  };
-
-  const subscribe = async (
-    req: PayloadRequest,
-    userId: string | number,
-    documentId: string,
-    collectionSlug: string,
-    reason: 'manual' | 'auto' = 'auto',
-  ): Promise<void> => {
-    const existing = await req.payload.find({
-      collection: subsSlug,
-      where: {
-        and: [
-          { user: { equals: userId } },
-          { documentId: { equals: documentId } },
-          { collectionSlug: { equals: collectionSlug } },
-        ],
-      },
-      limit: 1,
-    });
-
-    if (existing.totalDocs > 0) return;
-
-    await (req.payload.create as LooseCreateFn)({
-      collection: subsSlug,
-      data: { user: userId, documentId, collectionSlug, reason },
-      req,
-    });
-  };
-
-  const unsubscribe = async (
-    req: PayloadRequest,
-    userId: string | number,
-    documentId: string,
-    collectionSlug: string,
-  ): Promise<void> => {
-    await req.payload.delete({
-      collection: subsSlug,
-      where: {
-        and: [
-          { user: { equals: userId } },
-          { documentId: { equals: documentId } },
-          { collectionSlug: { equals: collectionSlug } },
-        ],
-      },
-      req,
-    });
-  };
-
-  const getSubscribers = async (
-    req: PayloadRequest,
-    documentId: string,
-    collectionSlug: string,
-  ): Promise<(string | number)[]> => {
-    const results = await req.payload.find({
-      collection: subsSlug,
-      where: {
-        and: [
-          { documentId: { equals: documentId } },
-          { collectionSlug: { equals: collectionSlug } },
-        ],
-      },
-      limit: 0,
-      depth: 0,
-    });
-
-    return results.docs.map(
-      (doc) =>
-        (doc as unknown as Record<string, unknown>).user as string | number,
+    config.endpoints ??= [];
+    config.endpoints.push(
+      markReadEndpoint(notificationsSlug),
+      markAllReadEndpoint(notificationsSlug),
+      unreadCountEndpoint(notificationsSlug),
+      subscribeEndpoint(subscriptionsSlug),
+      unsubscribeEndpoint(subscriptionsSlug),
     );
+
+    config.admin ??= {};
+    config.admin.components ??= {};
+    const afterNavLinks = config.admin.components.afterNavLinks ?? [];
+    afterNavLinks.push({
+      path: 'payload-notifications/client#NotificationBell',
+      clientProps: { pollInterval },
+    });
+    config.admin.components.afterNavLinks = afterNavLinks;
+
+    return config;
   };
 
-  return { plugin, notify, subscribe, unsubscribe, getSubscribers };
-};
+// --- Standalone API functions ---
 
-// Payload's local API is strictly typed against generated collection types.
-// Plugins work with dynamic slugs unknown at compile time, so we use
-// a wider signature for create calls.
-type LooseCreateFn = (args: {
-  collection: CollectionSlug;
-  data: Record<string, unknown>;
-  req?: PayloadRequest;
-}) => Promise<unknown>;
+export async function notify(
+  req: PayloadRequest,
+  input: NotifyInput,
+): Promise<void> {
+  const ctx = getPluginContext(req.payload.config);
+  const parsed = notifyInputSchema.parse(input);
+  const userSlug = req.payload.config.admin?.user ?? 'users';
 
-// --- Plugin setup helpers ---
+  const recipient = await req.payload.findByID({
+    collection: userSlug,
+    id: parsed.recipient,
+    depth: 0,
+  });
+
+  const prefs = recipient.notificationPreferences as
+    | { emailEnabled?: boolean; inAppEnabled?: boolean }
+    | undefined;
+
+  const isEmailEnabled = prefs?.emailEnabled !== false;
+  const isInAppEnabled = prefs?.inAppEnabled !== false;
+  const recipientEmail = recipient.email as string;
+
+  if (isInAppEnabled) {
+    await createNotificationDoc(req, ctx.notificationsSlug, parsed);
+  }
+
+  if (ctx.email && isEmailEnabled && recipientEmail) {
+    await sendNotificationEmail(req, ctx.email, parsed, recipientEmail);
+  }
+
+  if (ctx.onNotify) {
+    await invokeCallback(ctx.onNotify, req, parsed, recipientEmail);
+  }
+}
+
+export async function subscribe(
+  req: PayloadRequest,
+  userId: string | number,
+  documentId: string,
+  collectionSlug: string,
+  reason: 'manual' | 'auto' = 'auto',
+): Promise<void> {
+  const ctx = getPluginContext(req.payload.config);
+
+  const existing = await req.payload.find({
+    collection: ctx.subscriptionsSlug,
+    where: {
+      and: [
+        { user: { equals: userId } },
+        { documentId: { equals: documentId } },
+        { collectionSlug: { equals: collectionSlug } },
+      ],
+    },
+    limit: 1,
+  });
+
+  if (existing.totalDocs > 0) return;
+
+  await req.payload.create({
+    collection: ctx.subscriptionsSlug,
+    data: { user: userId, documentId, collectionSlug, reason },
+    req,
+  });
+}
+
+export async function unsubscribe(
+  req: PayloadRequest,
+  userId: string | number,
+  documentId: string,
+  collectionSlug: string,
+): Promise<void> {
+  const ctx = getPluginContext(req.payload.config);
+
+  await req.payload.delete({
+    collection: ctx.subscriptionsSlug,
+    where: {
+      and: [
+        { user: { equals: userId } },
+        { documentId: { equals: documentId } },
+        { collectionSlug: { equals: collectionSlug } },
+      ],
+    },
+    req,
+  });
+}
+
+export async function getSubscribers(
+  req: PayloadRequest,
+  documentId: string,
+  collectionSlug: string,
+): Promise<(string | number)[]> {
+  const ctx = getPluginContext(req.payload.config);
+
+  const results = await req.payload.find({
+    collection: ctx.subscriptionsSlug,
+    where: {
+      and: [
+        { documentId: { equals: documentId } },
+        { collectionSlug: { equals: collectionSlug } },
+      ],
+    },
+    limit: 0,
+    depth: 0,
+  });
+
+  return results.docs.map(
+    (doc) =>
+      (doc as unknown as Record<string, unknown>).user as string | number,
+  );
+}
+
+// --- Internal helpers ---
 
 function addNotificationPreferences(
   payloadConfig: Parameters<Plugin>[0],
@@ -218,95 +209,4 @@ function addNotificationPreferences(
       },
     ],
   });
-}
-
-function registerEndpoints(
-  payloadConfig: Parameters<Plugin>[0],
-  notifSlug: CollectionSlug,
-  subsSlug: CollectionSlug,
-): void {
-  payloadConfig.endpoints ??= [];
-  payloadConfig.endpoints.push(
-    markReadEndpoint(notifSlug),
-    markAllReadEndpoint(notifSlug),
-    unreadCountEndpoint(notifSlug),
-    subscribeEndpoint(subsSlug),
-    unsubscribeEndpoint(subsSlug),
-  );
-}
-
-function registerBellComponent(
-  payloadConfig: Parameters<Plugin>[0],
-  pollInterval: number,
-): void {
-  payloadConfig.admin ??= {};
-  payloadConfig.admin.components ??= {};
-
-  const afterNavLinks = payloadConfig.admin.components.afterNavLinks ?? [];
-  afterNavLinks.push({
-    path: 'payload-notifications/client#NotificationBell',
-    clientProps: { pollInterval },
-  });
-  payloadConfig.admin.components.afterNavLinks = afterNavLinks;
-}
-
-// --- Notify helpers ---
-
-async function createNotificationDoc(
-  req: PayloadRequest,
-  notifSlug: CollectionSlug,
-  parsed: NotifyInput,
-): Promise<void> {
-  await (req.payload.create as LooseCreateFn)({
-    collection: notifSlug,
-    data: {
-      recipient: parsed.recipient,
-      event: parsed.event,
-      actor: { id: parsed.actor.id, displayName: parsed.actor.displayName },
-      subject: parsed.subject,
-      url: parsed.url ?? null,
-      meta: parsed.meta ?? null,
-    },
-    req,
-  });
-}
-
-async function sendNotificationEmail(
-  req: PayloadRequest,
-  emailConfig: NonNullable<NotificationsConfig['email']>,
-  parsed: NotifyInput,
-  recipientEmail: string,
-): Promise<void> {
-  try {
-    const [html, subject] = await Promise.all([
-      emailConfig.generateHTML({
-        notification: parsed,
-        recipient: { id: parsed.recipient, email: recipientEmail },
-      }),
-      emailConfig.generateSubject({
-        notification: parsed,
-        recipient: { id: parsed.recipient, email: recipientEmail },
-      }),
-    ]);
-    await req.payload.sendEmail({ to: recipientEmail, subject, html });
-  } catch (err) {
-    console.error('[payload-notifications] Email delivery failed:', err);
-  }
-}
-
-async function invokeCallback(
-  onNotify: NonNullable<NotificationsConfig['onNotify']>,
-  req: PayloadRequest,
-  parsed: NotifyInput,
-  recipientEmail: string,
-): Promise<void> {
-  try {
-    await onNotify({
-      req,
-      notification: parsed,
-      recipient: { id: parsed.recipient, email: recipientEmail },
-    });
-  } catch (err) {
-    console.error('[payload-notifications] onNotify callback failed:', err);
-  }
 }
