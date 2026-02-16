@@ -1,7 +1,7 @@
 import type { CollectionSlug } from 'payload';
 import { ENDPOINTS } from '@/procedures';
 
-export const unsubscribeEndpoint = (subsSlug: CollectionSlug) =>
+export const unsubscribeEndpoint = (subscriptionsSlug: CollectionSlug) =>
   ENDPOINTS.unsubscribe.endpoint(
     async (req, { documentId, collectionSlug }) => {
       if (!req.user) {
@@ -9,7 +9,7 @@ export const unsubscribeEndpoint = (subsSlug: CollectionSlug) =>
       }
 
       await req.payload.delete({
-        collection: subsSlug,
+        collection: subscriptionsSlug as 'subscriptions',
         where: {
           and: [
             { user: { equals: req.user.id } },

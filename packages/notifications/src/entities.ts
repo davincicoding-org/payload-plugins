@@ -1,6 +1,6 @@
 import { createCollectionConfigFactory } from '@repo/common';
 
-export const Notifications = createCollectionConfigFactory(({ slug }) => ({
+export const Notifications = createCollectionConfigFactory({
   admin: { hidden: true },
   access: {
     read: ({ req }) => {
@@ -43,9 +43,9 @@ export const Notifications = createCollectionConfigFactory(({ slug }) => ({
     { name: 'emailSentAt', type: 'date' },
     { name: 'emailError', type: 'text' },
   ],
-}));
+});
 
-export const Subscriptions = createCollectionConfigFactory(({ slug }) => ({
+export const Subscriptions = createCollectionConfigFactory({
   admin: { hidden: true },
   access: {
     read: ({ req }) => {
@@ -77,4 +77,4 @@ export const Subscriptions = createCollectionConfigFactory(({ slug }) => ({
       required: true,
     },
   ],
-}));
+});

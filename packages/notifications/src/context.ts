@@ -1,14 +1,13 @@
-import type { Config, SanitizedConfig } from 'payload';
-import type { NotificationsConfig } from './types';
+import type { CollectionSlug, Config, SanitizedConfig } from 'payload';
+import type { NotifactionCallback, NotificationEmailConfig } from './types';
 
 const PLUGIN_KEY = 'notifications-plugin';
 
-export interface PluginContext {
-  notificationsSlug: string;
-  subscriptionsSlug: string;
+export interface NotificationPluginContext {
+  collectionSlugs: Record<'notifications' | 'subscriptions', CollectionSlug>;
   pollInterval: number;
-  email: NotificationsConfig['email'];
-  onNotify: NotificationsConfig['onNotify'];
+  email: NotificationEmailConfig | undefined;
+  onNotify: NotifactionCallback | undefined;
 }
 
 /**
@@ -17,7 +16,7 @@ export interface PluginContext {
  */
 export const attachPluginContext = (
   config: Config,
-  context: PluginContext,
+  context: NotificationPluginContext,
 ): void => {
   config.custom ??= {};
   config.custom[PLUGIN_KEY] = context;
@@ -27,8 +26,12 @@ export const attachPluginContext = (
  * Retrieve the plugin context previously stored by `attachPluginContext`.
  * Throws if the plugin was not registered, surfacing a clear error message.
  */
-export const getPluginContext = (config: SanitizedConfig): PluginContext => {
-  const ctx = config.custom?.[PLUGIN_KEY] as PluginContext | undefined;
+export const getPluginContext = (
+  config: SanitizedConfig,
+): NotificationPluginContext => {
+  const ctx = config.custom?.[PLUGIN_KEY] as
+    | NotificationPluginContext
+    | undefined;
   if (!ctx) {
     throw new Error(
       '[payload-notifications] Plugin context not found. Did you add notificationsPlugin() to your plugins array?',

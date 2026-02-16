@@ -1,20 +1,27 @@
 import type { CollectionSlug, PayloadRequest } from 'payload';
-import type { NotificationsConfig, NotifyInput } from './types';
+import type {
+  NotifactionCallback,
+  NotificationEmailConfig,
+  NotifyInput,
+} from './types';
 
 export async function createNotificationDoc(
   req: PayloadRequest,
-  notifSlug: CollectionSlug,
-  parsed: NotifyInput,
+  notificationsSlug: CollectionSlug,
+  input: NotifyInput,
 ): Promise<void> {
   await req.payload.create({
-    collection: notifSlug,
+    collection: notificationsSlug as 'notifications',
     data: {
-      recipient: parsed.recipient,
-      event: parsed.event,
-      actor: { id: parsed.actor.id, displayName: parsed.actor.displayName },
-      subject: parsed.subject,
-      url: parsed.url ?? null,
-      meta: parsed.meta ?? null,
+      recipient: String(input.recipient),
+      event: input.event,
+      actor: {
+        id: String(input.actor.id),
+        displayName: input.actor.displayName,
+      },
+      subject: input.subject,
+      url: input.url,
+      meta: input.meta,
     },
     req,
   });
@@ -22,7 +29,7 @@ export async function createNotificationDoc(
 
 export async function sendNotificationEmail(
   req: PayloadRequest,
-  emailConfig: NonNullable<NotificationsConfig['email']>,
+  emailConfig: NotificationEmailConfig,
   parsed: NotifyInput,
   recipientEmail: string,
 ): Promise<void> {
@@ -44,7 +51,7 @@ export async function sendNotificationEmail(
 }
 
 export async function invokeCallback(
-  onNotify: NonNullable<NotificationsConfig['onNotify']>,
+  onNotify: NotifactionCallback,
   req: PayloadRequest,
   parsed: NotifyInput,
   recipientEmail: string,
