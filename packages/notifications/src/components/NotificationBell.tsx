@@ -2,6 +2,7 @@
 
 import { DrawerToggler, Pill, useConfig, useDrawerSlug } from '@payloadcms/ui';
 import { useCallback, useEffect, useState } from 'react';
+import { ENDPOINTS } from '@/procedures';
 import styles from './NotificationBell.module.css';
 import {
   NOTIFICATIONS_DRAWER_SLUG,
@@ -24,13 +25,8 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
 
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const res = await fetch(`${apiRoute}/notifications-plugin/unread-count`, {
-        credentials: 'include',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUnreadCount(data.count);
-      }
+      const { count } = await ENDPOINTS.unreadCount.call(apiRoute);
+      setUnreadCount(count);
     } catch {
       // Poll will retry on next interval
     }

@@ -53,6 +53,7 @@
     "react-dom": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.2"
   },
   "peerDependencies": {

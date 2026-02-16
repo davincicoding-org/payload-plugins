@@ -2,6 +2,7 @@
 
 import { Drawer, useConfig } from '@payloadcms/ui';
 import { useCallback, useEffect, useState } from 'react';
+import { ENDPOINTS } from '@/procedures';
 import styles from './NotificationDrawer.module.css';
 import type { NotificationData } from './NotificationItem';
 import { NotificationItem } from './NotificationItem';
@@ -42,12 +43,7 @@ export function NotificationDrawer({ onRead }: NotificationDrawerProps) {
 
   const markRead = useCallback(
     async (id: string | number) => {
-      await fetch(`${apiRoute}/notifications-plugin/mark-read`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
+      await ENDPOINTS.markRead.call(apiRoute, { id });
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
@@ -59,10 +55,7 @@ export function NotificationDrawer({ onRead }: NotificationDrawerProps) {
   );
 
   const markAllRead = useCallback(async () => {
-    await fetch(`${apiRoute}/notifications-plugin/mark-all-read`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    await ENDPOINTS.markAllRead.call(apiRoute);
     setNotifications((prev) =>
       prev.map((n) => ({
         ...n,

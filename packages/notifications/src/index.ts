@@ -1,6 +1,11 @@
-import type { CollectionSlug, Endpoint, PayloadRequest, Plugin } from 'payload';
+import type { CollectionSlug, PayloadRequest, Plugin } from 'payload';
 import { Notifications } from './collections/notifications';
 import { Subscriptions } from './collections/subscriptions';
+import { markAllReadEndpoint } from './endpoints/mark-all-read';
+import { markReadEndpoint } from './endpoints/mark-read';
+import { subscribeEndpoint } from './endpoints/subscribe';
+import { unreadCountEndpoint } from './endpoints/unread-count';
+import { unsubscribeEndpoint } from './endpoints/unsubscribe';
 import type { NotificationsConfig, NotifyInput } from './types';
 import { notifyInputSchema } from './types';
 
@@ -177,18 +182,10 @@ export const createNotifications = (
 
 // Payload's local API is strictly typed against generated collection types.
 // Plugins work with dynamic slugs unknown at compile time, so we use
-// wider signatures for create/update calls.
+// a wider signature for create calls.
 type LooseCreateFn = (args: {
   collection: CollectionSlug;
   data: Record<string, unknown>;
-  req?: PayloadRequest;
-}) => Promise<unknown>;
-
-type LooseUpdateFn = (args: {
-  collection: CollectionSlug;
-  data: Record<string, unknown>;
-  id?: string | number;
-  where?: Record<string, unknown>;
   req?: PayloadRequest;
 }) => Promise<unknown>;
 
@@ -312,145 +309,4 @@ async function invokeCallback(
   } catch (err) {
     console.error('[payload-notifications] onNotify callback failed:', err);
   }
-}
-
-// --- Endpoint handlers ---
-
-function markReadEndpoint(notifSlug: CollectionSlug): Endpoint {
-  return {
-    path: '/notifications-plugin/mark-read',
-    method: 'post',
-    handler: async (req: PayloadRequest) => {
-      if (!req.user)
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      const { addDataAndFileToRequest } = await import('payload');
-      await addDataAndFileToRequest(req);
-      const { id } = req.data as { id: string | number };
-      await (req.payload.update as LooseUpdateFn)({
-        collection: notifSlug,
-        id,
-        data: { readAt: new Date().toISOString() },
-        req,
-      });
-      return Response.json({ success: true });
-    },
-  };
-}
-
-function markAllReadEndpoint(notifSlug: CollectionSlug): Endpoint {
-  return {
-    path: '/notifications-plugin/mark-all-read',
-    method: 'post',
-    handler: async (req: PayloadRequest) => {
-      if (!req.user)
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      await (req.payload.update as LooseUpdateFn)({
-        collection: notifSlug,
-        where: {
-          and: [
-            { recipient: { equals: req.user.id } },
-            { readAt: { exists: false } },
-          ],
-        },
-        data: { readAt: new Date().toISOString() },
-        req,
-      });
-      return Response.json({ success: true });
-    },
-  };
-}
-
-function unreadCountEndpoint(notifSlug: CollectionSlug): Endpoint {
-  return {
-    path: '/notifications-plugin/unread-count',
-    method: 'get',
-    handler: async (req: PayloadRequest) => {
-      if (!req.user)
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      const result = await req.payload.count({
-        collection: notifSlug,
-        where: {
-          and: [
-            { recipient: { equals: req.user.id } },
-            { readAt: { exists: false } },
-          ],
-        },
-      });
-      return Response.json({ count: result.totalDocs });
-    },
-  };
-}
-
-function subscribeEndpoint(subsSlug: CollectionSlug): Endpoint {
-  return {
-    path: '/notifications-plugin/subscribe',
-    method: 'post',
-    handler: async (req: PayloadRequest) => {
-      if (!req.user)
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      const { addDataAndFileToRequest } = await import('payload');
-      await addDataAndFileToRequest(req);
-      const { documentId, collectionSlug } = req.data as {
-        documentId: string;
-        collectionSlug: string;
-      };
-
-      const existing = await req.payload.find({
-        collection: subsSlug,
-        where: {
-          and: [
-            { user: { equals: req.user.id } },
-            { documentId: { equals: documentId } },
-            { collectionSlug: { equals: collectionSlug } },
-          ],
-        },
-        limit: 1,
-      });
-
-      if (existing.totalDocs > 0) {
-        return Response.json({ success: true, alreadySubscribed: true });
-      }
-
-      await (req.payload.create as LooseCreateFn)({
-        collection: subsSlug,
-        data: {
-          user: req.user.id,
-          documentId,
-          collectionSlug,
-          reason: 'manual',
-        },
-        req,
-      });
-      return Response.json({ success: true });
-    },
-  };
-}
-
-function unsubscribeEndpoint(subsSlug: CollectionSlug): Endpoint {
-  return {
-    path: '/notifications-plugin/unsubscribe',
-    method: 'post',
-    handler: async (req: PayloadRequest) => {
-      if (!req.user)
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      const { addDataAndFileToRequest } = await import('payload');
-      await addDataAndFileToRequest(req);
-      const { documentId, collectionSlug } = req.data as {
-        documentId: string;
-        collectionSlug: string;
-      };
-      await req.payload.delete({
-        collection: subsSlug,
-        where: {
-          and: [
-            { user: { equals: req.user.id } },
-            { documentId: { equals: documentId } },
-            { collectionSlug: { equals: collectionSlug } },
-          ],
-        },
-        req,
-      });
-      return Response.json({ success: true });
-    },
-  };
 }

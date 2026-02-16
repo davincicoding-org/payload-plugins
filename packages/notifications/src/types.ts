@@ -1,5 +1,19 @@
+import { entityIdSchema } from '@repo/common';
 import type { PayloadRequest } from 'payload';
 import { z } from 'zod';
+
+// --- Endpoint input schemas ---
+
+export const markReadSchema = z.object({
+  id: entityIdSchema,
+});
+
+export const subscriptionSchema = z.object({
+  documentId: z.string(),
+  collectionSlug: z.string(),
+});
+
+// --- Notification input ---
 
 export const notifyInputSchema = z.object({
   recipient: z.union([z.string(), z.number()]),
