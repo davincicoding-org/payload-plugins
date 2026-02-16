@@ -104,26 +104,26 @@ export const createSoftDeleteRepliesHooks =
     commentsSlug,
   }: {
     commentsSlug: CollectionSlug;
-  }): CollectionBeforeChangeHook<{
+  }): CollectionAfterChangeHook<{
     id: number | string;
     replies: (number | string)[] | null;
     deletedAt?: string;
   }> =>
-  async ({ req, operation, data }) => {
-    if (operation !== 'update') return data;
-    if (!data.deletedAt) return data;
+  async ({ doc, req, operation }) => {
+    if (operation !== 'update') return doc;
+    if (!doc.deletedAt) return doc;
 
-    if (!data.replies) return data;
-    if (data.replies.length === 0) return data;
+    if (!doc.replies) return doc;
+    if (doc.replies.length === 0) return doc;
 
     await req.payload.delete({
       collection: commentsSlug,
-      where: { id: { in: data.replies } },
+      where: { id: { in: doc.replies } },
       req,
       trash: true,
     });
 
-    return data;
+    return doc;
   };
 
 export const createDeleteRepliesHooks =
