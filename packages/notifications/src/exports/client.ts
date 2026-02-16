@@ -1,3 +1,3 @@
 'use client';
 
-export {};
+export { NotificationBell } from '../components/NotificationBell';
