@@ -6,23 +6,35 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./client": {
-      "types": "./src/exports/client.ts",
-      "import": "./src/exports/client.ts",
-      "default": "./src/exports/client.ts"
+      "types": "./dist/exports/client.d.ts",
+      "import": "./dist/exports/client.js",
+      "default": "./dist/exports/client.js"
     },
     "./rsc": {
-      "types": "./src/exports/rsc.ts",
-      "import": "./src/exports/rsc.ts",
-      "default": "./src/exports/rsc.ts"
+      "types": "./dist/exports/rsc.d.ts",
+      "import": "./dist/exports/rsc.js",
+      "default": "./dist/exports/rsc.js"
     }
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "prebuild": "rm -f src/internals 2>/dev/null; pnpm typecheck",
+    "build": "plugin-build",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "plugin-build --watch",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -31,14 +43,26 @@
   },
   "devDependencies": {
     "@payloadcms/ui": "catalog:payload-stack",
+    "@repo/common": "workspace:*",
+    "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
+    "@types/react-dom": "catalog:payload-stack",
     "next": "catalog:payload-stack",
     "payload": "catalog:payload-stack",
     "react": "catalog:payload-stack",
+    "react-dom": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
+    "vite": "catalog:vite",
     "vitest": "^3.1.2"
   },
   "peerDependencies": {
-    "payload": "^3.0.0"
+    "@payloadcms/next": ">=3.72.0",
+    "@payloadcms/ui": ">=3.72.0",
+    "next": ">=15.2.3",
+    "payload": ">=3.72.0"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9 || ^10"
   }
 }
