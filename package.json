@@ -35,6 +35,7 @@
           "payload-clienthub",
           "payload-discussions",
           "payload-intl",
+          "payload-notifications",
           "payload-invitations",
           "payload-smart-cache",
           "payload-smart-deletion",
