@@ -7,7 +7,12 @@ import { buildConfig } from 'payload';
 import { discussionsPlugin } from 'payload-discussions';
 import { intlPlugin } from 'payload-intl';
 import { invitationsPlugin } from 'payload-invitations';
-import { createNotifications } from 'payload-notifications';
+import {
+  getSubscribers,
+  notificationsPlugin,
+  notify,
+  subscribe,
+} from 'payload-notifications';
 import { smartCachePlugin } from 'payload-smart-cache';
 import { smartDeletionPlugin } from 'payload-smart-deletion';
 import sharp from 'sharp';
@@ -18,13 +23,6 @@ import { messages } from './i18n/messages';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-
-const notifications = createNotifications({
-  email: {
-    generateHTML: ({ notification }) => `<p>${notification.subject}</p>`,
-    generateSubject: ({ notification }) => notification.subject,
-  },
-});
 
 export default buildConfig({
   admin: {
@@ -138,7 +136,12 @@ export default buildConfig({
   sharp,
   plugins: [
     invitationsPlugin({}),
-    notifications.plugin(),
+    notificationsPlugin({
+      email: {
+        generateHTML: ({ notification }) => `<p>${notification.subject}</p>`,
+        generateSubject: ({ notification }) => notification.subject,
+      },
+    }),
     discussionsPlugin({
       collections: ['feature-requests'],
       onComment: async ({
@@ -156,16 +159,10 @@ export default buildConfig({
         if (!authorId) return;
 
         // Auto-subscribe the commenter to this document
-        await notifications.subscribe(
-          req,
-          authorId,
-          documentId,
-          collectionSlug,
-          'auto',
-        );
+        await subscribe(req, authorId, documentId, collectionSlug, 'auto');
 
         // Get all subscribers for this document
-        const subscribers = await notifications.getSubscribers(
+        const subscribers = await getSubscribers(
           req,
           documentId,
           collectionSlug,
@@ -189,7 +186,7 @@ export default buildConfig({
         );
 
         for (const recipientId of recipients) {
-          await notifications.notify(req, {
+          await notify(req, {
             recipient: recipientId,
             event,
             actor,
