@@ -2,12 +2,15 @@ import { entityIdSchema } from '@repo/common';
 import type { CollectionSlug, Endpoint } from 'payload';
 import { z } from 'zod';
 import { ENDPOINTS } from '@/procedures';
+import type { OnCommentArgs } from '@/types';
 import { populateComment } from '@/utitls/populate-comment';
 
 export const createCommentEndpoint = ({
   collectionSlug,
+  onComment,
 }: {
   collectionSlug: string;
+  onComment?: (args: OnCommentArgs) => void | Promise<void>;
 }): Endpoint =>
   ENDPOINTS.createComment.endpoint(
     async (req, { documentCollectionSlug, documentId, content }) => {
@@ -47,6 +50,19 @@ export const createCommentEndpoint = ({
         id: newComment.id,
         depth: 1,
       });
+
+      if (onComment) {
+        Promise.resolve(
+          onComment({
+            req,
+            comment: createdComment,
+            documentId: String(documentId),
+            collectionSlug: documentCollectionSlug,
+          }),
+        ).catch((err) =>
+          console.error('[payload-discussions] onComment callback error:', err),
+        );
+      }
 
       return populateComment(createdComment, req.payload);
     },

@@ -2,7 +2,7 @@ import type { CollectionSlug, Field, GlobalSlug, Plugin } from 'payload';
 import { createCommentEndpoint } from './endpoints/create-comment';
 import { createReplyEndpoint } from './endpoints/create-reply';
 import { Comments } from './entities';
-import type { FieldConfig } from './types';
+import type { FieldConfig, OnCommentArgs } from './types';
 
 export interface DiscussionsPluginOptions {
   /**
@@ -25,6 +25,8 @@ export interface DiscussionsPluginOptions {
    * @default "comments"
    */
   collectionSlug?: CollectionSlug;
+  /** Called after a comment or reply is created. Use this to integrate with other plugins (e.g. notifications). */
+  onComment?: (args: OnCommentArgs) => void | Promise<void>;
 }
 
 export const discussionsPlugin =
@@ -33,6 +35,7 @@ export const discussionsPlugin =
     globals = [],
     maxCommentDepth = 5,
     collectionSlug = 'comments',
+    onComment,
   }: DiscussionsPluginOptions): Plugin =>
   (config) => {
     const commentsSlug = collectionSlug as CollectionSlug;
@@ -61,9 +64,16 @@ export const discussionsPlugin =
       },
     };
 
+    const targetCollections = [
+      ...collections.map(String),
+      ...globals.map(String),
+    ];
+
     config.endpoints ??= [];
-    config.endpoints.push(createCommentEndpoint({ collectionSlug }));
-    config.endpoints.push(createReplyEndpoint({ collectionSlug }));
+    config.endpoints.push(createCommentEndpoint({ collectionSlug, onComment }));
+    config.endpoints.push(
+      createReplyEndpoint({ collectionSlug, onComment, targetCollections }),
+    );
 
     config.collections ??= [];
     config.collections.push(Comments({ slug: commentsSlug }));

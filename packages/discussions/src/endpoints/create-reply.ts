@@ -1,13 +1,23 @@
 import { entityIdSchema } from '@repo/common';
 import type { CollectionSlug, Endpoint } from 'payload';
 import { z } from 'zod';
+import type { Comment } from '@/payload-types';
 import { ENDPOINTS } from '@/procedures';
+import type { OnCommentArgs } from '@/types';
+import {
+  findDocumentForComment,
+  findRootComment,
+} from '@/utils/resolve-thread-context';
 import { populateComment } from '@/utitls/populate-comment';
 
 export const createReplyEndpoint = ({
   collectionSlug,
+  onComment,
+  targetCollections,
 }: {
   collectionSlug: string;
+  onComment?: (args: OnCommentArgs) => void | Promise<void>;
+  targetCollections: string[];
 }): Endpoint =>
   ENDPOINTS.createReply.endpoint(async (req, { parentId, content }) => {
     if (!req.user) {
@@ -44,6 +54,38 @@ export const createReplyEndpoint = ({
       id: newReply.id,
       depth: 1,
     });
+
+    if (onComment) {
+      Promise.resolve(
+        (async () => {
+          const rootId = await findRootComment(
+            req.payload,
+            parentId,
+            collectionSlug,
+          );
+          const rootComment = await req.payload.findByID({
+            collection: collectionSlug as CollectionSlug,
+            id: rootId,
+            depth: 1,
+          });
+          const docContext = await findDocumentForComment(
+            req.payload,
+            rootId,
+            targetCollections,
+          );
+          await onComment({
+            req,
+            comment: createdReply,
+            parentComment: parent as unknown as Comment,
+            rootComment: rootComment as unknown as Comment,
+            documentId: docContext?.documentId ?? '',
+            collectionSlug: docContext?.collectionSlug ?? '',
+          });
+        })(),
+      ).catch((err) =>
+        console.error('[payload-discussions] onComment callback error:', err),
+      );
+    }
 
     return populateComment(createdReply, req.payload);
   });
