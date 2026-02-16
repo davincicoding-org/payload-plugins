@@ -500,6 +500,9 @@ importers:
       payload-invitations:
         specifier: workspace:*
         version: link:../packages/invitations
+      payload-notifications:
+        specifier: workspace:*
+        version: link:../packages/notifications
       payload-smart-cache:
         specifier: workspace:*
         version: link:../packages/smart-cache

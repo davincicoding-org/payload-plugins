@@ -33,6 +33,7 @@
     "payload-discussions": "workspace:*",
     "payload-intl": "workspace:*",
     "payload-invitations": "workspace:*",
+    "payload-notifications": "workspace:*",
     "payload-smart-cache": "workspace:*",
     "payload-smart-deletion": "workspace:*",
     "react": "catalog:payload-stack",

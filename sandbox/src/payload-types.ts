@@ -70,6 +70,8 @@ export interface Config {
     users: User;
     media: Media;
     'feature-requests': FeatureRequest;
+    notifications: Notification;
+    subscriptions: Subscription;
     comments: Comment;
     messages: Message;
     'publish-queue': PublishQueue;
@@ -83,6 +85,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'feature-requests': FeatureRequestsSelect<false> | FeatureRequestsSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
     comments: CommentsSelect<false> | CommentsSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     'publish-queue': PublishQueueSelect<false> | PublishQueueSelect<true>;
@@ -133,6 +137,10 @@ export interface User {
   name?: string | null;
   role?: ('admin' | 'editor') | null;
   joinedAt?: string | null;
+  notificationPreferences?: {
+    emailEnabled?: boolean | null;
+    inAppEnabled?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -217,6 +225,48 @@ export interface Comment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: number;
+  recipient: number | User;
+  event: string;
+  actor: {
+    id: number | User;
+    displayName: string;
+  };
+  subject: string;
+  url?: string | null;
+  meta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  readAt?: string | null;
+  emailSentAt?: string | null;
+  emailError?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  user: number | User;
+  documentId: string;
+  collectionSlug: string;
+  reason: 'manual' | 'auto';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "messages".
  */
 export interface Message {
@@ -285,6 +335,14 @@ export interface PayloadLockedDocument {
         value: number | FeatureRequest;
       } | null)
     | ({
+        relationTo: 'notifications';
+        value: number | Notification;
+      } | null)
+    | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
         relationTo: 'comments';
         value: number | Comment;
       } | null)
@@ -346,6 +404,12 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
   joinedAt?: T;
+  notificationPreferences?:
+    | T
+    | {
+        emailEnabled?: T;
+        inAppEnabled?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -395,6 +459,40 @@ export interface FeatureRequestsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  recipient?: T;
+  event?: T;
+  actor?:
+    | T
+    | {
+        id?: T;
+        displayName?: T;
+      };
+  subject?: T;
+  url?: T;
+  meta?: T;
+  readAt?: T;
+  emailSentAt?: T;
+  emailError?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  documentId?: T;
+  collectionSlug?: T;
+  reason?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

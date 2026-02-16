@@ -80,15 +80,14 @@ export const createNotifications = (
       depth: 0,
     });
 
-    const prefs = (recipient as Record<string, unknown>)
-      .notificationPreferences as
+    const recipientData = recipient as unknown as Record<string, unknown>;
+    const prefs = recipientData.notificationPreferences as
       | { emailEnabled?: boolean; inAppEnabled?: boolean }
       | undefined;
 
     const isEmailEnabled = prefs?.emailEnabled !== false;
     const isInAppEnabled = prefs?.inAppEnabled !== false;
-    const recipientEmail = (recipient as Record<string, unknown>)
-      .email as string;
+    const recipientEmail = recipientData.email as string;
 
     if (isInAppEnabled) {
       await createNotificationDoc(req, notifSlug, parsed);
@@ -167,7 +166,10 @@ export const createNotifications = (
       depth: 0,
     });
 
-    return results.docs.map((doc) => doc.user as string | number);
+    return results.docs.map(
+      (doc) =>
+        (doc as unknown as Record<string, unknown>).user as string | number,
+    );
   };
 
   return { plugin, notify, subscribe, unsubscribe, getSubscribers };
