@@ -16,6 +16,7 @@ export const hideAuthOnCreateField: Field = {
   name: '_hideAuthOnCreate',
   type: 'ui',
   admin: {
+    disableListColumn: true,
     components: {
       Field: {
         path: 'payload-invitations/client#HideAuthOnCreate',
