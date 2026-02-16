@@ -1,45 +1,36 @@
 # Git Workflow
 
-## Commit Message Format
+## Commit Messages
 
-```
-<type>: <description>
+Follow the Conventional Commits specification:
 
-<optional body>
-```
+- `feat:` — new feature
+- `fix:` — bug fix
+- `docs:` — documentation only
+- `style:` — formatting, no code change
+- `refactor:` — code restructure without behavior change
+- `test:` — adding or updating tests
+- `chore:` — maintenance tasks
 
-Types: feat, fix, refactor, docs, test, chore, perf, ci
+Format: `<type>(<optional-scope>): <description>`
 
-Note: Attribution disabled globally via .claude/settings.json.
+Keep the subject line under 72 characters. Use the body for context when
+the change is non-trivial.
+
+## Branch Naming
+
+Use the pattern: `<type>/<short-description>`
+
+Examples:
+- `feat/user-auth`
+- `fix/login-redirect`
+- `chore/update-deps`
 
 ## Pull Request Workflow
 
-When creating PRs:
-1. Analyze full commit history (not just latest commit)
-2. Use `git diff [base-branch]...HEAD` to see all changes
-3. Draft comprehensive PR summary
-4. Include test plan with TODOs
-5. Push with `-u` flag if new branch
-
-## Feature Implementation Workflow
-
-1. **Plan First**
-   - Use **planner** agent to create implementation plan
-   - Identify dependencies and risks
-   - Break down into phases
-
-2. **TDD Approach**
-   - Use **tdd-guide** agent
-   - Write tests first (RED)
-   - Implement to pass tests (GREEN)
-   - Refactor (IMPROVE)
-   - Verify 80%+ coverage
-
-3. **Code Review**
-   - Use **code-reviewer** agent immediately after writing code
-   - Address CRITICAL and HIGH issues
-   - Fix MEDIUM issues when possible
-
-4. **Commit & Push**
-   - Detailed commit messages
-   - Follow conventional commits format
+1. Create a feature branch from the default branch
+2. Make small, focused commits
+3. Write a clear PR description explaining *what* and *why*
+4. Request review from at least one team member
+5. Address review comments with fixup commits
+6. Squash-merge to keep the main branch history clean
