@@ -1,9 +1,5 @@
 import { createCollectionConfigFactory } from '@repo/common';
-import {
-  attachAuthor,
-  createDeleteRepliesHooks,
-  createSoftDeleteRepliesHooks,
-} from './hooks';
+import { attachAuthor } from './hooks';
 
 export const Comments = createCollectionConfigFactory(({ slug }) => ({
   trash: true,
@@ -29,6 +25,7 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
       type: 'relationship',
       relationTo: slug,
       hasMany: true,
+      custom: { smartDeletion: 'cascade' },
       admin: {
         condition: (data) => Boolean(data?.id),
       },
@@ -37,7 +34,5 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
 
   hooks: {
     beforeChange: [attachAuthor],
-    afterChange: [createSoftDeleteRepliesHooks({ commentsSlug: slug })],
-    afterDelete: [createDeleteRepliesHooks({ commentsSlug: slug })],
   },
 }));

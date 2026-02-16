@@ -2,11 +2,6 @@ import type { CollectionSlug, Field, GlobalSlug, Plugin } from 'payload';
 import { createCommentEndpoint } from './endpoints/create-comment';
 import { createReplyEndpoint } from './endpoints/create-reply';
 import { Comments } from './entities';
-import {
-  createDeleteCommentsHooks,
-  createRestoreCommentsHooks,
-  createSoftDeleteCommentsHooks,
-} from './hooks';
 import type { FieldConfig } from './types';
 
 export interface DiscussionsPluginOptions {
@@ -47,6 +42,7 @@ export const discussionsPlugin =
       type: 'relationship',
       relationTo: commentsSlug,
       hasMany: true,
+      custom: { smartDeletion: 'cascade' },
       admin: {
         position: 'sidebar',
         condition: (data) => Boolean(data?.id),
@@ -76,26 +72,6 @@ export const discussionsPlugin =
       if (!collections.includes(collection.slug as CollectionSlug)) continue;
       collection.fields ??= [];
       collection.fields.push(discussionsField);
-
-      collection.hooks ??= {};
-      collection.hooks.beforeChange ??= [];
-      collection.hooks.beforeChange.push(
-        createSoftDeleteCommentsHooks({
-          commentsSlug,
-        }),
-      );
-      collection.hooks.afterChange ??= [];
-      collection.hooks.afterChange.push(
-        createRestoreCommentsHooks({
-          commentsSlug,
-        }),
-      );
-      collection.hooks.afterDelete ??= [];
-      collection.hooks.afterDelete.push(
-        createDeleteCommentsHooks({
-          commentsSlug,
-        }),
-      );
     }
 
     config.globals ??= [];

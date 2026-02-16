@@ -1,0 +1,58 @@
+{
+  "name": "payload-smart-deletion",
+  "version": "0.0.0",
+  "description": "Payload CMS plugin that adds PostgreSQL-style referential actions (cascade, set_null, restrict) to relationship fields.",
+  "keywords": [
+    "payload"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davincicoding-org/payload-plugins.git",
+    "directory": "packages/smart-deletion"
+  },
+  "license": "MIT",
+  "author": "DAVINCI CODING GmbH",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prebuild": "rm -f src/internals 2>/dev/null; pnpm typecheck",
+    "build": "plugin-build",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "plugin-build --watch",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/common": "workspace:*",
+    "@types/node": "^22.5.4",
+    "payload": "catalog:payload-stack",
+    "typescript": "catalog:payload-stack",
+    "vite": "catalog:vite",
+    "vitest": "^3.1.2",
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "payload": ">=3.72.0"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9 || ^10"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

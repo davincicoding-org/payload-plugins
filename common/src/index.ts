@@ -47,7 +47,18 @@ export const createCollectionConfigFactory =
     ...(typeof factory === 'function' ? factory(options) : factory),
   });
 
-export const resolveForeignKey = (entity: TypeWithID['id'] | TypeWithID) =>
+export type EntityReference = TypeWithID['id'] | TypeWithID;
+
+export function isEntityReference(value: unknown): value is EntityReference {
+  if (typeof value === 'string') return true;
+  if (typeof value === 'number') return true;
+  if (value === null) return false;
+  if (typeof value !== 'object') return true;
+  if (!('id' in value)) return false;
+  return isEntityReference(value.id);
+}
+
+export const resolveForeignKey = (entity: EntityReference) =>
   typeof entity === 'object' ? entity.id : entity;
 
 export {

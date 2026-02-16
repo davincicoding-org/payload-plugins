@@ -8,6 +8,7 @@ import { discussionsPlugin } from 'payload-discussions';
 import { intlPlugin } from 'payload-intl';
 import { invitationsPlugin } from 'payload-invitations';
 import { smartCachePlugin } from 'payload-smart-cache';
+import { smartDeletionPlugin } from 'payload-smart-deletion';
 import sharp from 'sharp';
 
 import { localFileStoragePlugin } from './cms/dev-plugins';
@@ -130,6 +131,7 @@ export default buildConfig({
   plugins: [
     invitationsPlugin({}),
     discussionsPlugin({ collections: ['feature-requests'] }),
+    smartDeletionPlugin(),
     intlPlugin({
       schema: messages,
       tabs: true,

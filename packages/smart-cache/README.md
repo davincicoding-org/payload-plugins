@@ -24,18 +24,22 @@ pnpm add payload-smart-cache
 
 ## Usage
 
+**Important:** `smartCachePlugin` scans collection and global fields at config time to auto-discover referenced collections. It must be listed **after** any plugin that registers collections or injects relationship fields, so those are visible during the scan.
+
 ```ts
 // payload.config.ts
-import { buildConfig } from 'payload';
-import { smartCachePlugin } from 'payload-smart-cache';
+import { buildConfig } from "payload";
+import { discussionsPlugin } from "payload-discussions";
+import { smartCachePlugin } from "payload-smart-cache";
 
 export default buildConfig({
   // ...
   plugins: [
+    discussionsPlugin({ collections: ["posts"] }), // registers collections & injects fields
     smartCachePlugin({
-      collections: ['pages', 'posts'],
-      globals: ['site-settings'],
-    }),
+      collections: ["pages", "posts"],
+      globals: ["site-settings"],
+    }), // must come after
   ],
 });
 ```
@@ -43,25 +47,25 @@ export default buildConfig({
 Wrap your data-fetching functions with `createRequestHandler` so they are cached by entity tags and automatically revalidated on publish:
 
 ```ts
-import { createRequestHandler } from 'payload-smart-cache';
+import { createRequestHandler } from "payload-smart-cache";
 
 const getPosts = createRequestHandler(
   async () => {
     const payload = await getPayload({ config });
-    return payload.find({ collection: 'posts' });
+    return payload.find({ collection: "posts" });
   },
-  ['posts'], // cache tags — revalidated when posts change
+  ["posts"], // cache tags — revalidated when posts change
 );
 ```
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `collections` | `CollectionSlug[]` | `[]` | Collections to track changes for. Referenced collections are auto-tracked. |
-| `globals` | `GlobalSlug[]` | `[]` | Globals to track changes for. Referenced collections are auto-tracked. |
-| `disableAutoTracking` | `boolean` | `false` | Disable automatic tracking of collections referenced via relationship/upload fields. |
-| `publishHandler` | `(changes: ChangedDocuments) => void \| Promise<void>` | — | Custom handler called when changes are published. Receives a record mapping collection slugs to arrays of changed document IDs. |
+| Option                | Type                                                   | Default | Description                                                                                                                     |
+| --------------------- | ------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `collections`         | `CollectionSlug[]`                                     | `[]`    | Collections to track changes for. Referenced collections are auto-tracked.                                                      |
+| `globals`             | `GlobalSlug[]`                                         | `[]`    | Globals to track changes for. Referenced collections are auto-tracked.                                                          |
+| `disableAutoTracking` | `boolean`                                              | `false` | Disable automatic tracking of collections referenced via relationship/upload fields.                                            |
+| `publishHandler`      | `(changes: ChangedDocuments) => void \| Promise<void>` | —       | Custom handler called when changes are published. Receives a record mapping collection slugs to arrays of changed document IDs. |
 
 ## Contributing
 

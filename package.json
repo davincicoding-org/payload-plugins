@@ -37,6 +37,7 @@
           "payload-intl",
           "payload-invitations",
           "payload-smart-cache",
+          "payload-smart-deletion",
           "sandbox",
           "root"
         ]

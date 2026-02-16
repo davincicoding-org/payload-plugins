@@ -398,6 +398,30 @@ importers:
         specifier: ^3.1.2
         version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
 
+  packages/smart-deletion:
+    devDependencies:
+      '@repo/common':
+        specifier: workspace:*
+        version: link:../../common
+      '@types/node':
+        specifier: ^22.5.4
+        version: 22.19.7
+      payload:
+        specifier: catalog:payload-stack
+        version: 3.72.0(graphql@16.12.0)(typescript@5.7.3)
+      typescript:
+        specifier: catalog:payload-stack
+        version: 5.7.3
+      vite:
+        specifier: catalog:vite
+        version: 7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
+      vitest:
+        specifier: ^3.1.2
+        version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.5
+
   sandbox:
     dependencies:
       '@payloadcms/db-postgres':
@@ -448,6 +472,9 @@ importers:
       payload-smart-cache:
         specifier: workspace:*
         version: link:../packages/smart-cache
+      payload-smart-deletion:
+        specifier: workspace:*
+        version: link:../packages/smart-deletion
       react:
         specifier: catalog:payload-stack
         version: 19.2.1
@@ -4779,6 +4806,7 @@ packages:
 
   scmp@2.1.0:
     resolution: {integrity: sha512-o/mRQGk9Rcer/jEEw/yw4mwo3EU/NvYvp577/Btqrym9Qy5/MdWGBqipbALgd2lrdWTJ5/gqDusxfnQBxOxT2Q==}
+    deprecated: Just use Node.js's crypto.timingSafeEqual()
 
   secure-json-parse@4.1.0:
     resolution: {integrity: sha512-l4KnYfEyqYJxDwlNVyRfO2E4NTHfMKAWdUuA8J0yve2Dz/E/PdBepY03RvyJpssIpRFwJoCD55wA+mEDs6ByWA==}

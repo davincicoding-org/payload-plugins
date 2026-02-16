@@ -34,6 +34,7 @@
     "payload-intl": "workspace:*",
     "payload-invitations": "workspace:*",
     "payload-smart-cache": "workspace:*",
+    "payload-smart-deletion": "workspace:*",
     "react": "catalog:payload-stack",
     "react-dom": "catalog:payload-stack",
     "sharp": "0.34.2",
