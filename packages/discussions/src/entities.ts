@@ -2,7 +2,9 @@ import { createCollectionConfigFactory } from '@repo/common';
 import { attachAuthor } from './hooks';
 
 export const Comments = createCollectionConfigFactory(({ slug }) => ({
-  trash: true,
+  admin: {
+    hidden: true,
+  },
   access: {
     read: () => true,
     create: ({ req }) => Boolean(req.user),
