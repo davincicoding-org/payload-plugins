@@ -4,6 +4,7 @@ import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { hideAuthOnCreateField, joinedAtField } from './fields';
 import { autoGeneratePassword } from './hooks/auto-generate-password';
+import { validateUniqueEmail } from './hooks/validate-unique-email';
 import type { User } from './payload-types';
 
 export interface InvitationsPluginConfig {
@@ -141,6 +142,8 @@ export const invitationsPlugin =
       collection.hooks ??= {};
       collection.hooks.beforeValidate ??= [];
       collection.hooks.beforeValidate.push(autoGeneratePassword);
+      collection.hooks.beforeChange ??= [];
+      collection.hooks.beforeChange.push(validateUniqueEmail);
     }
 
     config.endpoints ??= [];

@@ -37,6 +37,16 @@ export function HideAuthOnCreate() {
     });
   }, [id, dispatchFields, isInitializing]);
 
+  // Disable autocomplete on hidden auth fields to prevent browser password manager prompts
+  useEffect(() => {
+    if (id) return;
+
+    const inputs = document.querySelectorAll('.auth-fields input');
+    for (const input of inputs) {
+      input.setAttribute('autocomplete', 'off');
+    }
+  }, [id]);
+
   // Only hide auth fields on create (new document)
   if (id) return null;
 
