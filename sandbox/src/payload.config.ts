@@ -4,6 +4,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { resendAdapter } from '@payloadcms/email-resend';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
+import { discussionsPlugin } from 'payload-discussions';
 import { intlPlugin } from 'payload-intl';
 import { invitationsPlugin } from 'payload-invitations';
 import { smartCachePlugin } from 'payload-smart-cache';
@@ -60,6 +61,55 @@ export default buildConfig({
       ],
       upload: true,
     },
+    {
+      slug: 'feature-requests',
+      trash: true,
+      admin: {
+        useAsTitle: 'title',
+        description:
+          'Help improve the camp management system by sharing your ideas.',
+      },
+
+      hooks: {
+        beforeChange: [
+          ({ req, operation, data }) => {
+            if (operation === 'create' && req.user) {
+              data.createdBy = req.user.id;
+            }
+
+            return data;
+          },
+        ],
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'createdBy',
+              type: 'relationship',
+              relationTo: 'users',
+              admin: {
+                width: '250px',
+                readOnly: true,
+                condition: (data) => Boolean(data?.id),
+              },
+            },
+          ],
+        },
+
+        {
+          name: 'description',
+          type: 'richText',
+          required: true,
+        },
+      ],
+    },
   ],
   email: resendAdapter({
     defaultFromAddress: 'noreply@davincicoding.ch',
@@ -79,6 +129,7 @@ export default buildConfig({
   sharp,
   plugins: [
     invitationsPlugin({}),
+    discussionsPlugin({ collections: ['feature-requests'] }),
     intlPlugin({
       schema: messages,
       tabs: true,

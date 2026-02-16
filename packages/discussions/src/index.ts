@@ -52,14 +52,14 @@ export const discussionsPlugin =
         condition: (data) => Boolean(data?.id),
         components: {
           Field: {
-            path: '@/cms/plugins/discussions/rsc#DiscussionsField',
+            path: 'payload-discussions/rsc#DiscussionsField',
             clientProps: {
               maxDepth: maxCommentDepth,
               commentsCollectionSlug: collectionSlug,
             } satisfies FieldConfig,
           },
           Cell: {
-            path: '@/cms/plugins/discussions/rsc#DiscussionsCell',
+            path: 'payload-discussions/rsc#DiscussionsCell',
           },
         },
       },

@@ -30,6 +30,7 @@
     "next": "catalog:payload-stack",
     "next-intl": "^4.7.0",
     "payload": "catalog:payload-stack",
+    "payload-discussions": "workspace:*",
     "payload-intl": "workspace:*",
     "payload-invitations": "workspace:*",
     "payload-smart-cache": "workspace:*",

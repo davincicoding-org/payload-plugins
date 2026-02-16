@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'feature-requests': FeatureRequest;
+    comments: Comment;
     messages: Message;
     'publish-queue': PublishQueue;
     'payload-kv': PayloadKv;
@@ -80,6 +82,8 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'feature-requests': FeatureRequestsSelect<false> | FeatureRequestsSelect<true>;
+    comments: CommentsSelect<false> | CommentsSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     'publish-queue': PublishQueueSelect<false> | PublishQueueSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -170,6 +174,49 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Help improve the camp management system by sharing your ideas.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feature-requests".
+ */
+export interface FeatureRequest {
+  id: number;
+  title: string;
+  createdBy?: (number | null) | User;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  discussions?: (number | Comment)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: number;
+  content: string;
+  author?: (number | null) | User;
+  replies?: (number | Comment)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "messages".
  */
@@ -233,6 +280,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'feature-requests';
+        value: number | FeatureRequest;
+      } | null)
+    | ({
+        relationTo: 'comments';
+        value: number | Comment;
       } | null)
     | ({
         relationTo: 'messages';
@@ -329,6 +384,31 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feature-requests_select".
+ */
+export interface FeatureRequestsSelect<T extends boolean = true> {
+  title?: T;
+  createdBy?: T;
+  description?: T;
+  discussions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments_select".
+ */
+export interface CommentsSelect<T extends boolean = true> {
+  content?: T;
+  author?: T;
+  replies?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
