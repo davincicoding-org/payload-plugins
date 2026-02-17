@@ -57,7 +57,7 @@ export function NotificationItem({
 
   return (
     <div className={styles.row}>
-      <button
+      <Popover.Close
         className={styles.item}
         data-unread={isUnread}
         onClick={handleClick}
