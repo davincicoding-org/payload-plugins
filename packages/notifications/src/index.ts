@@ -1,5 +1,6 @@
 import type { CollectionSlug, Plugin } from 'payload';
 import { attachPluginContext } from './context';
+import { deleteNotificationEndpoint } from './endpoints/delete-notification';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { subscribeEndpoint } from './endpoints/subscribe';
@@ -84,6 +85,7 @@ export const notificationsPlugin = ({
       markReadEndpoint(notifSlug),
       markAllReadEndpoint(notifSlug),
       unreadCountEndpoint(notifSlug),
+      deleteNotificationEndpoint(notifSlug),
       subscribeEndpoint(subsSlug),
       unsubscribeEndpoint(subsSlug),
     );

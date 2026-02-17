@@ -29,4 +29,10 @@ export const ENDPOINTS = {
     method: 'post',
     input: subscriptionSchema,
   }).returns<{ success: true }>(),
+
+  deleteNotification: defineProcedure({
+    path: '/notifications-plugin/delete',
+    method: 'post',
+    input: markReadSchema,
+  }).returns<{ success: true }>(),
 };
