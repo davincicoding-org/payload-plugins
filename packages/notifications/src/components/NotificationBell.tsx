@@ -158,14 +158,20 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
             <button
               aria-label="Notification settings"
               className={styles.headerAction}
-              onClick={() => setPrefsOpen((p) => !p)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setPrefsOpen((p) => !p);
+              }}
               type="button"
             >
               <GearIcon />
             </button>
             <button
               className={styles.markAll}
-              onClick={markAllRead}
+              onClick={(e) => {
+                e.stopPropagation();
+                markAllRead();
+              }}
               type="button"
             >
               Mark all as read
@@ -174,10 +180,11 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
 
           <Collapsible
             className={styles.prefs}
+            disableHeaderToggle
+            disableToggleIndicator
             header={<span className={styles.prefsLabel}>Preferences</span>}
             initCollapsed={!prefsOpen}
             isCollapsed={!prefsOpen}
-            onToggle={() => setPrefsOpen((p) => !p)}
           >
             <label className={styles.prefRow}>
               <input
