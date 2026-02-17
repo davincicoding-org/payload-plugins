@@ -4,6 +4,15 @@ import type {
   ResolvedUser,
 } from './types';
 
+function escapeHTML(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 interface EmailArgs {
   notification: MinimalNotification;
   recipient: ResolvedUser;
@@ -33,8 +42,8 @@ export function defaultGenerateHTML({
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;padding:32px;">
         <tr><td>
-          <p style="margin:0 0 16px;font-size:15px;color:#333;">Hi ${recipient.displayName},</p>
-          <p style="margin:0 0 24px;font-size:15px;color:#333;">${notification.message}</p>
+          <p style="margin:0 0 16px;font-size:15px;color:#333;">Hi ${escapeHTML(recipient.displayName)},</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#333;">${escapeHTML(notification.message)}</p>
           <a href="${links.openURL}"
              style="display:inline-block;padding:10px 20px;background:#333;color:#fff;text-decoration:none;border-radius:4px;font-size:14px;">
             View notification

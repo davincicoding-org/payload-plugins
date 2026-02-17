@@ -64,15 +64,14 @@ export function generateEmailLinks(
     ? `${serverURL}${apiRoute}/notifications-plugin/open?id=${notificationId}`
     : (url ?? '#');
 
-  const unsubscribeURL = documentReference
-    ? (() => {
-        const token = signUnsubscribeToken(req.payload.config.secret, {
-          userId: recipientId,
-          documentReference,
-        });
-        return `${serverURL}${apiRoute}/notifications-plugin/email-unsubscribe?token=${token}`;
-      })()
-    : undefined;
+  let unsubscribeURL: string | undefined;
+  if (documentReference) {
+    const token = signUnsubscribeToken(req.payload.config.secret, {
+      userId: recipientId,
+      documentReference,
+    });
+    unsubscribeURL = `${serverURL}${apiRoute}/notifications-plugin/email-unsubscribe?token=${token}`;
+  }
 
   return { openURL, unsubscribeURL };
 }
