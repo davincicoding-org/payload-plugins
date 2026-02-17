@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createLiveMessage,
   getSubscribers,
   notificationsPlugin,
   notify,
@@ -38,5 +39,9 @@ describe('standalone API functions', () => {
 
   it('should export getSubscribers as a function', () => {
     expect(getSubscribers).toBeTypeOf('function');
+  });
+
+  it('should export createLiveMessage as a function', () => {
+    expect(createLiveMessage).toBeTypeOf('function');
   });
 });

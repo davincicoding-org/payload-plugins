@@ -10,8 +10,8 @@ import styles from './NotificationItem.module.css';
 export interface NotificationData {
   id: string | number;
   event: string;
-  /** Pre-resolved subject string for display. */
-  subject: string;
+  /** Pre-resolved message string for display. */
+  message: string;
   readAt?: string | null;
   documentReference?: StoredDocumentReference | null;
   createdAt: string;
@@ -53,7 +53,7 @@ export function NotificationItem({
       >
         {isUnread && <span className={styles.dot} />}
         <div className={styles.content}>
-          <p className={styles.subject}>{notification.subject}</p>
+          <p className={styles.message}>{notification.message}</p>
           <span className={styles.time}>
             {formatTimeToNow({ date: notification.createdAt, i18n })}
           </span>

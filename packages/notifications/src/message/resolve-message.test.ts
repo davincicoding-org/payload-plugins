@@ -1,25 +1,25 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSubjectAtReadTime, toStoredSubject } from './resolve-subject';
-import { createLiveSubject } from './subject';
+import { createLiveMessage } from './builder';
+import { resolveMessageAtReadTime, serializeMessage } from './resolve-message';
 
-describe('toStoredSubject', () => {
+describe('toMessage', () => {
   it('should store a plain string as static', () => {
-    const result = toStoredSubject('Hello', { actor: undefined });
+    const result = serializeMessage('Hello', { actor: undefined });
     expect(result).toEqual({ type: 'static', value: 'Hello' });
   });
 
-  it('should resolve a SubjectFn and store as static', () => {
+  it('should resolve a MessageFn and store as static', () => {
     const fn = ({ actor }: any) => `${actor.displayName} commented`;
-    const result = toStoredSubject(fn, {
+    const result = serializeMessage(fn, {
       actor: { id: '1', displayName: 'Jane' },
     });
     expect(result).toEqual({ type: 'static', value: 'Jane commented' });
   });
 
-  it('should pass document and meta to SubjectFn', () => {
+  it('should pass document and meta to MessageFn', () => {
     const fn = ({ actor, document, meta }: any) =>
       `${actor.displayName} did ${meta.action} on ${document.title}`;
-    const result = toStoredSubject(fn, {
+    const result = serializeMessage(fn, {
       actor: { id: '1', displayName: 'Jane' },
       document: { title: 'My Doc' },
       meta: { action: 'edit' },
@@ -30,9 +30,9 @@ describe('toStoredSubject', () => {
     });
   });
 
-  it('should store a LiveSubject as dynamic', () => {
-    const live = createLiveSubject((t) => t`${t.actor} commented`);
-    const result = toStoredSubject(live, { actor: undefined });
+  it('should store a LiveMessage as dynamic', () => {
+    const live = createLiveMessage((t) => t`${t.actor} commented`);
+    const result = serializeMessage(live, { actor: undefined });
     expect(result).toEqual({
       type: 'dynamic',
       parts: [{ type: 'actor', field: 'displayName' }, ' commented'],
@@ -40,27 +40,27 @@ describe('toStoredSubject', () => {
   });
 });
 
-describe('resolveSubjectAtReadTime', () => {
-  it('should return the value for a static subject', () => {
-    const result = resolveSubjectAtReadTime(
+describe('resolveMessageAtReadTime', () => {
+  it('should return the value for a static message', () => {
+    const result = resolveMessageAtReadTime(
       { type: 'static', value: 'Hello' },
       {},
     );
     expect(result).toBe('Hello');
   });
 
-  it('should resolve actor tokens in a dynamic subject', () => {
+  it('should resolve actor tokens in a dynamic message', () => {
     const stored = {
       type: 'dynamic' as const,
       parts: [{ type: 'actor' as const, field: 'displayName' }, ' commented'],
     };
-    const result = resolveSubjectAtReadTime(stored, {
+    const result = resolveMessageAtReadTime(stored, {
       actor: { id: '1', displayName: 'Jane' },
     });
     expect(result).toBe('Jane commented');
   });
 
-  it('should resolve document tokens in a dynamic subject', () => {
+  it('should resolve document tokens in a dynamic message', () => {
     const stored = {
       type: 'dynamic' as const,
       parts: [
@@ -70,19 +70,19 @@ describe('resolveSubjectAtReadTime', () => {
         '"',
       ],
     };
-    const result = resolveSubjectAtReadTime(stored, {
+    const result = resolveMessageAtReadTime(stored, {
       actor: { id: '1', displayName: 'Jane' },
       document: { title: 'My Doc' },
     });
     expect(result).toBe('Jane edited "My Doc"');
   });
 
-  it('should resolve meta tokens in a dynamic subject', () => {
+  it('should resolve meta tokens in a dynamic message', () => {
     const stored = {
       type: 'dynamic' as const,
       parts: ['Action: ', { type: 'meta' as const, field: 'action' }],
     };
-    const result = resolveSubjectAtReadTime(stored, {
+    const result = resolveMessageAtReadTime(stored, {
       meta: { action: 'deploy' },
     });
     expect(result).toBe('Action: deploy');
@@ -96,7 +96,7 @@ describe('resolveSubjectAtReadTime', () => {
         ' did something',
       ],
     };
-    const result = resolveSubjectAtReadTime(stored, {});
+    const result = resolveMessageAtReadTime(stored, {});
     expect(result).toBe(' did something');
   });
 });

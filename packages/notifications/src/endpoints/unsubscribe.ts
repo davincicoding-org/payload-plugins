@@ -1,25 +1,13 @@
-import type { CollectionSlug } from 'payload';
+import { unsubscribe } from '@/api';
 import { ENDPOINTS } from '@/procedures';
 
-export const unsubscribeEndpoint = (subscriptionsSlug: CollectionSlug) =>
-  ENDPOINTS.unsubscribe.endpoint(
-    async (req, { documentId, collectionSlug }) => {
-      if (!req.user) {
-        return Response.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+export const unsubscribeEndpoint = () =>
+  ENDPOINTS.unsubscribe.endpoint(async (req, { documentReference }) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-      await req.payload.delete({
-        collection: subscriptionsSlug as 'subscriptions',
-        where: {
-          and: [
-            { user: { equals: req.user.id } },
-            { documentId: { equals: documentId } },
-            { collectionSlug: { equals: collectionSlug } },
-          ],
-        },
-        req,
-      });
+    await unsubscribe(req, req.user.id, documentReference);
 
-      return { success: true as const };
-    },
-  );
+    return { success: true as const };
+  });

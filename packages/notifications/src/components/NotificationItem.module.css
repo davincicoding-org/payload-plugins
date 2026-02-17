@@ -1,6 +1,6 @@
 .row {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   border-bottom: 1px solid var(--theme-elevation-150);
 }
 
@@ -12,9 +12,9 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  padding: 0.625rem 0 0.625rem 0.75rem;
   flex: 1;
   min-width: 0;
+  padding: 0.625rem 0.75rem;
   background: none;
   border: none;
   cursor: pointer;
@@ -45,34 +45,92 @@
   min-width: 0;
 }
 
-.subject {
+.message {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 12px;
   line-height: 1.4;
 }
 
-.meta {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.6875rem;
-  color: var(--theme-elevation-500);
-  margin-top: 0.125rem;
-}
-
-.actor {
-  font-weight: 600;
-}
-
 .time {
-  opacity: 0.8;
+  display: block;
+  font-size: 10px;
+  color: var(--theme-elevation-400);
+  margin-top: 2px;
 }
 
-.menu {
+/* Menu trigger */
+
+.menuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  padding: 0.5rem 0.375rem;
-  opacity: 0.4;
+  width: 0;
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--style-radius-s);
+  cursor: pointer;
+  color: var(--theme-elevation-400);
+  transition:
+    width 120ms ease,
+    opacity 120ms ease;
+  opacity: 0;
 }
 
-.menu:hover {
+.row:hover .menuTrigger,
+.menuTrigger[data-popup-open] {
+  width: 1.75rem;
   opacity: 1;
+}
+
+.menuTrigger:hover {
+  color: var(--theme-text);
+  background-color: var(--theme-elevation-100);
+}
+
+/* Menu popup */
+
+.menuPopup {
+  background-color: var(--theme-input-bg);
+  border-radius: var(--style-radius-s);
+  box-shadow: 0 4px 16px -2px #0003;
+  padding: 0.25rem;
+  min-width: 9rem;
+  z-index: 100;
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--style-radius-s);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  cursor: pointer;
+  color: var(--theme-text);
+  background: none;
+  border: none;
+  text-align: left;
+}
+
+.menuItem:hover,
+.menuItem[data-highlighted] {
+  background-color: var(--theme-elevation-100);
+}
+
+.menuItem[data-variant="danger"] {
+  color: var(--theme-error-500);
+}
+
+.menuItem[data-variant="danger"]:hover,
+.menuItem[data-variant="danger"][data-highlighted] {
+  background-color: var(--theme-error-50, #fef2f2);
+}
+
+.menuSeparator {
+  height: 1px;
+  background-color: var(--theme-elevation-150);
+  margin: 0.25rem 0;
 }

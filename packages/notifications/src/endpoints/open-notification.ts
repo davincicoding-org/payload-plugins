@@ -1,4 +1,4 @@
-import { getAdminURL } from '@repo/common';
+import { getAdminURL, resolveDocumentID } from '@repo/common';
 import type { CollectionSlug } from 'payload';
 import { ENDPOINTS } from '@/procedures';
 
@@ -17,12 +17,9 @@ export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
     });
 
     // Verify ownership
-    const recipientId =
-      typeof notification.recipient === 'object'
-        ? notification.recipient.id
-        : notification.recipient;
+    const recipientId = resolveDocumentID(notification.recipient);
 
-    if (String(recipientId) !== String(req.user.id)) {
+    if (recipientId !== req.user.id) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -36,27 +33,21 @@ export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
       });
     }
 
-    // Determine redirect URL
-    let redirectUrl: string;
-
+    // Explicitly passed URL wins
     if (notification.url) {
-      // Explicit URL override wins
-      redirectUrl = notification.url;
-    } else if (
-      notification.documentReference?.entity &&
-      notification.documentReference?.slug
-    ) {
-      // Derive from document reference
-      const ref = notification.documentReference;
-      const path =
-        ref.entity === 'collection' && ref.documentId
-          ? `/collections/${ref.slug}/${ref.documentId}`
-          : `/globals/${ref.slug}`;
-      redirectUrl = getAdminURL({ req, path: path as `/${string}` });
-    } else {
-      // Fallback to admin root
-      redirectUrl = getAdminURL({ req, path: '' });
+      return Response.redirect(notification.url, 302);
     }
 
-    return Response.redirect(redirectUrl, 302);
+    if (!notification.documentReference) {
+      return Response.redirect(getAdminURL({ req, path: '' }), 302);
+    }
+
+    // Derive from document reference
+    const ref = notification.documentReference;
+    const path =
+      ref.entity === 'collection' && ref.documentId
+        ? (`/collections/${ref.slug}/${ref.documentId}` as const)
+        : (`/globals/${ref.slug}` as const);
+
+    return Response.redirect(getAdminURL({ req, path }), 302);
   });

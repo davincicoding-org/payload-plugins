@@ -1,76 +1,69 @@
-import type { CollectionSlug, PayloadRequest } from 'payload';
-import type { StoredSubject } from './resolve-subject';
+import type { DocumentID } from '@repo/common';
+import type { BasePayload, PayloadRequest } from 'payload';
 import type {
-  NotifactionCallback,
+  MinimalNotification,
   NotificationEmailConfig,
-  StoredDocumentReference,
+  ResolvedUser,
 } from './types';
 
-export async function createNotificationDoc(
-  req: PayloadRequest,
-  notificationsSlug: CollectionSlug,
-  data: {
-    recipient: string;
-    event: string;
-    actor?: string;
-    subject: StoredSubject;
-    url?: string;
-    meta?: Record<string, unknown>;
-    documentReference?: StoredDocumentReference;
-  },
-): Promise<void> {
-  await req.payload.create({
-    collection: notificationsSlug as 'notifications',
-    data: {
-      recipient: data.recipient,
-      event: data.event,
-      actor: data.actor,
-      subject: data.subject,
-      url: data.url,
-      meta: data.meta,
-      documentReference: data.documentReference,
-    },
-    req,
+/**
+ * Resolve a user ID into a display-name pair using the user collection's
+ * `admin.useAsTitle` config. Falls back to `email` when the configured
+ * field is missing or not a string.
+ */
+export async function resolveUser(
+  payload: BasePayload,
+  userId: DocumentID,
+): Promise<ResolvedUser> {
+  const userSlug = payload.config.admin?.user as 'users' | undefined;
+  if (!userSlug) throw new Error('User collection not configured');
+
+  const user = await payload.findByID({
+    collection: userSlug,
+    id: userId,
+    depth: 0,
   });
+
+  const displayName = (() => {
+    const { useAsTitle = 'email' } =
+      payload.collections[userSlug].config.admin ?? {};
+
+    const title = user[useAsTitle as keyof typeof user];
+
+    if (typeof title === 'string') {
+      return title;
+    }
+    return user.email;
+  })();
+
+  return { ...user, displayName };
 }
 
 export async function sendNotificationEmail(
   req: PayloadRequest,
-  emailConfig: NotificationEmailConfig,
-  notification: { subject: string; recipient: string; event: string },
-  recipientEmail: string,
+  {
+    emailConfig,
+    notification,
+    recipient,
+  }: {
+    emailConfig: NotificationEmailConfig;
+    notification: MinimalNotification;
+    recipient: ResolvedUser;
+  },
 ): Promise<void> {
   try {
-    const input = { ...notification, subject: notification.subject } as any;
     const [html, subject] = await Promise.all([
       emailConfig.generateHTML({
-        notification: input,
-        recipient: { id: notification.recipient, email: recipientEmail },
+        notification,
+        recipient,
       }),
       emailConfig.generateSubject({
-        notification: input,
-        recipient: { id: notification.recipient, email: recipientEmail },
+        notification,
+        recipient,
       }),
     ]);
-    await req.payload.sendEmail({ to: recipientEmail, subject, html });
+    await req.payload.sendEmail({ to: recipient.email, subject, html });
   } catch (err) {
     console.error('[payload-notifications] Email delivery failed:', err);
-  }
-}
-
-export async function invokeCallback(
-  onNotify: NotifactionCallback,
-  req: PayloadRequest,
-  notification: { subject: string; recipient: string; event: string },
-  recipientEmail: string,
-): Promise<void> {
-  try {
-    await onNotify({
-      req,
-      notification: notification as any,
-      recipient: { id: notification.recipient, email: recipientEmail },
-    });
-  } catch (err) {
-    console.error('[payload-notifications] onNotify callback failed:', err);
   }
 }

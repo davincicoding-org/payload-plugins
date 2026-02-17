@@ -1,17 +1,12 @@
 import { type DocumentReference, fetchDocumentByReference } from '@repo/common';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
 import { getPluginContext } from './context';
-import {
-  createNotificationDoc,
-  invokeCallback,
-  sendNotificationEmail,
-} from './helpers';
-import { resolveActor } from './resolve-actor';
-import { resolveSubjectAtReadTime, toStoredSubject } from './resolve-subject';
+import { resolveUser, sendNotificationEmail } from './helpers';
+import { resolveMessageAtReadTime, toMessage } from './message';
 import type {
+  MessageContext,
   NotifyInput,
   StoredDocumentReference,
-  SubjectContext,
 } from './types';
 
 /** Convert a DocumentReference to the flat shape stored in the group field. */
@@ -46,7 +41,7 @@ export async function notify(
 
   // Resolve actor display name if provided
   const actor = input.actor
-    ? await resolveActor(req.payload, input.actor)
+    ? await resolveUser(req.payload, input.actor)
     : undefined;
 
   // Fetch the referenced document if provided
@@ -54,60 +49,62 @@ export async function notify(
     ? await fetchDocumentByReference(req.payload, input.documentReference)
     : undefined;
 
-  // Build subject context from resolved data
-  const subjectContext: SubjectContext = {
+  // Build message context from resolved data
+  const messageContext: MessageContext = {
     actor,
     document: document as Record<string, unknown> | undefined,
     meta: input.meta,
   };
 
-  // Convert subject to stored format and resolve a plain string for email/callback
-  const storedSubject = toStoredSubject(input.subject, subjectContext);
-  const resolvedSubjectString = resolveSubjectAtReadTime(
-    storedSubject,
-    subjectContext,
+  // Convert message to stored format and resolve a plain string for email/callback
+  const serializedMessage = toMessage(input.message, messageContext);
+  const resolvedMessageString = resolveMessageAtReadTime(
+    serializedMessage,
+    messageContext,
   );
 
-  // Convert documentReference to stored format
-  const storedRef = input.documentReference
-    ? toStoredReference(input.documentReference)
-    : undefined;
-
-  const recipient = await req.payload.findByID({
-    collection: req.payload.config.admin.user as 'users',
-    id: input.recipient,
-    depth: 0,
-  });
+  const recipient = await resolveUser(req.payload, input.recipient);
 
   if (recipient.notificationPreferences?.inAppEnabled) {
-    await createNotificationDoc(req, ctx.collectionSlugs.notifications, {
-      recipient: String(input.recipient),
-      event: input.event,
-      actor: actor ? String(actor.id) : undefined,
-      subject: storedSubject,
-      url: input.url,
-      meta: input.meta,
-      documentReference: storedRef,
+    await req.payload.create({
+      collection: ctx.collectionSlugs.notifications as 'notifications',
+      data: {
+        recipient: input.recipient as string,
+        event: input.event,
+        actor: input.actor as string,
+        message: serializedMessage,
+        url: input.url,
+        meta: input.meta,
+        documentReference: input.documentReference,
+      },
+      req,
     });
   }
 
-  const emailNotification = {
-    subject: resolvedSubjectString,
-    recipient: String(input.recipient),
-    event: input.event,
-  };
-
   if (ctx.email && recipient.notificationPreferences?.emailEnabled) {
-    await sendNotificationEmail(
-      req,
-      ctx.email,
-      emailNotification,
-      recipient.email,
-    );
+    await sendNotificationEmail(req, {
+      emailConfig: ctx.email,
+      notification: {
+        message: resolvedMessageString,
+        event: input.event,
+      },
+      recipient,
+    });
   }
 
   if (ctx.onNotify) {
-    await invokeCallback(ctx.onNotify, req, emailNotification, recipient.email);
+    try {
+      await ctx.onNotify({
+        req,
+        notification: {
+          message: resolvedMessageString,
+          event: input.event,
+        },
+        recipient,
+      });
+    } catch (err) {
+      console.error('[payload-notifications] onNotify callback failed:', err);
+    }
   }
 }
 

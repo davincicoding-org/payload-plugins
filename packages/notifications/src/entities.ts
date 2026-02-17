@@ -1,7 +1,7 @@
 import { createCollectionConfigFactory } from '@repo/common';
 import type { JSONSchema4 } from 'json-schema';
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import { storedSubjectSchema } from './resolve-subject';
+import { z } from 'zod';
+import { messageSchema } from './types';
 
 export const Notifications = createCollectionConfigFactory({
   admin: { hidden: true },
@@ -35,15 +35,10 @@ export const Notifications = createCollectionConfigFactory({
       relationTo: 'users',
     },
     {
-      name: 'subject',
+      name: 'message',
       type: 'json',
       required: true,
-      typescriptSchema: [
-        () =>
-          zodToJsonSchema(storedSubjectSchema, {
-            target: 'jsonSchema4',
-          }) as JSONSchema4,
-      ],
+      typescriptSchema: [() => z.toJSONSchema(messageSchema) as JSONSchema4],
     },
     { name: 'url', type: 'text' },
     { name: 'meta', type: 'json' },

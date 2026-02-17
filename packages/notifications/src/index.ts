@@ -12,9 +12,13 @@ import { Notifications, Subscriptions } from './entities';
 import type { NotifactionCallback, NotificationEmailConfig } from './types';
 
 export { getSubscribers, notify, subscribe, unsubscribe } from './api';
-export type { LiveSubject } from './subject';
-export { createLiveSubject } from './subject';
-export type { NotifyInput, SubjectContext, SubjectFn } from './types';
+export { createLiveMessage } from './message';
+export type {
+  LiveMessage,
+  MessageContext,
+  MessageFn,
+  NotifyInput,
+} from './types';
 
 export interface NotificationsPluginConfig {
   /** Email channel configuration. If omitted, email delivery is skipped. */
@@ -90,8 +94,8 @@ export const notificationsPlugin = ({
       unreadCountEndpoint(notifSlug),
       deleteNotificationEndpoint(notifSlug),
       openNotificationEndpoint(notifSlug),
-      subscribeEndpoint(subsSlug),
-      unsubscribeEndpoint(subsSlug),
+      subscribeEndpoint(),
+      unsubscribeEndpoint(),
     );
 
     // Add admin components

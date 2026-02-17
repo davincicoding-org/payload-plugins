@@ -57,15 +57,15 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
       );
       if (res.ok) {
         const data = await res.json();
-        // Map stored subject JSON to a display string
+        // Map stored message JSON to a display string
         const mapped = data.docs.map((doc: any) => ({
           ...doc,
-          subject:
-            typeof doc.subject === 'string'
-              ? doc.subject
-              : doc.subject?.type === 'static'
-                ? doc.subject.value
-                : (doc.subject?.fallbackValue ?? '...'),
+          message:
+            typeof doc.message === 'string'
+              ? doc.message
+              : doc.message?.type === 'static'
+                ? doc.message.value
+                : (doc.message?.fallbackValue ?? '...'),
         }));
         setNotifications(mapped);
       }

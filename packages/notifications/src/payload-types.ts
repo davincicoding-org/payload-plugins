@@ -154,11 +154,22 @@ export interface Notification {
   id: string;
   recipient: string | User;
   event: string;
-  actor: {
-    id: string | User;
-    displayName: string;
-  };
-  subject: string;
+  actor?: (string | null) | User;
+  message:
+    | {
+        type: 'static';
+        value: string;
+      }
+    | {
+        type: 'dynamic';
+        parts: (
+          | string
+          | {
+              type: 'actor' | 'document' | 'meta';
+              field: string;
+            }
+        )[];
+      };
   url?: string | null;
   meta?:
     | {
@@ -169,6 +180,11 @@ export interface Notification {
     | number
     | boolean
     | null;
+  documentReference?: {
+    entity?: ('collection' | 'global') | null;
+    slug?: string | null;
+    documentId?: string | null;
+  };
   readAt?: string | null;
   emailSentAt?: string | null;
   emailError?: string | null;
@@ -182,8 +198,11 @@ export interface Notification {
 export interface Subscription {
   id: string;
   user: string | User;
-  documentId: string;
-  collectionSlug: string;
+  documentReference: {
+    entity: 'collection' | 'global';
+    slug: string;
+    documentId?: string | null;
+  };
   reason: 'manual' | 'auto';
   updatedAt: string;
   createdAt: string;
@@ -301,15 +320,17 @@ export interface UsersSelect<T extends boolean = true> {
 export interface NotificationsSelect<T extends boolean = true> {
   recipient?: T;
   event?: T;
-  actor?:
-    | T
-    | {
-        id?: T;
-        displayName?: T;
-      };
-  subject?: T;
+  actor?: T;
+  message?: T;
   url?: T;
   meta?: T;
+  documentReference?:
+    | T
+    | {
+        entity?: T;
+        slug?: T;
+        documentId?: T;
+      };
   readAt?: T;
   emailSentAt?: T;
   emailError?: T;
@@ -322,8 +343,13 @@ export interface NotificationsSelect<T extends boolean = true> {
  */
 export interface SubscriptionsSelect<T extends boolean = true> {
   user?: T;
-  documentId?: T;
-  collectionSlug?: T;
+  documentReference?:
+    | T
+    | {
+        entity?: T;
+        slug?: T;
+        documentId?: T;
+      };
   reason?: T;
   updatedAt?: T;
   createdAt?: T;

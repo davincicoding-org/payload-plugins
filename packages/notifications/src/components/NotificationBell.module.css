@@ -1,71 +1,88 @@
-.bellButton {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--theme-text);
-}
-
-.bellButton:hover {
-  color: var(--theme-elevation-500);
-}
-
 .bellIcon {
-  width: 1.25rem;
-  height: 1.25rem;
+  position: relative;
 }
 
-/* Popup overrides */
-.popup :global(.popup__content) {
-  width: 24rem;
-  padding: 0;
+.indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-inline: 2px;
+  border-radius: 50%;
+  background-color: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+  font-size: 0.75rem;
+  height: 14px;
+  min-width: 14px;
+  line-height: 1;
+  translate: 25% -25%;
 }
 
-.popup :global(.popup__scroll-container) {
-  max-height: 32rem;
+.popoverPopup {
+  background-color: var(--theme-input-bg);
+  border-radius: var(--style-radius-m);
+  width: 16rem;
+  overflow: hidden;
+  font-size: 13px;
+  box-shadow:
+    0 4px 24px -4px #0002,
+    0 0 0 1px var(--theme-elevation-100);
+}
+
+.popoverArrow {
+  display: flex;
+  top: -8px;
+  svg {
+    fill: var(--theme-input-bg);
+  }
+}
+
+.popoverViewport {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Panel */
-.panel {
-  display: flex;
-  flex-direction: column;
+
+.panelTop {
+  border-bottom: 1px solid var(--theme-elevation-150);
 }
 
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.375rem;
-  padding: 0.625rem 0.75rem;
-  border-bottom: 1px solid var(--theme-elevation-150);
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
 }
 
 .title {
   margin: 0;
-  flex: 1;
   font-size: 0.8125rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--theme-elevation-500);
 }
 
 .headerAction {
+  width: 28px;
+  height: 28px;
   display: flex;
+  justify-content: center;
   align-items: center;
-  background: none;
   border: none;
   cursor: pointer;
+  background-color: transparent;
+  border-radius: var(--style-radius-s);
   color: var(--theme-elevation-400);
-  padding: 0.125rem;
 }
 
 .headerAction:hover {
+  background-color: var(--theme-elevation-100);
   color: var(--theme-text);
-}
-
-.headerAction svg {
-  width: 0.875rem;
-  height: 0.875rem;
 }
 
 .markAll {
@@ -82,6 +99,19 @@
 }
 
 /* Preferences */
+
+.prefsPanel {
+  height: var(--collapsible-panel-height);
+  transition: all 150ms ease-out;
+  overflow: hidden;
+  background-color: var(--theme-elevation-100);
+  border-top: 1px solid var(--theme-elevation-150);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    height: 0;
+  }
+}
 .prefs {
   border-bottom: 1px solid var(--theme-elevation-150);
 }
@@ -108,6 +138,8 @@
 .sections {
   display: flex;
   flex-direction: column;
+  max-height: 24rem;
+  overflow-y: auto;
 }
 
 .sectionLabel {
@@ -121,7 +153,7 @@
 }
 
 .empty {
-  padding: 2rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   text-align: center;
   color: var(--theme-elevation-400);
   font-size: 0.8125rem;
