@@ -4,7 +4,6 @@ import { deleteNotificationEndpoint } from './endpoints/delete-notification';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { openNotificationEndpoint } from './endpoints/open-notification';
-import { subscribeEndpoint } from './endpoints/subscribe';
 import { unreadCountEndpoint } from './endpoints/unread-count';
 import { unsubscribeEndpoint } from './endpoints/unsubscribe';
 import { Notifications, Subscriptions } from './entities';
@@ -94,7 +93,6 @@ export const notificationsPlugin = ({
       unreadCountEndpoint(notifSlug),
       deleteNotificationEndpoint(notifSlug),
       openNotificationEndpoint(notifSlug),
-      subscribeEndpoint(),
       unsubscribeEndpoint(),
     );
 

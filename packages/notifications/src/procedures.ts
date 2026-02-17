@@ -18,12 +18,6 @@ export const ENDPOINTS = {
     method: 'get',
   }).returns<{ count: number }>(),
 
-  subscribe: defineProcedure({
-    path: '/notifications-plugin/subscribe',
-    method: 'post',
-    input: subscriptionSchema,
-  }).returns<{ success: true; alreadySubscribed?: boolean }>(),
-
   unsubscribe: defineProcedure({
     path: '/notifications-plugin/unsubscribe',
     method: 'post',
