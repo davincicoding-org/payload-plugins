@@ -11,7 +11,9 @@ import { Notifications, Subscriptions } from './entities';
 import type { NotifactionCallback, NotificationEmailConfig } from './types';
 
 export { getSubscribers, notify, subscribe, unsubscribe } from './api';
-export type { NotifyInput } from './types';
+export type { LiveSubject } from './subject';
+export { createLiveSubject } from './subject';
+export type { NotifyInput, SubjectContext, SubjectFn } from './types';
 
 export interface NotificationsPluginConfig {
   /** Email channel configuration. If omitted, email delivery is skipped. */
