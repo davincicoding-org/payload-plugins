@@ -51,7 +51,7 @@ describe('resolveMessageAtReadTime', () => {
 
   it('should resolve actor tokens in a dynamic message', () => {
     const stored = {
-      type: 'dynamic' as const,
+      type: 'live' as const,
       parts: [{ type: 'actor' as const, field: 'displayName' }, ' commented'],
     };
     const result = resolveMessageAtReadTime(stored, {
@@ -62,7 +62,7 @@ describe('resolveMessageAtReadTime', () => {
 
   it('should resolve document tokens in a dynamic message', () => {
     const stored = {
-      type: 'dynamic' as const,
+      type: 'live' as const,
       parts: [
         { type: 'actor' as const, field: 'displayName' },
         ' edited "',
@@ -79,7 +79,7 @@ describe('resolveMessageAtReadTime', () => {
 
   it('should resolve meta tokens in a dynamic message', () => {
     const stored = {
-      type: 'dynamic' as const,
+      type: 'live' as const,
       parts: ['Action: ', { type: 'meta' as const, field: 'action' }],
     };
     const result = resolveMessageAtReadTime(stored, {
@@ -90,7 +90,7 @@ describe('resolveMessageAtReadTime', () => {
 
   it('should use empty string for missing token data', () => {
     const stored = {
-      type: 'dynamic' as const,
+      type: 'live' as const,
       parts: [
         { type: 'actor' as const, field: 'displayName' },
         ' did something',

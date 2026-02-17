@@ -1,4 +1,4 @@
-import { resolveForeignKey } from '@repo/common';
+import { resolveDocumentID } from '@repo/common';
 import type { FieldWithPath } from '@repo/common/utils';
 import type {
   CollectionAfterChangeHook,
@@ -110,7 +110,7 @@ function groupByCollection(
     const col = isPolymorphic ? (ref.relationTo as string) : relationTo;
     const raw = isPolymorphic ? ref.value : entry;
     if (!col || raw == null) continue;
-    const id = resolveForeignKey(raw);
+    const id = resolveDocumentID(raw);
     const ids = grouped.get(col);
     if (ids) {
       ids.push(id);

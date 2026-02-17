@@ -170,8 +170,8 @@ export default buildConfig({
             actor: authorId,
             message: ({ actor }) =>
               parentComment
-                ? `${actor.displayName} replied to a comment`
-                : `${actor.displayName} commented on a document`,
+                ? `${actor ? actor.displayName : 'Someone'} replied to a comment`
+                : `${actor ? actor.displayName : 'Someone'} commented on a document`,
             documentReference,
           });
         }

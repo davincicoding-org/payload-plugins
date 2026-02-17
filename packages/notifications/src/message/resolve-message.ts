@@ -25,7 +25,7 @@ export function serializeMessage(
     return { type: 'static', value };
   }
 
-  return { type: 'dynamic', parts: [...message.parts] };
+  return { type: 'live', parts: [...message.parts] };
 }
 
 /**
@@ -40,7 +40,7 @@ export function resolveMessageAtReadTime(
   switch (message.type) {
     case 'static':
       return message.value;
-    case 'dynamic':
+    case 'live':
       return message.parts
         .map((part) => {
           if (typeof part === 'string') return part;
