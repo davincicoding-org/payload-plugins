@@ -1,27 +1,34 @@
 import type { CollectionSlug, PayloadRequest } from 'payload';
+import type { StoredSubject } from './resolve-subject';
 import type {
   NotifactionCallback,
   NotificationEmailConfig,
-  NotifyInput,
+  StoredDocumentReference,
 } from './types';
 
 export async function createNotificationDoc(
   req: PayloadRequest,
   notificationsSlug: CollectionSlug,
-  input: NotifyInput,
+  data: {
+    recipient: string;
+    event: string;
+    actor?: string;
+    subject: StoredSubject;
+    url?: string;
+    meta?: Record<string, unknown>;
+    documentReference?: StoredDocumentReference;
+  },
 ): Promise<void> {
   await req.payload.create({
     collection: notificationsSlug as 'notifications',
     data: {
-      recipient: input.recipient as string,
-      event: input.event,
-      actor: {
-        id: input.actor.id as string,
-        displayName: input.actor.displayName,
-      },
-      subject: input.subject,
-      url: input.url,
-      meta: input.meta,
+      recipient: data.recipient,
+      event: data.event,
+      actor: data.actor,
+      subject: data.subject,
+      url: data.url,
+      meta: data.meta,
+      documentReference: data.documentReference,
     },
     req,
   });
@@ -30,18 +37,19 @@ export async function createNotificationDoc(
 export async function sendNotificationEmail(
   req: PayloadRequest,
   emailConfig: NotificationEmailConfig,
-  input: NotifyInput,
+  notification: { subject: string; recipient: string; event: string },
   recipientEmail: string,
 ): Promise<void> {
   try {
+    const input = { ...notification, subject: notification.subject } as any;
     const [html, subject] = await Promise.all([
       emailConfig.generateHTML({
         notification: input,
-        recipient: { id: input.recipient as string, email: recipientEmail },
+        recipient: { id: notification.recipient, email: recipientEmail },
       }),
       emailConfig.generateSubject({
         notification: input,
-        recipient: { id: input.recipient as string, email: recipientEmail },
+        recipient: { id: notification.recipient, email: recipientEmail },
       }),
     ]);
     await req.payload.sendEmail({ to: recipientEmail, subject, html });
@@ -53,14 +61,14 @@ export async function sendNotificationEmail(
 export async function invokeCallback(
   onNotify: NotifactionCallback,
   req: PayloadRequest,
-  input: NotifyInput,
+  notification: { subject: string; recipient: string; event: string },
   recipientEmail: string,
 ): Promise<void> {
   try {
     await onNotify({
       req,
-      notification: input,
-      recipient: { id: input.recipient as string, email: recipientEmail },
+      notification: notification as any,
+      recipient: { id: notification.recipient, email: recipientEmail },
     });
   } catch (err) {
     console.error('[payload-notifications] onNotify callback failed:', err);
