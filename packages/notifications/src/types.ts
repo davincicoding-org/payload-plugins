@@ -18,10 +18,12 @@ export interface NotificationEmailConfig {
   generateSubject: (args: {
     notification: MinimalNotification;
     recipient: ResolvedUser;
+    links: NotificationEmailLinks;
   }) => string | Promise<string>;
   generateHTML: (args: {
     notification: MinimalNotification;
     recipient: ResolvedUser;
+    links: NotificationEmailLinks;
   }) => string | Promise<string>;
 }
 
@@ -44,6 +46,13 @@ export interface NotifyInput {
 export interface MinimalNotification {
   message: string;
   event: string;
+}
+
+export interface NotificationEmailLinks {
+  /** Marks notification as read and redirects to its target. Requires login. */
+  openURL: string;
+  /** Unsubscribes the user from this notification source. No login required. */
+  unsubscribeURL: string | undefined;
 }
 
 // ── Message schemas & types ────────────────────────────────────────────
