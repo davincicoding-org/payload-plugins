@@ -17,6 +17,8 @@ export interface NotifyInput {
   subject: string;
   url?: string;
   meta?: Record<string, unknown>;
+  collectionSlug?: string;
+  documentId?: string;
 }
 
 export interface NotificationEmailConfig {

@@ -12,7 +12,10 @@ export const Notifications = createCollectionConfigFactory({
       if (!req.user) return false;
       return { recipient: { equals: req.user.id } };
     },
-    delete: () => false,
+    delete: ({ req }) => {
+      if (!req.user) return false;
+      return { recipient: { equals: req.user.id } };
+    },
   },
   fields: [
     {
@@ -39,6 +42,8 @@ export const Notifications = createCollectionConfigFactory({
     { name: 'subject', type: 'text', required: true },
     { name: 'url', type: 'text' },
     { name: 'meta', type: 'json' },
+    { name: 'collectionSlug', type: 'text' },
+    { name: 'documentId', type: 'text' },
     { name: 'readAt', type: 'date' },
     { name: 'emailSentAt', type: 'date' },
     { name: 'emailError', type: 'text' },
