@@ -161,7 +161,7 @@ export interface Notification {
         value: string;
       }
     | {
-        type: 'dynamic';
+        type: 'live';
         parts: (
           | string
           | {
@@ -203,7 +203,6 @@ export interface Subscription {
     slug: string;
     documentId?: string | null;
   };
-  reason: 'manual' | 'auto';
   updatedAt: string;
   createdAt: string;
 }
@@ -350,7 +349,6 @@ export interface SubscriptionsSelect<T extends boolean = true> {
         slug?: T;
         documentId?: T;
       };
-  reason?: T;
   updatedAt?: T;
   createdAt?: T;
 }

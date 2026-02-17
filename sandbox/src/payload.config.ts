@@ -153,7 +153,6 @@ export default buildConfig({
         await subscribe(req, {
           userId: authorId,
           documentReference,
-          reason: 'auto',
         });
 
         // Get all subscribers for this document

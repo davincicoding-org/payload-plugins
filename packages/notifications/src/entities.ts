@@ -94,15 +94,5 @@ export const Subscriptions = createCollectionConfigFactory({
         { name: 'documentId', type: 'text', index: true },
       ],
     },
-    {
-      name: 'reason',
-      type: 'select',
-      options: [
-        { label: 'Manual', value: 'manual' },
-        { label: 'Auto', value: 'auto' },
-      ],
-      defaultValue: 'auto',
-      required: true,
-    },
   ],
 });

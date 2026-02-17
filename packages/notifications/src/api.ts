@@ -9,29 +9,6 @@ import type {
   StoredDocumentReference,
 } from './types';
 
-/** Convert a DocumentReference to the flat shape stored in the group field. */
-function toStoredReference(ref: DocumentReference): StoredDocumentReference {
-  return {
-    entity: ref.entity,
-    slug: ref.slug,
-    documentId: ref.entity === 'collection' ? String(ref.id) : undefined,
-  };
-}
-
-/** Build the where clause to match a stored document reference. */
-function documentReferenceWhere(ref: StoredDocumentReference): Where[] {
-  const conditions: Where[] = [
-    { 'documentReference.entity': { equals: ref.entity } },
-    { 'documentReference.slug': { equals: ref.slug } },
-  ];
-  if (ref.documentId) {
-    conditions.push({
-      'documentReference.documentId': { equals: ref.documentId },
-    });
-  }
-  return conditions;
-}
-
 export async function notify(
   req: PayloadRequest,
   input: NotifyInput,
@@ -113,11 +90,9 @@ export async function subscribe(
   {
     userId,
     documentReference,
-    reason = 'auto',
   }: {
     userId: string | number;
     documentReference: DocumentReference;
-    reason: 'manual' | 'auto';
   },
 ): Promise<void> {
   const ctx = getPluginContext(req.payload.config);
@@ -138,7 +113,6 @@ export async function subscribe(
     data: {
       user: userId as string,
       documentReference: ref,
-      reason,
     },
     req,
   });
@@ -180,4 +154,27 @@ export async function getSubscribers(
   return results.docs.map(({ user }) =>
     typeof user === 'object' ? user.id : user,
   );
+}
+
+/** Convert a DocumentReference to the flat shape stored in the group field. */
+function toStoredReference(ref: DocumentReference): StoredDocumentReference {
+  return {
+    entity: ref.entity,
+    slug: ref.slug,
+    documentId: ref.entity === 'collection' ? String(ref.id) : undefined,
+  };
+}
+
+/** Build the where clause to match a stored document reference. */
+function documentReferenceWhere(ref: StoredDocumentReference): Where[] {
+  const conditions: Where[] = [
+    { 'documentReference.entity': { equals: ref.entity } },
+    { 'documentReference.slug': { equals: ref.slug } },
+  ];
+  if (ref.documentId) {
+    conditions.push({
+      'documentReference.documentId': { equals: ref.documentId },
+    });
+  }
+  return conditions;
 }
