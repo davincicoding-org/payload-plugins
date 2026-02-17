@@ -91,12 +91,11 @@ export const notificationsPlugin = ({
     // Add admin components
     config.admin ??= {};
     config.admin.components ??= {};
-    const afterNavLinks = config.admin.components.afterNavLinks ?? [];
-    afterNavLinks.push({
+    config.admin.components.actions ??= [];
+    config.admin.components.actions.push({
       path: 'payload-notifications/client#NotificationBell',
       clientProps: { pollInterval },
     });
-    config.admin.components.afterNavLinks = afterNavLinks;
 
     return config;
   };

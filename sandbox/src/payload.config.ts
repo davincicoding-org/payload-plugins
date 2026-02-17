@@ -40,12 +40,12 @@ export default buildConfig({
     {
       slug: 'users',
       admin: {
-        useAsTitle: 'email',
+        useAsTitle: 'name',
       },
       auth: true,
       fields: [
         { name: 'name', type: 'text' },
-        { name: 'email', type: 'email' },
+
         {
           name: 'role',
           type: 'select',

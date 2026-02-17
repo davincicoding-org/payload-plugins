@@ -58,7 +58,7 @@ export async function subscribe(
 
   await req.payload.create({
     collection: ctx.collectionSlugs.subscriptions as 'subscriptions',
-    data: { user: String(userId), documentId, collectionSlug, reason },
+    data: { user: userId as string, documentId, collectionSlug, reason },
     req,
   });
 }

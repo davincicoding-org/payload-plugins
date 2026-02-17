@@ -13,10 +13,10 @@ export async function createNotificationDoc(
   await req.payload.create({
     collection: notificationsSlug as 'notifications',
     data: {
-      recipient: String(input.recipient),
+      recipient: input.recipient as string,
       event: input.event,
       actor: {
-        id: String(input.actor.id),
+        id: input.actor.id as string,
         displayName: input.actor.displayName,
       },
       subject: input.subject,
@@ -30,18 +30,18 @@ export async function createNotificationDoc(
 export async function sendNotificationEmail(
   req: PayloadRequest,
   emailConfig: NotificationEmailConfig,
-  parsed: NotifyInput,
+  input: NotifyInput,
   recipientEmail: string,
 ): Promise<void> {
   try {
     const [html, subject] = await Promise.all([
       emailConfig.generateHTML({
-        notification: parsed,
-        recipient: { id: parsed.recipient, email: recipientEmail },
+        notification: input,
+        recipient: { id: input.recipient as string, email: recipientEmail },
       }),
       emailConfig.generateSubject({
-        notification: parsed,
-        recipient: { id: parsed.recipient, email: recipientEmail },
+        notification: input,
+        recipient: { id: input.recipient as string, email: recipientEmail },
       }),
     ]);
     await req.payload.sendEmail({ to: recipientEmail, subject, html });
@@ -53,14 +53,14 @@ export async function sendNotificationEmail(
 export async function invokeCallback(
   onNotify: NotifactionCallback,
   req: PayloadRequest,
-  parsed: NotifyInput,
+  input: NotifyInput,
   recipientEmail: string,
 ): Promise<void> {
   try {
     await onNotify({
       req,
-      notification: parsed,
-      recipient: { id: parsed.recipient, email: recipientEmail },
+      notification: input,
+      recipient: { id: input.recipient as string, email: recipientEmail },
     });
   } catch (err) {
     console.error('[payload-notifications] onNotify callback failed:', err);

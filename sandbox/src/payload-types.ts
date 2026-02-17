@@ -134,6 +134,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  _email?: string | null;
   name?: string | null;
   role?: ('admin' | 'editor') | null;
   joinedAt?: string | null;
@@ -401,6 +402,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  _email?: T;
   name?: T;
   role?: T;
   joinedAt?: T;

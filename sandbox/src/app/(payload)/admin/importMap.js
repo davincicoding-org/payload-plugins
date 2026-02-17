@@ -24,9 +24,9 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { DiscussionsCell as DiscussionsCell_77e3b10abcc2020ef7c36000682f65de } from 'payload-discussions/rsc'
 import { DiscussionsField as DiscussionsField_77e3b10abcc2020ef7c36000682f65de } from 'payload-discussions/rsc'
+import { NotificationBell as NotificationBell_9c2011b1d83f80810829049dd253f6eb } from 'payload-notifications/client'
 import { MessagesLink as MessagesLink_77833c228fec376212747c040184fa6e } from 'payload-intl/rsc'
 import { PublishButton as PublishButton_ce5a0aed4ab42bfe31710faf8fd6ed17 } from 'payload-smart-cache/rsc'
-import { NotificationBell as NotificationBell_9c2011b1d83f80810829049dd253f6eb } from 'payload-notifications/client'
 import { InvitationPage as InvitationPage_8328cae158c5c8423cb9800a9613a7db } from 'payload-invitations/rsc'
 import { MessagesView as MessagesView_77833c228fec376212747c040184fa6e } from 'payload-intl/rsc'
 import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
@@ -58,9 +58,9 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "payload-discussions/rsc#DiscussionsCell": DiscussionsCell_77e3b10abcc2020ef7c36000682f65de,
   "payload-discussions/rsc#DiscussionsField": DiscussionsField_77e3b10abcc2020ef7c36000682f65de,
+  "payload-notifications/client#NotificationBell": NotificationBell_9c2011b1d83f80810829049dd253f6eb,
   "payload-intl/rsc#MessagesLink": MessagesLink_77833c228fec376212747c040184fa6e,
   "payload-smart-cache/rsc#PublishButton": PublishButton_ce5a0aed4ab42bfe31710faf8fd6ed17,
-  "payload-notifications/client#NotificationBell": NotificationBell_9c2011b1d83f80810829049dd253f6eb,
   "payload-invitations/rsc#InvitationPage": InvitationPage_8328cae158c5c8423cb9800a9613a7db,
   "payload-intl/rsc#MessagesView": MessagesView_77833c228fec376212747c040184fa6e,
   "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
