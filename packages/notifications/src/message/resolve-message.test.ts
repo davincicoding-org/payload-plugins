@@ -34,7 +34,7 @@ describe('toMessage', () => {
     const live = createLiveMessage((t) => t`${t.actor} commented`);
     const result = serializeMessage(live, { actor: undefined });
     expect(result).toEqual({
-      type: 'dynamic',
+      type: 'live',
       parts: [{ type: 'actor', field: 'displayName' }, ' commented'],
     });
   });
