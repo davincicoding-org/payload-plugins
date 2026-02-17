@@ -2,7 +2,7 @@ import type { CollectionSlug, Field, GlobalSlug, Plugin } from 'payload';
 import { createCommentEndpoint } from './endpoints/create-comment';
 import { createReplyEndpoint } from './endpoints/create-reply';
 import { Comments } from './entities';
-import type { FieldConfig, OnCommentArgs } from './types';
+import type { CreateCommentCallback, DiscussionsFieldConfig } from './types';
 
 export interface DiscussionsPluginOptions {
   /**
@@ -26,7 +26,7 @@ export interface DiscussionsPluginOptions {
    */
   collectionSlug?: CollectionSlug;
   /** Called after a comment or reply is created. Use this to integrate with other plugins (e.g. notifications). */
-  onComment?: (args: OnCommentArgs) => void | Promise<void>;
+  onComment?: CreateCommentCallback;
 }
 
 export const discussionsPlugin =
@@ -38,9 +38,11 @@ export const discussionsPlugin =
     onComment,
   }: DiscussionsPluginOptions): Plugin =>
   (config) => {
-    const commentsSlug = collectionSlug as CollectionSlug;
+    const commentsSlug = collectionSlug as 'comments';
 
-    const discussionsField: Field = {
+    const createDisussionsField = (
+      source: DiscussionsFieldConfig['source'],
+    ): Field => ({
       name: 'discussions',
       type: 'relationship',
       relationTo: commentsSlug,
@@ -48,31 +50,36 @@ export const discussionsPlugin =
       custom: { smartDeletion: 'cascade' },
       admin: {
         position: 'sidebar',
-        condition: (data) => Boolean(data?.id),
+        condition: (data) => Boolean(data?.id || data?.createdAt),
         components: {
           Field: {
             path: 'payload-discussions/rsc#DiscussionsField',
             clientProps: {
               maxDepth: maxCommentDepth,
-              commentsCollectionSlug: collectionSlug,
-            } satisfies FieldConfig,
+              commentsSlug,
+              source,
+            } satisfies DiscussionsFieldConfig,
           },
           Cell: {
             path: 'payload-discussions/rsc#DiscussionsCell',
           },
         },
       },
-    };
-
-    const targetCollections = [
-      ...collections.map(String),
-      ...globals.map(String),
-    ];
+    });
 
     config.endpoints ??= [];
-    config.endpoints.push(createCommentEndpoint({ collectionSlug, onComment }));
     config.endpoints.push(
-      createReplyEndpoint({ collectionSlug, onComment, targetCollections }),
+      createCommentEndpoint({
+        commentsSlug,
+        callback: onComment,
+      }),
+    );
+    config.endpoints.push(
+      createReplyEndpoint({
+        commentsSlug,
+        callback: onComment,
+        enabledEntities: { collections, globals },
+      }),
     );
 
     config.collections ??= [];
@@ -81,7 +88,12 @@ export const discussionsPlugin =
     for (const collection of config.collections ?? []) {
       if (!collections.includes(collection.slug as CollectionSlug)) continue;
       collection.fields ??= [];
-      collection.fields.push(discussionsField);
+      collection.fields.push(
+        createDisussionsField({
+          entity: 'collection',
+          slug: collection.slug,
+        }),
+      );
     }
 
     config.globals ??= [];
@@ -89,7 +101,12 @@ export const discussionsPlugin =
     for (const global of config.globals ?? []) {
       if (!globals.includes(global.slug as GlobalSlug)) continue;
       global.fields ??= [];
-      global.fields.push(discussionsField);
+      global.fields.push(
+        createDisussionsField({
+          entity: 'global',
+          slug: global.slug,
+        }),
+      );
     }
 
     return config;

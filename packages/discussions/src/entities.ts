@@ -1,5 +1,4 @@
 import { createCollectionConfigFactory } from '@repo/common';
-import { attachAuthor } from './hooks';
 
 export const Comments = createCollectionConfigFactory(({ slug }) => ({
   admin: {
@@ -17,15 +16,15 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
       name: 'author',
       type: 'relationship',
       relationTo: 'users',
+      required: true,
       admin: {
         readOnly: true,
-        condition: (data) => Boolean(data?.id),
       },
     },
     {
       name: 'replies',
       type: 'relationship',
-      relationTo: slug,
+      relationTo: slug as 'comments',
       hasMany: true,
       custom: { smartDeletion: 'cascade' },
       admin: {
@@ -33,8 +32,4 @@ export const Comments = createCollectionConfigFactory(({ slug }) => ({
       },
     },
   ],
-
-  hooks: {
-    beforeChange: [attachAuthor],
-  },
 }));

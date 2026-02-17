@@ -1,63 +1,53 @@
-import { entityIdSchema } from '@repo/common';
-import type { CollectionSlug, Endpoint } from 'payload';
-import { z } from 'zod';
+import {
+  fetchDocumentByReference,
+  updateDocumentByReference,
+} from '@repo/common';
+import type { Endpoint } from 'payload';
 import { ENDPOINTS } from '@/procedures';
-import type { OnCommentArgs } from '@/types';
-import { populateComment } from '@/utitls/populate-comment';
+import { type CreateCommentCallback, discussionsDocumentSchema } from '@/types';
+import { populateComment } from '@/utils';
 
 export const createCommentEndpoint = ({
-  collectionSlug,
-  onComment,
+  commentsSlug: collectionSlug,
+  callback,
 }: {
-  collectionSlug: string;
-  onComment?: (args: OnCommentArgs) => void | Promise<void>;
+  commentsSlug: 'comments';
+  callback?: CreateCommentCallback;
 }): Endpoint =>
   ENDPOINTS.createComment.endpoint(
-    async (req, { documentCollectionSlug, documentId, content }) => {
+    async (req, { content, documentReference }) => {
       if (!req.user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
       const newComment = await req.payload.create({
-        collection: collectionSlug as CollectionSlug,
-        data: { content },
+        collection: collectionSlug,
+        data: { author: req.user.id, content },
         req,
       });
 
-      const doc = await req.payload.findByID({
-        collection: documentCollectionSlug as CollectionSlug,
-        id: documentId,
-        depth: 0,
-      });
+      const documentData = await fetchDocumentByReference(
+        req.payload,
+        documentReference,
+      );
 
-      const existingIds = z
-        .object({
-          discussions: z.array(entityIdSchema).nullable().default([]),
-        })
-        .transform(({ discussions }) => (discussions ?? []).map(String))
-        .parse(doc);
+      const existingComments = discussionsDocumentSchema.parse(documentData);
 
-      await req.payload.update({
-        collection: documentCollectionSlug as CollectionSlug,
-        id: documentId,
-        // FIXME
-        // @ts-expect-error - discussions field is not typed
-        data: { discussions: [...existingIds, newComment.id] },
+      await updateDocumentByReference(req.payload, documentReference, {
+        discussions: [...existingComments, newComment.id],
       });
 
       const createdComment = await req.payload.findByID({
-        collection: collectionSlug as 'comments',
+        collection: collectionSlug,
         id: newComment.id,
         depth: 1,
       });
 
-      if (onComment) {
+      if (callback) {
         Promise.resolve(
-          onComment({
-            req,
+          callback(req, {
             comment: createdComment,
-            documentId: String(documentId),
-            collectionSlug: documentCollectionSlug,
+            documentReference: documentReference,
           }),
         ).catch((err) =>
           console.error('[payload-discussions] onComment callback error:', err),

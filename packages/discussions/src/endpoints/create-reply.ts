@@ -1,23 +1,22 @@
-import { entityIdSchema } from '@repo/common';
+import { documentIdSchema } from '@repo/common';
 import type { CollectionSlug, Endpoint } from 'payload';
 import { z } from 'zod';
-import type { Comment } from '@/payload-types';
 import { ENDPOINTS } from '@/procedures';
-import type { OnCommentArgs } from '@/types';
+import type { CreateCommentCallback, ResolvedPluginOptions } from '@/types';
 import {
   findDocumentForComment,
   findRootComment,
-} from '@/utils/resolve-thread-context';
-import { populateComment } from '@/utitls/populate-comment';
+  populateComment,
+} from '@/utils';
 
 export const createReplyEndpoint = ({
-  collectionSlug,
-  onComment,
-  targetCollections,
+  commentsSlug,
+  callback,
+  enabledEntities,
 }: {
-  collectionSlug: string;
-  onComment?: (args: OnCommentArgs) => void | Promise<void>;
-  targetCollections: string[];
+  commentsSlug: 'comments';
+  callback?: CreateCommentCallback;
+  enabledEntities: ResolvedPluginOptions<'collections' | 'globals'>;
 }): Endpoint =>
   ENDPOINTS.createReply.endpoint(async (req, { parentId, content }) => {
     if (!req.user) {
@@ -25,61 +24,64 @@ export const createReplyEndpoint = ({
     }
 
     const newReply = await req.payload.create({
-      collection: collectionSlug as CollectionSlug,
-      data: { content },
+      collection: commentsSlug,
+      data: { author: req.user.id, content },
       req,
     });
 
-    const parent = await req.payload.findByID({
-      collection: collectionSlug as CollectionSlug,
+    const parentComment = await req.payload.findByID({
+      collection: commentsSlug,
       id: parentId,
       depth: 0,
     });
 
     const existingReplies = z
       .object({
-        replies: z.array(entityIdSchema).nullable().default([]),
+        replies: z.array(documentIdSchema).nullable().default([]),
       })
-      .transform(({ replies }) => (replies ?? []).map(String))
-      .parse(parent);
+      .transform(({ replies }) => replies ?? [])
+      .parse(parentComment);
 
     await req.payload.update({
-      collection: collectionSlug as CollectionSlug,
-      id: parentId,
-      data: { replies: [...existingReplies, newReply.id] },
+      collection: commentsSlug,
+      id: parentId as string,
+      data: {
+        replies: [...(existingReplies as string[]), newReply.id as string],
+      },
     });
 
     const createdReply = await req.payload.findByID({
-      collection: collectionSlug as 'comments',
+      collection: commentsSlug,
       id: newReply.id,
       depth: 1,
     });
 
-    if (onComment) {
+    if (callback) {
       Promise.resolve(
         (async () => {
           const rootId = await findRootComment(
             req.payload,
             parentId,
-            collectionSlug,
+            commentsSlug,
           );
+
           const rootComment = await req.payload.findByID({
-            collection: collectionSlug as CollectionSlug,
+            collection: commentsSlug,
             id: rootId,
             depth: 1,
           });
-          const docContext = await findDocumentForComment(
+
+          const documentReference = await findDocumentForComment(
             req.payload,
             rootId,
-            targetCollections,
+            enabledEntities,
           );
-          await onComment({
-            req,
+
+          await callback(req, {
             comment: createdReply,
-            parentComment: parent as unknown as Comment,
-            rootComment: rootComment as unknown as Comment,
-            documentId: docContext?.documentId ?? '',
-            collectionSlug: docContext?.collectionSlug ?? '',
+            parentComment,
+            rootComment,
+            documentReference,
           });
         })(),
       ).catch((err) =>

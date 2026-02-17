@@ -147,11 +147,10 @@ export interface User {
 export interface Comment {
   id: string;
   content: string;
-  author?: (string | null) | User;
+  author: string | User;
   replies?: (string | Comment)[] | null;
   updatedAt: string;
   createdAt: string;
-  deletedAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -259,7 +258,6 @@ export interface CommentsSelect<T extends boolean = true> {
   replies?: T;
   updatedAt?: T;
   createdAt?: T;
-  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,7 +1,7 @@
 'use client';
 
 import { useConfig } from '@payloadcms/ui';
-import type { EntityID } from '@repo/common';
+import type { DocumentID, DocumentReference } from '@repo/common';
 import { useCallback, useState } from 'react';
 import { ENDPOINTS } from '@/procedures';
 import type { PopulatedComment } from '../types';
@@ -11,15 +11,13 @@ import styles from './Discussions.module.css';
 
 interface DiscussionsClientProps {
   initialComments: PopulatedComment[];
-  documentId: number | string;
-  documentCollectionSlug: string;
+  documentReference: DocumentReference;
   maxDepth: number;
 }
 
 export function DiscussionsClient({
   initialComments,
-  documentId,
-  documentCollectionSlug,
+  documentReference,
   maxDepth,
 }: DiscussionsClientProps) {
   const {
@@ -31,15 +29,14 @@ export function DiscussionsClient({
 
   const handleCreateComment = async (content: string) => {
     const populated = await ENDPOINTS.createComment.call(apiRoute, {
-      documentCollectionSlug,
-      documentId,
       content,
+      documentReference,
     });
     setComments((prev) => [populated, ...prev]);
   };
 
   const handleReply = useCallback(
-    async (parentId: EntityID, content: string) => {
+    async (parentId: DocumentID, content: string) => {
       const populated = await ENDPOINTS.createReply.call(apiRoute, {
         parentId,
         content,

@@ -1,28 +1,42 @@
+import { type DocumentReference, uncaughtSwitchCase } from '@repo/common';
 import type { ServerComponentProps } from 'payload';
-import { populateComment } from '@/utitls/populate-comment';
-import type { FieldConfig, PopulatedComment } from '../types';
+import { populateComment } from '@/utils';
+import type { DiscussionsFieldConfig, PopulatedComment } from '../types';
 import { DiscussionsClient } from './Discussions';
 
 export const DiscussionsField = async ({
   payload,
   data,
   id,
-  collectionSlug,
-  commentsCollectionSlug,
+  source,
+  commentsSlug,
   maxDepth,
-}: ServerComponentProps & FieldConfig) => {
-  if (id === undefined)
-    throw new Error('Discussions field can only be used on existing documents');
-
+}: ServerComponentProps & DiscussionsFieldConfig) => {
   const discussionIds: number[] = (data?.discussions as number[]) || [];
 
-  payload.collections.users.config.admin.useAsTitle;
+  const documentReference = ((): DocumentReference => {
+    switch (source.entity) {
+      case 'global':
+        return source;
+      case 'collection':
+        if (id === undefined)
+          throw new Error(
+            'DiscussionsField can only be used on exsting documents',
+          );
+        return {
+          ...source,
+          id,
+        };
+      default:
+        return uncaughtSwitchCase(source);
+    }
+  })();
 
   const comments: PopulatedComment[] =
     discussionIds.length > 0
       ? await payload
           .find({
-            collection: commentsCollectionSlug as 'comments',
+            collection: commentsSlug,
             where: { id: { in: discussionIds } },
             sort: '-createdAt',
             depth: maxDepth,
@@ -34,8 +48,7 @@ export const DiscussionsField = async ({
 
   return (
     <DiscussionsClient
-      documentCollectionSlug={collectionSlug}
-      documentId={id}
+      documentReference={documentReference}
       initialComments={comments}
       maxDepth={maxDepth}
     />

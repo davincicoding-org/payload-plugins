@@ -1,6 +1,6 @@
 'use client';
 
-import type { EntityID } from '@repo/common';
+import type { DocumentID } from '@repo/common';
 import type { PopulatedComment } from '../types';
 import { CommentItem } from './CommentItem';
 import styles from './CommentList.module.css';
@@ -8,7 +8,7 @@ import styles from './CommentList.module.css';
 interface CommentListProps {
   comments: PopulatedComment[];
   isLoading?: boolean;
-  onReply: (parentId: EntityID, content: string) => Promise<void>;
+  onReply: (parentId: DocumentID, content: string) => Promise<void>;
   maxDepth: number;
 }
 
