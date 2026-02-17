@@ -232,11 +232,8 @@ export interface Notification {
   id: number;
   recipient: number | User;
   event: string;
-  actor: {
-    id: number | User;
-    displayName: string;
-  };
-  subject: string;
+  actor?: (number | null) | User;
+  message: string;
   url?: string | null;
   meta?:
     | {
@@ -247,6 +244,8 @@ export interface Notification {
     | number
     | boolean
     | null;
+  subscription?: (number | null) | Subscription;
+  documentId?: string | null;
   readAt?: string | null;
   emailSentAt?: string | null;
   emailError?: string | null;
@@ -469,15 +468,12 @@ export interface FeatureRequestsSelect<T extends boolean = true> {
 export interface NotificationsSelect<T extends boolean = true> {
   recipient?: T;
   event?: T;
-  actor?:
-    | T
-    | {
-        id?: T;
-        displayName?: T;
-      };
-  subject?: T;
+  actor?: T;
+  message?: T;
   url?: T;
   meta?: T;
+  subscription?: T;
+  documentId?: T;
   readAt?: T;
   emailSentAt?: T;
   emailError?: T;

@@ -137,8 +137,8 @@ export default buildConfig({
     invitationsPlugin({}),
     notificationsPlugin({
       email: {
-        generateHTML: ({ notification }) => `<p>${notification.subject}</p>`,
-        generateSubject: ({ notification }) => notification.subject,
+        generateHTML: ({ notification }) => `<p>${notification.message}</p>`,
+        generateSubject: ({ notification }) => notification.message,
       },
     }),
     discussionsPlugin({
@@ -169,7 +169,7 @@ export default buildConfig({
             recipient: recipientId,
             event,
             actor: authorId,
-            subject: ({ actor }) =>
+            message: ({ actor }) =>
               parentComment
                 ? `${actor.displayName} replied to a comment`
                 : `${actor.displayName} commented on a document`,
