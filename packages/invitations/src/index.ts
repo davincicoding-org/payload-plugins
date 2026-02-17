@@ -1,4 +1,4 @@
-import { findFields, getAdminURL } from '@repo/common';
+import { getAdminURL } from '@repo/common';
 import type { PayloadRequest, Plugin } from 'payload';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
@@ -106,35 +106,17 @@ export const invitationsPlugin =
 
       collection.fields ??= [];
 
-      const [emailField] = findFields(
-        collection.fields,
-        (field) => field.type === 'email',
-      ).filter((field) => field.name === 'email');
-
-      if (emailField) {
-        emailField.name = '_email';
-        emailField.label = ({ t }) => t('general:email');
-        emailField.required = true;
-        emailField.virtual = true;
-        emailField.admin ??= {};
-        emailField.admin = {
-          ...emailField.admin,
+      collection.fields.unshift({
+        name: '_email',
+        label: ({ t }) => t('general:email'),
+        type: 'email',
+        required: true,
+        virtual: true,
+        admin: {
           disableListColumn: true,
           condition: (data) => !data.id,
-        };
-      } else {
-        collection.fields.unshift({
-          name: '_email',
-          label: ({ t }) => t('general:email'),
-          type: 'email',
-          required: true,
-          virtual: true,
-          admin: {
-            disableListColumn: true,
-            condition: (data) => !data.id,
-          },
-        });
-      }
+        },
+      });
 
       collection.fields.push(joinedAtField);
       collection.fields.push(hideAuthOnCreateField);

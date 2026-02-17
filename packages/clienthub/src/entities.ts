@@ -1,4 +1,4 @@
-import { createCollectionConfigFactory, resolveForeignKey } from '@repo/common';
+import { createCollectionConfigFactory, resolveDocumentID } from '@repo/common';
 import type { GlobalConfig } from 'payload';
 import { SETTINGS_SLUG } from './const';
 import type { ResolvedPluginOptions } from './types';
@@ -426,7 +426,7 @@ export const Invoices = createCollectionConfigFactory<
 
           await req.payload.delete({
             collection: invoicePdfsCollectionSlug,
-            id: resolveForeignKey(doc.pdf),
+            id: resolveDocumentID(doc.pdf),
             req,
           });
         },
