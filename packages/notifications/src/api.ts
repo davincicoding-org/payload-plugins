@@ -1,7 +1,11 @@
 import { type DocumentReference, fetchDocumentByReference } from '@repo/common';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
 import { getPluginContext } from './context';
-import { resolveUser, sendNotificationEmail } from './helpers';
+import {
+  generateEmailLinks,
+  resolveUser,
+  sendNotificationEmail,
+} from './helpers';
 import { resolveMessageAtReadTime, toMessage } from './message';
 import type {
   MessageContext,
@@ -42,8 +46,10 @@ export async function notify(
 
   const recipient = await resolveUser(req.payload, input.recipient);
 
+  let notificationId: string | undefined;
+
   if (recipient.notificationPreferences?.inAppEnabled) {
-    await req.payload.create({
+    const doc = await req.payload.create({
       collection: ctx.collectionSlugs.notifications as 'notifications',
       data: {
         recipient: input.recipient as string,
@@ -56,9 +62,17 @@ export async function notify(
       },
       req,
     });
+    notificationId = String(doc.id);
   }
 
   if (ctx.email && recipient.notificationPreferences?.emailEnabled) {
+    const links = generateEmailLinks(req, {
+      notificationId,
+      recipientId: input.recipient,
+      url: input.url,
+      documentReference: input.documentReference,
+    });
+
     await sendNotificationEmail(req, {
       emailConfig: ctx.email,
       notification: {
@@ -66,6 +80,7 @@ export async function notify(
         event: input.event,
       },
       recipient,
+      links,
     });
   }
 
