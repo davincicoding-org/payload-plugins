@@ -1,4 +1,7 @@
 import { createCollectionConfigFactory } from '@repo/common';
+import type { JSONSchema4 } from 'json-schema';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+import { storedSubjectSchema } from './resolve-subject';
 
 export const Notifications = createCollectionConfigFactory({
   admin: { hidden: true },
@@ -36,47 +39,10 @@ export const Notifications = createCollectionConfigFactory({
       type: 'json',
       required: true,
       typescriptSchema: [
-        () => ({
-          oneOf: [
-            {
-              type: 'object' as const,
-              properties: {
-                type: { type: 'string' as const, enum: ['static'] },
-                value: { type: 'string' as const },
-              },
-              required: ['type', 'value'],
-              additionalProperties: false,
-            },
-            {
-              type: 'object' as const,
-              properties: {
-                type: { type: 'string' as const, enum: ['dynamic'] },
-                parts: {
-                  type: 'array' as const,
-                  items: {
-                    oneOf: [
-                      { type: 'string' as const },
-                      {
-                        type: 'object' as const,
-                        properties: {
-                          type: {
-                            type: 'string' as const,
-                            enum: ['actor', 'document', 'meta'],
-                          },
-                          field: { type: 'string' as const },
-                        },
-                        required: ['type', 'field'],
-                        additionalProperties: false,
-                      },
-                    ],
-                  },
-                },
-              },
-              required: ['type', 'parts'],
-              additionalProperties: false,
-            },
-          ],
-        }),
+        () =>
+          zodToJsonSchema(storedSubjectSchema, {
+            target: 'jsonSchema4',
+          }) as JSONSchema4,
       ],
     },
     { name: 'url', type: 'text' },

@@ -1,18 +1,29 @@
-import type { LiveSubject, LiveSubjectToken } from './subject';
+import { z } from 'zod';
+import type { LiveSubject } from './subject';
 import { isLiveSubject } from './subject';
 import type { SubjectContext, SubjectFn } from './types';
 
-export interface StaticStoredSubject {
-  type: 'static';
-  value: string;
-}
+const liveSubjectTokenSchema = z.object({
+  type: z.enum(['actor', 'document', 'meta']),
+  field: z.string(),
+});
 
-export interface DynamicStoredSubject {
-  type: 'dynamic';
-  parts: ReadonlyArray<string | LiveSubjectToken>;
-}
+const staticStoredSubjectSchema = z.object({
+  type: z.literal('static'),
+  value: z.string(),
+});
 
-export type StoredSubject = StaticStoredSubject | DynamicStoredSubject;
+const dynamicStoredSubjectSchema = z.object({
+  type: z.literal('dynamic'),
+  parts: z.array(z.union([z.string(), liveSubjectTokenSchema])),
+});
+
+export const storedSubjectSchema = z.discriminatedUnion('type', [
+  staticStoredSubjectSchema,
+  dynamicStoredSubjectSchema,
+]);
+
+export type StoredSubject = z.infer<typeof storedSubjectSchema>;
 
 /**
  * Convert a subject input into the shape stored in the database.
@@ -53,6 +64,8 @@ export function resolveSubjectAtReadTime(
     })
     .join('');
 }
+
+type LiveSubjectToken = z.infer<typeof liveSubjectTokenSchema>;
 
 function resolveToken(
   token: LiveSubjectToken,
