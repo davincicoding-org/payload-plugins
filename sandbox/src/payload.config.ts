@@ -16,7 +16,6 @@ import {
 import { smartCachePlugin } from 'payload-smart-cache';
 import { smartDeletionPlugin } from 'payload-smart-deletion';
 import sharp from 'sharp';
-
 import { localFileStoragePlugin } from './cms/dev-plugins';
 import { env } from './env';
 import { messages } from './i18n/messages';
@@ -144,58 +143,37 @@ export default buildConfig({
     }),
     discussionsPlugin({
       collections: ['feature-requests'],
-      onComment: async ({
-        req,
-        comment,
-        parentComment,
-        documentId,
-        collectionSlug,
-      }) => {
+      onComment: async (req, { comment, parentComment, documentReference }) => {
         const authorId =
-          typeof comment.author === 'object' && comment.author
+          typeof comment.author === 'object'
             ? comment.author.id
             : comment.author;
 
-        if (!authorId) return;
-
         // Auto-subscribe the commenter to this document
-        await subscribe(req, authorId, documentId, collectionSlug, 'auto');
+        await subscribe(req, {
+          userId: authorId,
+          documentReference,
+          reason: 'auto',
+        });
 
         // Get all subscribers for this document
-        const subscribers = await getSubscribers(
-          req,
-          documentId,
-          collectionSlug,
-        );
-
-        // Build actor info for the notification
-        const actor =
-          typeof comment.author === 'object' && comment.author
-            ? {
-                id: comment.author.id,
-                displayName:
-                  (comment.author as { email?: string }).email ?? 'Unknown',
-              }
-            : { id: authorId, displayName: 'Unknown' };
+        const subscribers = await getSubscribers(req, documentReference);
 
         const event = parentComment ? 'reply.created' : 'comment.created';
 
         // Notify all subscribers except the author
-        const recipients = subscribers.filter(
-          (id) => String(id) !== String(authorId),
-        );
+        const recipients = subscribers.filter((id) => id !== authorId);
 
         for (const recipientId of recipients) {
           await notify(req, {
             recipient: recipientId,
             event,
-            actor,
-            subject: parentComment
-              ? `${actor.displayName} replied to a comment`
-              : `${actor.displayName} commented on a document`,
-            url: `/admin/collections/${collectionSlug}/${documentId}`,
-            collectionSlug,
-            documentId,
+            actor: authorId,
+            subject: ({ actor }) =>
+              parentComment
+                ? `${actor.displayName} replied to a comment`
+                : `${actor.displayName} commented on a document`,
+            documentReference,
           });
         }
       },
