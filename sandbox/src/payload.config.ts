@@ -194,6 +194,8 @@ export default buildConfig({
               ? `${actor.displayName} replied to a comment`
               : `${actor.displayName} commented on a document`,
             url: `/admin/collections/${collectionSlug}/${documentId}`,
+            collectionSlug,
+            documentId,
           });
         }
       },
