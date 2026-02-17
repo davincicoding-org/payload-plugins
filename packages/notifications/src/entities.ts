@@ -31,7 +31,54 @@ export const Notifications = createCollectionConfigFactory({
       type: 'relationship',
       relationTo: 'users',
     },
-    { name: 'subject', type: 'json', required: true },
+    {
+      name: 'subject',
+      type: 'json',
+      required: true,
+      typescriptSchema: [
+        () => ({
+          oneOf: [
+            {
+              type: 'object' as const,
+              properties: {
+                type: { type: 'string' as const, enum: ['static'] },
+                value: { type: 'string' as const },
+              },
+              required: ['type', 'value'],
+              additionalProperties: false,
+            },
+            {
+              type: 'object' as const,
+              properties: {
+                type: { type: 'string' as const, enum: ['dynamic'] },
+                parts: {
+                  type: 'array' as const,
+                  items: {
+                    oneOf: [
+                      { type: 'string' as const },
+                      {
+                        type: 'object' as const,
+                        properties: {
+                          type: {
+                            type: 'string' as const,
+                            enum: ['actor', 'document', 'meta'],
+                          },
+                          field: { type: 'string' as const },
+                        },
+                        required: ['type', 'field'],
+                        additionalProperties: false,
+                      },
+                    ],
+                  },
+                },
+              },
+              required: ['type', 'parts'],
+              additionalProperties: false,
+            },
+          ],
+        }),
+      ],
+    },
     { name: 'url', type: 'text' },
     { name: 'meta', type: 'json' },
     {
