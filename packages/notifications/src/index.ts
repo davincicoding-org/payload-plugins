@@ -1,5 +1,6 @@
 import type { CollectionSlug, Plugin } from 'payload';
 import { attachPluginContext } from './context';
+import { defaultGenerateHTML, defaultGenerateSubject } from './default-email';
 import { deleteNotificationEndpoint } from './endpoints/delete-notification';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
@@ -16,12 +17,13 @@ export type {
   LiveMessage,
   MessageContext,
   MessageFn,
+  NotificationEmailLinks,
   NotifyInput,
 } from './types';
 
 export interface NotificationsPluginConfig {
-  /** Email channel configuration. If omitted, email delivery is skipped. */
-  email?: NotificationEmailConfig;
+  /** Email channel configuration. Pass `true` for default templates, or provide custom functions. */
+  email?: true | NotificationEmailConfig;
   /** External callback fired for every notification. */
   onNotify?: NotifactionCallback;
   /** Slug for the notifications collection. @default "notifications" */
@@ -42,6 +44,14 @@ export const notificationsPlugin = ({
   const notifSlug = notificationsSlug as CollectionSlug;
   const subsSlug = subscriptionsSlug as CollectionSlug;
 
+  const resolvedEmail: NotificationEmailConfig | undefined =
+    email === true
+      ? {
+          generateSubject: defaultGenerateSubject,
+          generateHTML: defaultGenerateHTML,
+        }
+      : email;
+
   return (config) => {
     attachPluginContext(config, {
       collectionSlugs: {
@@ -49,7 +59,7 @@ export const notificationsPlugin = ({
         subscriptions: subsSlug,
       },
       pollInterval,
-      email,
+      email: resolvedEmail,
       onNotify,
     });
 

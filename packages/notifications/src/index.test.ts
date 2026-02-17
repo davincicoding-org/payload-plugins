@@ -22,6 +22,11 @@ describe('notificationsPlugin', () => {
     });
     expect(plugin).toBeTypeOf('function');
   });
+
+  it('should accept email: true for default templates', () => {
+    const plugin = notificationsPlugin({ email: true });
+    expect(plugin).toBeTypeOf('function');
+  });
 });
 
 describe('standalone API functions', () => {
