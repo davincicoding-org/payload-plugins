@@ -1,63 +1,51 @@
 'use client';
 
-import {
-  ConfirmationModal,
-  formatTimeToNow,
-  MoreIcon,
-  Popup,
-  PopupList,
-  useModal,
-  useTranslation,
-} from '@payloadcms/ui';
-import { useRouter } from 'next/navigation.js';
+import { Menu } from '@base-ui/react/menu';
+import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
+import type { DocumentReference } from '@repo/common';
+import { IconDotsVertical } from '@tabler/icons-react';
+import type { StoredDocumentReference } from '@/types';
 import styles from './NotificationItem.module.css';
 
 export interface NotificationData {
   id: string | number;
   event: string;
-  actor: { id: string | number; displayName: string };
+  /** Pre-resolved subject string for display. */
   subject: string;
-  url?: string | null;
   readAt?: string | null;
-  collectionSlug?: string | null;
-  documentId?: string | null;
+  documentReference?: StoredDocumentReference | null;
   createdAt: string;
 }
 
 interface NotificationItemProps {
   notification: NotificationData;
+  apiRoute: string;
   onMarkRead: (id: string | number) => void;
-  onUnsubscribe: (documentId: string, collectionSlug: string) => void;
+  onUnsubscribe: (documentReference: DocumentReference) => void;
   onDelete: (id: string | number) => void;
-  closePanel?: () => void;
 }
 
 export function NotificationItem({
   notification,
+  apiRoute,
   onMarkRead,
   onUnsubscribe,
   onDelete,
-  closePanel,
 }: NotificationItemProps) {
   const { i18n } = useTranslation();
-  const router = useRouter();
-  const { openModal, closeModal } = useModal();
   const isUnread = !notification.readAt;
   const canUnsubscribe =
-    !!notification.collectionSlug && !!notification.documentId;
-  const deleteModalSlug = `delete-notification-${notification.id}`;
+    !!notification.documentReference?.entity &&
+    !!notification.documentReference?.slug;
 
   const handleClick = () => {
-    if (isUnread) onMarkRead(notification.id);
-    if (notification.url) {
-      closePanel?.();
-      router.push(notification.url);
-    }
+    // The /open endpoint marks as read and redirects
+    window.location.href = `${apiRoute}/notifications-plugin/open?id=${notification.id}`;
   };
 
   return (
     <div className={styles.row}>
-      <Popover.Close
+      <button
         className={styles.item}
         data-unread={isUnread}
         onClick={handleClick}
@@ -66,59 +54,58 @@ export function NotificationItem({
         {isUnread && <span className={styles.dot} />}
         <div className={styles.content}>
           <p className={styles.subject}>{notification.subject}</p>
-          <span className={styles.meta}>
-            <span className={styles.actor}>
-              {notification.actor.displayName}
-            </span>
-            <span className={styles.time}>
-              {formatTimeToNow({ date: notification.createdAt, i18n })}
-            </span>
+          <span className={styles.time}>
+            {formatTimeToNow({ date: notification.createdAt, i18n })}
           </span>
         </div>
       </button>
 
-      <Popup
-        button={<MoreIcon />}
-        buttonType="custom"
-        className={styles.menu}
-        horizontalAlign="right"
-        size="small"
-      >
-        <PopupList.ButtonGroup>
-          {isUnread && (
-            <PopupList.Button onClick={() => onMarkRead(notification.id)}>
-              Mark as read
-            </PopupList.Button>
-          )}
-          {canUnsubscribe && (
-            <PopupList.Button
-              onClick={() =>
-                onUnsubscribe(
-                  notification.documentId!,
-                  notification.collectionSlug!,
-                )
-              }
-            >
-              Unsubscribe
-            </PopupList.Button>
-          )}
-          <PopupList.Divider />
-          <PopupList.Button onClick={() => openModal(deleteModalSlug)}>
-            Delete
-          </PopupList.Button>
-        </PopupList.ButtonGroup>
-      </Popup>
-
-      <ConfirmationModal
-        body="This notification will be permanently deleted."
-        heading="Delete notification"
-        modalSlug={deleteModalSlug}
-        onCancel={() => closeModal(deleteModalSlug)}
-        onConfirm={async () => {
-          onDelete(notification.id);
-          closeModal(deleteModalSlug);
-        }}
-      />
+      <Menu.Root>
+        <Menu.Trigger className={styles.menuTrigger}>
+          <IconDotsVertical size={14} />
+        </Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner align="end" sideOffset={4}>
+            <Menu.Popup className={styles.menuPopup}>
+              {isUnread && (
+                <Menu.Item
+                  className={styles.menuItem}
+                  onClick={() => onMarkRead(notification.id)}
+                >
+                  Mark as read
+                </Menu.Item>
+              )}
+              {canUnsubscribe && (
+                <Menu.Item
+                  className={styles.menuItem}
+                  onClick={() => {
+                    const ref = notification.documentReference!;
+                    const docRef: DocumentReference =
+                      ref.entity === 'collection'
+                        ? {
+                            entity: 'collection',
+                            slug: ref.slug,
+                            id: ref.documentId!,
+                          }
+                        : { entity: 'global', slug: ref.slug };
+                    onUnsubscribe(docRef);
+                  }}
+                >
+                  Unsubscribe
+                </Menu.Item>
+              )}
+              <Menu.Separator className={styles.menuSeparator} />
+              <Menu.Item
+                className={styles.menuItem}
+                data-variant="danger"
+                onClick={() => onDelete(notification.id)}
+              >
+                Delete
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
     </div>
   );
 }

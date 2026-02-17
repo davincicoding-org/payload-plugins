@@ -1,14 +1,11 @@
 'use client';
 
-import {
-  Collapsible,
-  GearIcon,
-  Pill,
-  Popup,
-  useAuth,
-  useConfig,
-} from '@payloadcms/ui';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Collapsible } from '@base-ui/react/collapsible';
+import { Popover, type PopoverRootActions } from '@base-ui/react/popover';
+import { Button, useAuth, useConfig } from '@payloadcms/ui';
+import type { DocumentReference } from '@repo/common';
+import { IconAdjustments, IconBell } from '@tabler/icons-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ENDPOINTS } from '@/procedures';
 import styles from './NotificationBell.module.css';
 import type { NotificationData } from './NotificationItem';
@@ -26,10 +23,11 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   } = useConfig();
   const { user } = useAuth();
 
+  const popoverActions = useRef<PopoverRootActions>(null);
+
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [prefsOpen, setPrefsOpen] = useState(false);
 
   const prefs = user?.notificationPreferences as
     | { emailEnabled?: boolean; inAppEnabled?: boolean }
@@ -59,7 +57,17 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
       );
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data.docs);
+        // Map stored subject JSON to a display string
+        const mapped = data.docs.map((doc: any) => ({
+          ...doc,
+          subject:
+            typeof doc.subject === 'string'
+              ? doc.subject
+              : doc.subject?.type === 'static'
+                ? doc.subject.value
+                : (doc.subject?.fallbackValue ?? '...'),
+        }));
+        setNotifications(mapped);
       }
     } finally {
       setIsLoading(false);
@@ -101,11 +109,8 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   }, [apiRoute, fetchUnreadCount]);
 
   const handleUnsubscribe = useCallback(
-    async (documentId: string, collectionSlug: string) => {
-      await ENDPOINTS.unsubscribe.call(apiRoute, {
-        documentId,
-        collectionSlug,
-      });
+    async (documentReference: DocumentReference) => {
+      await ENDPOINTS.unsubscribe.call(apiRoute, { documentReference });
     },
     [apiRoute],
   );
@@ -136,138 +141,108 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   );
 
   return (
-    <Popup
-      button={
-        <span className={styles.bellButton}>
-          <BellIcon />
-          {unreadCount > 0 && (
-            <Pill pillStyle="dark" size="small">
-              {String(unreadCount)}
-            </Pill>
-          )}
-        </span>
-      }
-      buttonType="custom"
-      className={styles.popup}
-      horizontalAlign="right"
-      onToggleOpen={fetchNotifications}
-      render={({ close }) => (
-        <div className={styles.panel}>
-          <div className={styles.header}>
-            <h3 className={styles.title}>Notifications</h3>
-            <button
-              aria-label="Notification settings"
-              className={styles.headerAction}
-              onClick={(e) => {
-                e.stopPropagation();
-                setPrefsOpen((p) => !p);
-              }}
-              type="button"
-            >
-              <GearIcon />
-            </button>
-            <button
-              className={styles.markAll}
-              onClick={(e) => {
-                e.stopPropagation();
-                markAllRead();
-              }}
-              type="button"
-            >
-              Mark all as read
-            </button>
-          </div>
-
-          <Collapsible
-            className={styles.prefs}
-            disableHeaderToggle
-            disableToggleIndicator
-            header={<span className={styles.prefsLabel}>Preferences</span>}
-            initCollapsed={!prefsOpen}
-            isCollapsed={!prefsOpen}
-          >
-            <label className={styles.prefRow}>
-              <input
-                checked={prefs?.inAppEnabled ?? true}
-                onChange={() => togglePref('inAppEnabled')}
-                type="checkbox"
-              />
-              In-app notifications
-            </label>
-            <label className={styles.prefRow}>
-              <input
-                checked={prefs?.emailEnabled ?? true}
-                onChange={() => togglePref('emailEnabled')}
-                type="checkbox"
-              />
-              Email notifications
-            </label>
-          </Collapsible>
-
-          <div className={styles.sections}>
-            {isLoading && <p className={styles.empty}>Loading...</p>}
-
-            {!isLoading && unread.length === 0 && read.length === 0 && (
-              <p className={styles.empty}>No notifications</p>
-            )}
-
-            {unread.length > 0 && (
-              <>
-                <span className={styles.sectionLabel}>New</span>
-                {unread.map((n) => (
-                  <NotificationItem
-                    closePanel={close}
-                    key={n.id}
-                    notification={n}
-                    onDelete={handleDelete}
-                    onMarkRead={markRead}
-                    onUnsubscribe={handleUnsubscribe}
-                  />
-                ))}
-              </>
-            )}
-
-            {read.length > 0 && (
-              <>
-                <span className={styles.sectionLabel}>Earlier</span>
-                {read.map((n) => (
-                  <NotificationItem
-                    closePanel={close}
-                    key={n.id}
-                    notification={n}
-                    onDelete={handleDelete}
-                    onMarkRead={markRead}
-                    onUnsubscribe={handleUnsubscribe}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-      showScrollbar
-      size="large"
-    />
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg
-      aria-label="Notifications"
-      className={styles.bellIcon}
-      fill="none"
-      role="img"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
+    <Popover.Root
+      actionsRef={popoverActions}
+      onOpenChange={(open) => {
+        if (!open) return;
+        fetchNotifications();
+      }}
     >
-      <title>Notifications</title>
-      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-    </svg>
+      <Popover.Trigger render={<Button buttonStyle="tab" />}>
+        <div className={styles.bellIcon}>
+          <IconBell size={20} strokeWidth={1.5} />
+          {unreadCount > 0 && (
+            <span className={styles.indicator}>{unreadCount}</span>
+          )}
+        </div>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner align="start" sideOffset={8}>
+          <Popover.Popup className={styles.popoverPopup}>
+            <Popover.Arrow className={styles.popoverArrow}>
+              {/** biome-ignore lint/a11y/noSvgWithoutTitle: gracefully ignored */}
+              <svg fill="none" height="10" viewBox="0 0 20 10" width="20">
+                <path d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z" />
+              </svg>
+            </Popover.Arrow>
+            <Popover.Viewport className={styles.popoverViewport}>
+              <Collapsible.Root>
+                <div className={styles.panelTop}>
+                  <div className={styles.header}>
+                    <h3 className={styles.title}>Notifications</h3>
+                    <Collapsible.Trigger
+                      aria-label="Notification settings"
+                      className={styles.headerAction}
+                      type="button"
+                    >
+                      <IconAdjustments size={18} strokeWidth={1.5} />
+                    </Collapsible.Trigger>
+                    {/*<button
+                    className={styles.markAll}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      markAllRead();
+                    }}
+                    type="button"
+                  >
+                    Mark all as read
+                  </button>*/}
+                  </div>
+                  <Collapsible.Panel className={styles.prefsPanel}>
+                    <label className={styles.prefRow}>
+                      <input
+                        checked={prefs?.inAppEnabled ?? true}
+                        onChange={() => togglePref('inAppEnabled')}
+                        type="checkbox"
+                      />
+                      In-app notifications
+                    </label>
+                    <label className={styles.prefRow}>
+                      <input
+                        checked={prefs?.emailEnabled ?? true}
+                        onChange={() => togglePref('emailEnabled')}
+                        type="checkbox"
+                      />
+                      Email notifications
+                    </label>
+                  </Collapsible.Panel>
+                </div>
+              </Collapsible.Root>
+              <div className={styles.sections}>
+                {isLoading && <p className={styles.empty}>Loading...</p>}
+
+                {!isLoading && unread.length === 0 && read.length === 0 && (
+                  <p className={styles.empty}>No notifications</p>
+                )}
+
+                {unread.length > 0 &&
+                  unread.map((n) => (
+                    <NotificationItem
+                      apiRoute={apiRoute}
+                      key={n.id}
+                      notification={n}
+                      onDelete={handleDelete}
+                      onMarkRead={markRead}
+                      onUnsubscribe={handleUnsubscribe}
+                    />
+                  ))}
+
+                {read.length > 0 &&
+                  read.map((n) => (
+                    <NotificationItem
+                      apiRoute={apiRoute}
+                      key={n.id}
+                      notification={n}
+                      onDelete={handleDelete}
+                      onMarkRead={markRead}
+                      onUnsubscribe={handleUnsubscribe}
+                    />
+                  ))}
+              </div>
+            </Popover.Viewport>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
