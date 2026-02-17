@@ -6,7 +6,13 @@ import { ENDPOINTS } from '@/procedures';
 export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
   ENDPOINTS.openNotification.endpoint(async (req, { id }) => {
     if (!req.user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      const loginURL = getAdminURL({ req, path: '/login' });
+      const apiRoute = req.payload.config.routes.api;
+      const currentPath = `${apiRoute}/notifications-plugin/open?id=${id}`;
+      return Response.redirect(
+        `${loginURL}?redirect=${encodeURIComponent(currentPath)}`,
+        302,
+      );
     }
 
     const notification = await req.payload.findByID({
