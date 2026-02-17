@@ -1,4 +1,5 @@
 import { defineProcedure } from '@repo/common';
+import { z } from 'zod';
 import { markReadSchema, subscriptionSchema } from './types';
 
 export const ENDPOINTS = {
@@ -34,5 +35,11 @@ export const ENDPOINTS = {
     path: '/notifications-plugin/open',
     method: 'get',
     input: markReadSchema,
+  }).returns<void>(),
+
+  emailUnsubscribe: defineProcedure({
+    path: '/notifications-plugin/email-unsubscribe',
+    method: 'get',
+    input: z.object({ token: z.string() }),
   }).returns<void>(),
 };

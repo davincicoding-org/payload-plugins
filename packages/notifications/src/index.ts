@@ -2,6 +2,7 @@ import type { CollectionSlug, Plugin } from 'payload';
 import { attachPluginContext } from './context';
 import { defaultGenerateHTML, defaultGenerateSubject } from './default-email';
 import { deleteNotificationEndpoint } from './endpoints/delete-notification';
+import { emailUnsubscribeEndpoint } from './endpoints/email-unsubscribe';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { openNotificationEndpoint } from './endpoints/open-notification';
@@ -104,6 +105,7 @@ export const notificationsPlugin = ({
       deleteNotificationEndpoint(notifSlug),
       openNotificationEndpoint(notifSlug),
       unsubscribeEndpoint(),
+      emailUnsubscribeEndpoint(),
     );
 
     // Add admin components
