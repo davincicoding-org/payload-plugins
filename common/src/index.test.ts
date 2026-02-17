@@ -3,30 +3,30 @@ import { describe, expect, test } from 'vitest';
 import {
   assertPopulated,
   createCollectionConfigFactory,
-  entityIdSchema,
+  documentIdSchema,
   isPopulated,
-  resolveForeignKey,
+  resolveDocumentID,
 } from './index';
 
 describe('entityIdSchema', () => {
   test('validates numbers', () => {
-    expect(entityIdSchema.safeParse(42).success).toBe(true);
+    expect(documentIdSchema.safeParse(42).success).toBe(true);
   });
 
   test('validates strings', () => {
-    expect(entityIdSchema.safeParse('abc-123').success).toBe(true);
+    expect(documentIdSchema.safeParse('abc-123').success).toBe(true);
   });
 
   test('rejects objects', () => {
-    expect(entityIdSchema.safeParse({ id: 1 }).success).toBe(false);
+    expect(documentIdSchema.safeParse({ id: 1 }).success).toBe(false);
   });
 
   test('rejects booleans', () => {
-    expect(entityIdSchema.safeParse(true).success).toBe(false);
+    expect(documentIdSchema.safeParse(true).success).toBe(false);
   });
 
   test('rejects null', () => {
-    expect(entityIdSchema.safeParse(null).success).toBe(false);
+    expect(documentIdSchema.safeParse(null).success).toBe(false);
   });
 });
 
@@ -82,15 +82,15 @@ describe('assertPopulated', () => {
 
 describe('resolveForeignKey', () => {
   test('extracts ID from a populated object', () => {
-    expect(resolveForeignKey({ id: 5 })).toBe(5);
+    expect(resolveDocumentID({ id: 5 })).toBe(5);
   });
 
   test('returns number primitive as-is', () => {
-    expect(resolveForeignKey(5)).toBe(5);
+    expect(resolveDocumentID(5)).toBe(5);
   });
 
   test('returns string primitive as-is', () => {
-    expect(resolveForeignKey('abc')).toBe('abc');
+    expect(resolveDocumentID('abc')).toBe('abc');
   });
 });
 

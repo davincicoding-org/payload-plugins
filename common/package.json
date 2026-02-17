@@ -13,10 +13,10 @@
     "plugin-build": "./scripts/build.js"
   },
   "scripts": {
+    "check:types": "tsc --noEmit",
     "clean": "rm -rf node_modules",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
