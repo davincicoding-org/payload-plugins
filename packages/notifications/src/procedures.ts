@@ -35,4 +35,10 @@ export const ENDPOINTS = {
     method: 'post',
     input: markReadSchema,
   }).returns<{ success: true }>(),
+
+  openNotification: defineProcedure({
+    path: '/notifications-plugin/open',
+    method: 'get',
+    input: markReadSchema,
+  }).returns<void>(),
 };
