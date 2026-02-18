@@ -28,5 +28,24 @@ export const unreadNotificationsEndpoint = (
       depth: 0,
     });
 
-    return { docs: result.docs.map(mapNotification), timestamp };
+    // On initial load, check if any read notifications exist so the UI
+    // can decide whether to show the "Show older" button.
+    const hasMore = since
+      ? undefined
+      : (
+          await req.payload.find({
+            collection: notificationsSlug as 'notifications',
+            where: {
+              and: [
+                { recipient: { equals: req.user.id } },
+                { readAt: { exists: true } },
+              ],
+            },
+            limit: 1,
+            depth: 0,
+            select: {},
+          })
+        ).docs.length > 0;
+
+    return { docs: result.docs.map(mapNotification), timestamp, hasMore };
   });

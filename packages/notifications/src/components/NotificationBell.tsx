@@ -106,7 +106,7 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
                   />
                 ))}
 
-                {!state.isReadLoaded && state.unread.length > 0 && (
+                {!state.isReadLoaded && state.hasMore && (
                   <button
                     className={styles.showOlder}
                     onClick={loadMore}
@@ -169,12 +169,18 @@ function useUnreadPolling(
   const poll = useCallback(async () => {
     try {
       const since = timestampRef.current ?? undefined;
-      const { docs, timestamp } = await ENDPOINTS.unread.call(apiRoute, {
-        since,
-      });
+      const { docs, timestamp, hasMore } = await ENDPOINTS.unread.call(
+        apiRoute,
+        { since },
+      );
 
       if (!timestampRef.current) {
-        dispatch({ type: 'SET_UNREAD', docs, timestamp });
+        dispatch({
+          type: 'SET_UNREAD',
+          docs,
+          timestamp,
+          hasMore: hasMore ?? false,
+        });
       } else {
         dispatch({ type: 'PREPEND_UNREAD', docs, timestamp });
       }

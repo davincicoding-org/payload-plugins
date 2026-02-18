@@ -19,15 +19,17 @@ const makeNotification = (
 
 describe('notificationReducer', () => {
   describe('SET_UNREAD', () => {
-    it('should replace unread list and set timestamp', () => {
+    it('should replace unread list, set timestamp and hasMore', () => {
       const docs = [makeNotification({ id: '1' })];
       const result = notificationReducer(INITIAL_STATE, {
         type: 'SET_UNREAD',
         docs,
         timestamp: '2026-01-01T00:00:00.000Z',
+        hasMore: true,
       });
       expect(result.unread).toEqual(docs);
       expect(result.pollTimestamp).toBe('2026-01-01T00:00:00.000Z');
+      expect(result.hasMore).toBe(true);
     });
   });
 

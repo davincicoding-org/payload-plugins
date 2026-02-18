@@ -8,7 +8,11 @@ export const ENDPOINTS = {
     path: '/notifications-plugin/unread',
     method: 'get',
     input: z.object({ since: z.string().datetime().optional() }),
-  }).returns<{ docs: NotificationData[]; timestamp: string }>(),
+  }).returns<{
+    docs: NotificationData[];
+    timestamp: string;
+    hasMore?: boolean;
+  }>(),
 
   read: defineProcedure({
     path: '/notifications-plugin/read',

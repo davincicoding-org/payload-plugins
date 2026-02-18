@@ -5,6 +5,7 @@ export interface NotificationState {
   read: NotificationData[];
   readPage: number;
   hasMoreRead: boolean;
+  hasMore: boolean;
   isReadLoaded: boolean;
   pollTimestamp: string | null;
 }
@@ -14,12 +15,18 @@ export const INITIAL_STATE: NotificationState = {
   read: [],
   readPage: 0,
   hasMoreRead: true,
+  hasMore: false,
   isReadLoaded: false,
   pollTimestamp: null,
 };
 
 export type NotificationAction =
-  | { type: 'SET_UNREAD'; docs: NotificationData[]; timestamp: string }
+  | {
+      type: 'SET_UNREAD';
+      docs: NotificationData[];
+      timestamp: string;
+      hasMore: boolean;
+    }
   | { type: 'PREPEND_UNREAD'; docs: NotificationData[]; timestamp: string }
   | {
       type: 'APPEND_READ';
@@ -39,6 +46,7 @@ export function notificationReducer(
       return {
         ...state,
         unread: action.docs,
+        hasMore: action.hasMore,
         pollTimestamp: action.timestamp,
       };
 
@@ -70,6 +78,7 @@ export function notificationReducer(
         read: state.isReadLoaded
           ? [{ ...item, readAt: action.readAt }, ...state.read]
           : state.read,
+        hasMore: true,
       };
     }
 
