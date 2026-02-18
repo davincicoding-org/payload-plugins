@@ -1,4 +1,4 @@
-import type { CollectionSlug, Plugin } from 'payload';
+import type { Plugin } from 'payload';
 import type { MessagesViewProps } from './components/MessagesView';
 import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
@@ -13,7 +13,7 @@ export interface MessagesPluginConfig {
    *
    * @default `messages`
    */
-  collectionSlug?: CollectionSlug;
+  collectionSlug?: string;
   /**
    * Access control for allowing to edit the messages.
    *

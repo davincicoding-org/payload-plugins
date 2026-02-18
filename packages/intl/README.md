@@ -27,25 +27,25 @@ pnpm add payload-intl
 
 ```ts
 // payload.config.ts
-import { buildConfig } from 'payload';
-import { intlPlugin } from 'payload-intl';
+import { buildConfig } from "payload";
+import { intlPlugin } from "payload-intl";
 
 export default buildConfig({
   localization: {
-    locales: ['en', 'de', 'fr'],
-    defaultLocale: 'en',
+    locales: ["en", "de", "fr"],
+    defaultLocale: "en",
   },
   // ...
   plugins: [
     intlPlugin({
       schema: {
         common: {
-          greeting: '[Main greeting] Hello {name}!',
-          items: '{count, plural, one {# item} other {# items}}',
+          greeting: "[Main greeting] Hello {name}!",
+          items: "{count, plural, one {# item} other {# items}}",
         },
         auth: {
-          login: 'Sign in',
-          logout: 'Sign out',
+          login: "Sign in",
+          logout: "Sign out",
         },
       },
       tabs: true,
@@ -57,24 +57,27 @@ export default buildConfig({
 Fetch messages in your application:
 
 ```ts
-import { fetchMessages } from 'payload-intl';
+import { fetchMessages } from "payload-intl";
 
 // Server-side — pass the Payload instance directly
-const messages = await fetchMessages(payload, 'en');
+const messages = await fetchMessages(payload, "en");
 
 // Client-side — pass a config object to fetch from the REST API
-const messages = await fetchMessages({ serverUrl: 'http://localhost:3000' }, 'en');
+const messages = await fetchMessages(
+  { serverUrl: "http://localhost:3000" },
+  "en",
+);
 ```
 
 ### Options
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `schema` | `MessagesSchema` | — | Required. Nested object defining message keys and ICU templates. Leaf values are ICU MessageFormat strings, optionally prefixed with a `[description]`. |
-| `collectionSlug` | `CollectionSlug` | `'messages'` | Slug of the collection used to store translation files. |
-| `editorAccess` | `(req: PayloadRequest) => boolean \| Promise<boolean>` | `(req) => req.user !== null` | Access control function that determines who can edit messages. |
-| `hooks` | `MessagesHooks` | `{}` | Collection hooks. Extends Payload's collection hooks with an additional `afterUpdate` callback fired when translations are saved. |
-| `tabs` | `boolean` | `false` | When enabled, top-level keys in the schema are rendered as tabs in the admin UI. |
+| Option           | Type                                                   | Default                      | Description                                                                                                                                             |
+| ---------------- | ------------------------------------------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema`         | `MessagesSchema`                                       | —                            | Required. Nested object defining message keys and ICU templates. Leaf values are ICU MessageFormat strings, optionally prefixed with a `[description]`. |
+| `collectionSlug` | `string`                                               | `'messages'`                 | Slug of the collection used to store translation files.                                                                                                 |
+| `editorAccess`   | `(req: PayloadRequest) => boolean \| Promise<boolean>` | `(req) => req.user !== null` | Access control function that determines who can edit messages.                                                                                          |
+| `hooks`          | `MessagesHooks`                                        | `{}`                         | Collection hooks. Extends Payload's collection hooks with an additional `afterUpdate` callback fired when translations are saved.                       |
+| `tabs`           | `boolean`                                              | `false`                      | When enabled, top-level keys in the schema are rendered as tabs in the admin UI.                                                                        |
 
 ## Contributing
 

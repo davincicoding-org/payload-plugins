@@ -24,7 +24,7 @@ export interface DiscussionsPluginOptions {
    * The slug to use for the comments collection.
    * @default "comments"
    */
-  collectionSlug?: CollectionSlug;
+  collectionSlug?: string;
   /** Called after a comment or reply is created. Use this to integrate with other plugins (e.g. notifications). */
   onComment?: CreateCommentCallback;
 }

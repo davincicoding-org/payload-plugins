@@ -26,15 +26,15 @@ pnpm add payload-discussions
 
 ```ts
 // payload.config.ts
-import { buildConfig } from 'payload';
-import { discussionsPlugin } from 'payload-discussions';
+import { buildConfig } from "payload";
+import { discussionsPlugin } from "payload-discussions";
 
 export default buildConfig({
   // ...
   plugins: [
     discussionsPlugin({
-      collections: ['posts', 'pages'],
-      globals: ['settings'],
+      collections: ["posts", "pages"],
+      globals: ["settings"],
     }),
   ],
 });
@@ -42,12 +42,12 @@ export default buildConfig({
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `collections` | `CollectionSlug[]` | `[]` | Collections to add the discussions field to. |
-| `globals` | `GlobalSlug[]` | `[]` | Globals to add the discussions field to. |
-| `maxCommentDepth` | `number` | `5` | Maximum nesting depth for reply threads. |
-| `collectionSlug` | `CollectionSlug` | `"comments"` | Slug used for the auto-created comments collection. |
+| Option            | Type               | Default      | Description                                         |
+| ----------------- | ------------------ | ------------ | --------------------------------------------------- |
+| `collections`     | `CollectionSlug[]` | `[]`         | Collections to add the discussions field to.        |
+| `globals`         | `GlobalSlug[]`     | `[]`         | Globals to add the discussions field to.            |
+| `maxCommentDepth` | `number`           | `5`          | Maximum nesting depth for reply threads.            |
+| `collectionSlug`  | `string`           | `"comments"` | Slug used for the auto-created comments collection. |
 
 ## Contributing
 
