@@ -57,7 +57,9 @@ export async function notify<Actor extends DocumentID | null>(
       message: serializedMessage,
       url: input.url,
       meta: input.meta,
-      documentReference: input.documentReference,
+      documentReference: input.documentReference
+        ? toStoredReference(input.documentReference)
+        : undefined,
     },
     req,
   });
