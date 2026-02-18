@@ -39,3 +39,7 @@
   justify-content: space-between;
   padding-inline: 0.5rem;
 }
+
+.cancelReply {
+  color: var(--theme-success-500);
+}

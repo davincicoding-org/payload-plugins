@@ -47,6 +47,7 @@ export function CommentCard({
         {showReplyButton && (
           <Button
             buttonStyle="transparent"
+            className={isReplying ? styles.cancelReply : undefined}
             onClick={onReplyToggle}
             size="small"
             type="button"

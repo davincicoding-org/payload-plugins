@@ -1,7 +1,7 @@
 'use client';
 
 import { Collapsible } from '@base-ui/react/collapsible';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { PopulatedComment } from '../types';
 import { CommentCard } from './CommentCard';
 import { CommentComposer } from './CommentComposer';
@@ -21,7 +21,14 @@ export function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
 
   const isReplying = activeReplyId === comment.id;
   const showReplyButton = depth < maxDepth;
-  const replies = comment.replies ?? [];
+  const replies = useMemo(
+    () =>
+      [...(comment.replies ?? [])].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ),
+    [comment.replies],
+  );
 
   const handleReplyToggle = () => {
     if (isReplying) {

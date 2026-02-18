@@ -8,7 +8,7 @@ import styles from './CommentComposer.module.css';
 export interface CommentComposerProps {
   readonly placeholder: string;
   readonly submitLabel: string;
-  readonly onSubmit: (content: string) => void;
+  readonly onSubmit: (content: string) => void | Promise<void>;
   readonly onCancel?: () => void;
   readonly onFocus?: () => void;
 }
