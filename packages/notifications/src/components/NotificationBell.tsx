@@ -1,20 +1,22 @@
 'use client';
 
 import { Collapsible } from '@base-ui/react/collapsible';
-import { Popover, type PopoverRootActions } from '@base-ui/react/popover';
+import { Popover } from '@base-ui/react/popover';
 import { Button, useAuth, useConfig } from '@payloadcms/ui';
 import { IconAdjustments, IconBell } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { toDocumentReference } from '@/helpers';
 import type { User } from '@/payload-types';
 import { ENDPOINTS } from '@/procedures';
-import type {
-  NotificationData,
-  ResolvedPluginOptions,
-  StoredDocumentReference,
-} from '@/types';
+import type { ResolvedPluginOptions, StoredDocumentReference } from '@/types';
 import styles from './NotificationBell.module.css';
 import { NotificationItem } from './NotificationItem';
+import {
+  INITIAL_STATE,
+  type NotificationAction,
+  type NotificationState,
+  notificationReducer,
+} from './notification-reducer';
 
 export type NotificationBellProps = ResolvedPluginOptions<'pollInterval'>;
 
@@ -26,18 +28,17 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   } = useConfig();
   const { user } = useAuth<User>();
 
-  const popoverActions = useRef<PopoverRootActions>(null);
+  const [state, dispatch] = useReducer(notificationReducer, INITIAL_STATE);
 
-  const { unreadCount, refreshUnreadCount } = useUnreadCount(
+  useUnreadPolling(apiRoute, pollInterval, state, dispatch);
+  const { loadMore, isLoadingRead } = useReadNotifications(
     apiRoute,
-    pollInterval,
+    state,
+    dispatch,
   );
-  const { unread, read, isLoading, fetchNotifications, setNotifications } =
-    useNotificationList({ apiRoute });
   const { markRead, markAllRead, deleteNotification } = useNotificationActions(
     apiRoute,
-    setNotifications,
-    refreshUnreadCount,
+    dispatch,
   );
 
   const { prefs, togglePref, unsubscribe } = useNotificationPreferences(
@@ -46,18 +47,12 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   );
 
   return (
-    <Popover.Root
-      actionsRef={popoverActions}
-      onOpenChange={(open) => {
-        if (!open) return;
-        fetchNotifications();
-      }}
-    >
+    <Popover.Root>
       <Popover.Trigger render={<Button buttonStyle="tab" />}>
         <div className={styles.bellIcon}>
           <IconBell size={20} strokeWidth={1.5} />
-          {unreadCount > 0 && (
-            <span className={styles.indicator}>{unreadCount}</span>
+          {state.unread.length > 0 && (
+            <span className={styles.indicator}>{state.unread.length}</span>
           )}
         </div>
       </Popover.Trigger>
@@ -96,35 +91,58 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
                 </div>
               </Collapsible.Root>
               <div className={styles.sections}>
-                {isLoading && <p className={styles.empty}>Loading...</p>}
-
-                {!isLoading && unread.length === 0 && read.length === 0 && (
+                {state.unread.length === 0 && !state.isReadLoaded && (
                   <p className={styles.empty}>No notifications</p>
                 )}
 
-                {unread.length > 0 &&
-                  unread.map((n) => (
-                    <NotificationItem
-                      apiRoute={apiRoute}
-                      key={n.id}
-                      notification={n}
-                      onDelete={deleteNotification}
-                      onMarkRead={markRead}
-                      onUnsubscribe={unsubscribe}
-                    />
-                  ))}
+                {state.unread.map((n) => (
+                  <NotificationItem
+                    apiRoute={apiRoute}
+                    key={n.id}
+                    notification={n}
+                    onDelete={deleteNotification}
+                    onMarkRead={markRead}
+                    onUnsubscribe={unsubscribe}
+                  />
+                ))}
 
-                {read.length > 0 &&
-                  read.map((n) => (
-                    <NotificationItem
-                      apiRoute={apiRoute}
-                      key={n.id}
-                      notification={n}
-                      onDelete={deleteNotification}
-                      onMarkRead={markRead}
-                      onUnsubscribe={unsubscribe}
-                    />
-                  ))}
+                {!state.isReadLoaded && state.unread.length > 0 && (
+                  <button
+                    className={styles.showOlder}
+                    onClick={loadMore}
+                    type="button"
+                  >
+                    Show older
+                  </button>
+                )}
+
+                {state.isReadLoaded &&
+                  state.read.length === 0 &&
+                  state.unread.length === 0 && (
+                    <p className={styles.empty}>No notifications</p>
+                  )}
+
+                {state.read.map((n) => (
+                  <NotificationItem
+                    apiRoute={apiRoute}
+                    key={n.id}
+                    notification={n}
+                    onDelete={deleteNotification}
+                    onMarkRead={markRead}
+                    onUnsubscribe={unsubscribe}
+                  />
+                ))}
+
+                {state.isReadLoaded && state.hasMoreRead && (
+                  <button
+                    className={styles.showOlder}
+                    disabled={isLoadingRead}
+                    onClick={loadMore}
+                    type="button"
+                  >
+                    {isLoadingRead ? 'Loading...' : 'Show more'}
+                  </button>
+                )}
               </div>
             </Popover.Viewport>
           </Popover.Popup>
@@ -138,25 +156,39 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
 // Hooks
 // ---------------------------------------------------------------------------
 
-/** Polls the server for the current unread notification count. */
-function useUnreadCount(apiRoute: string, pollInterval: number) {
-  const [unreadCount, setUnreadCount] = useState(0);
+/** Polls unread notifications with `since`-based diffing. */
+function useUnreadPolling(
+  apiRoute: string,
+  pollInterval: number,
+  state: NotificationState,
+  dispatch: React.Dispatch<NotificationAction>,
+) {
+  const timestampRef = useRef(state.pollTimestamp);
+  timestampRef.current = state.pollTimestamp;
 
-  const refreshUnreadCount = useCallback(async () => {
+  const poll = useCallback(async () => {
     try {
-      const { docs } = await ENDPOINTS.unread.call(apiRoute, {});
-      setUnreadCount(docs.length);
+      const since = timestampRef.current ?? undefined;
+      const { docs, timestamp } = await ENDPOINTS.unread.call(apiRoute, {
+        since,
+      });
+
+      if (!timestampRef.current) {
+        dispatch({ type: 'SET_UNREAD', docs, timestamp });
+      } else {
+        dispatch({ type: 'PREPEND_UNREAD', docs, timestamp });
+      }
     } catch {
       // Poll will retry on next interval
     }
-  }, [apiRoute]);
+  }, [apiRoute, dispatch]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
 
     const start = () => {
-      refreshUnreadCount();
-      interval = setInterval(refreshUnreadCount, pollInterval * 1000);
+      poll();
+      interval = setInterval(poll, pollInterval * 1000);
     };
 
     const stop = () => {
@@ -176,79 +208,58 @@ function useUnreadCount(apiRoute: string, pollInterval: number) {
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [refreshUnreadCount, pollInterval]);
-
-  return { unreadCount, refreshUnreadCount };
+  }, [poll, pollInterval]);
 }
 
-/** Fetches and partitions the notification list into unread/read. */
-function useNotificationList({ apiRoute }: { apiRoute: string }) {
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+/** On-demand paginated loading of read notifications. */
+function useReadNotifications(
+  apiRoute: string,
+  state: NotificationState,
+  dispatch: React.Dispatch<NotificationAction>,
+) {
+  const [isLoadingRead, setIsLoadingRead] = useState(false);
+  const nextPage = state.readPage + 1;
 
-  const fetchNotifications = useCallback(async () => {
-    setIsLoading(true);
+  const loadMore = useCallback(async () => {
+    setIsLoadingRead(true);
     try {
-      const [unreadResult, readResult] = await Promise.all([
-        ENDPOINTS.unread.call(apiRoute, {}),
-        ENDPOINTS.read.call(apiRoute, { page: 1, limit: 10 }),
-      ]);
-      setNotifications([...unreadResult.docs, ...readResult.docs]);
+      const { docs, hasNextPage } = await ENDPOINTS.read.call(apiRoute, {
+        page: nextPage,
+        limit: 10,
+      });
+      dispatch({ type: 'APPEND_READ', docs, hasNextPage });
     } finally {
-      setIsLoading(false);
+      setIsLoadingRead(false);
     }
-  }, [apiRoute]);
+  }, [apiRoute, nextPage, dispatch]);
 
-  const { unread, read } = useMemo(() => {
-    const unread: NotificationData[] = [];
-    const read: NotificationData[] = [];
-    for (const n of notifications) {
-      if (n.readAt) read.push(n);
-      else unread.push(n);
-    }
-    return { unread, read };
-  }, [notifications]);
-
-  return { unread, read, isLoading, fetchNotifications, setNotifications };
+  return { loadMore, isLoadingRead };
 }
 
-/** Optimistic mutations for the notification list. */
+/** Optimistic mutations dispatched to the reducer. */
 function useNotificationActions(
   apiRoute: string,
-  setNotifications: React.Dispatch<React.SetStateAction<NotificationData[]>>,
-  onMutate: () => void,
+  dispatch: React.Dispatch<NotificationAction>,
 ) {
   const markRead = useCallback(
     async (id: string | number) => {
+      dispatch({ type: 'MARK_READ', id, readAt: new Date().toISOString() });
       await ENDPOINTS.markRead.call(apiRoute, { id });
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, readAt: new Date().toISOString() } : n,
-        ),
-      );
-      onMutate();
     },
-    [apiRoute, setNotifications, onMutate],
+    [apiRoute, dispatch],
   );
 
   const markAllRead = useCallback(async () => {
+    dispatch({ type: 'MARK_ALL_READ' });
     await ENDPOINTS.markAllRead.call(apiRoute);
-    setNotifications((prev) =>
-      prev.map((n) => ({
-        ...n,
-        readAt: n.readAt ?? new Date().toISOString(),
-      })),
-    );
-    onMutate();
-  }, [apiRoute, setNotifications, onMutate]);
+  }, [apiRoute, dispatch]);
 
   const deleteNotification = useCallback(
     async (id: string | number) => {
+      dispatch({ type: 'DELETE_NOTIFICATION', id });
       await ENDPOINTS.deleteNotification.call(apiRoute, { id });
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      onMutate();
     },
-    [apiRoute, setNotifications, onMutate],
+    [apiRoute, dispatch],
   );
 
   return { markRead, markAllRead, deleteNotification };
