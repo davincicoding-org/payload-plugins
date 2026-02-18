@@ -7,7 +7,7 @@ export const ENDPOINTS = {
   unread: defineProcedure({
     path: '/notifications-plugin/unread',
     method: 'get',
-    input: z.object({ since: z.string().optional() }),
+    input: z.object({ since: z.string().datetime().optional() }),
   }).returns<{ docs: NotificationData[]; timestamp: string }>(),
 
   read: defineProcedure({
