@@ -1,5 +1,11 @@
 # payload-intl
 
+## 1.2.4
+
+### Patch Changes
+
+- [`71a9c33`](https://github.com/davincicoding-org/payload-plugins/commit/71a9c33b64e576a230e7eeca75b364389dcf882f) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Use string type for collectionSlug option and clean up tsconfig include paths. Update internal dependency for renamed common API.
+
 ## 1.2.3
 
 ### Patch Changes
