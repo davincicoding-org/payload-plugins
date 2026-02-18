@@ -7,11 +7,11 @@ import {
 } from './email/default-email';
 import { deleteNotificationEndpoint } from './endpoints/delete-notification';
 import { emailUnsubscribeEndpoint } from './endpoints/email-unsubscribe';
-import { listNotificationsEndpoint } from './endpoints/list-notifications';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { openNotificationEndpoint } from './endpoints/open-notification';
-import { unreadCountEndpoint } from './endpoints/unread-count';
+import { readNotificationsEndpoint } from './endpoints/read-notifications';
+import { unreadNotificationsEndpoint } from './endpoints/unread-notifications';
 import { unsubscribeEndpoint } from './endpoints/unsubscribe';
 import { updatePreferencesEndpoint } from './endpoints/update-preferences';
 import { Notifications, Subscriptions } from './entities';
@@ -99,10 +99,10 @@ export const notificationsPlugin = ({
     // Attach Endpoints
     config.endpoints ??= [];
     config.endpoints.push(
-      listNotificationsEndpoint(notifSlug),
+      unreadNotificationsEndpoint(notifSlug),
+      readNotificationsEndpoint(notifSlug),
       markReadEndpoint(notifSlug),
       markAllReadEndpoint(notifSlug),
-      unreadCountEndpoint(notifSlug),
       updatePreferencesEndpoint(),
       deleteNotificationEndpoint(notifSlug),
       openNotificationEndpoint(notifSlug),
