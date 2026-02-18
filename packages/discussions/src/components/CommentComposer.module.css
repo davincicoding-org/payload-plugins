@@ -1,0 +1,26 @@
+.form {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  outline: none;
+  border: none;
+  color: var(--theme-text);
+  background-color: transparent;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.footer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-inline: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem;
+}
