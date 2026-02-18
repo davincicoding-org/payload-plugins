@@ -1,13 +1,14 @@
 'use client';
 
 import { Button } from '@payloadcms/ui';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import styles from './CommentComposer.module.css';
 
 export interface CommentComposerProps {
   readonly placeholder: string;
   readonly submitLabel: string;
+  readonly autoFocus?: boolean;
   readonly onSubmit: (content: string) => void | Promise<void>;
   readonly onCancel?: () => void;
   readonly onFocus?: () => void;
@@ -16,6 +17,7 @@ export interface CommentComposerProps {
 export function CommentComposer({
   placeholder,
   submitLabel,
+  autoFocus,
   onSubmit,
   onCancel,
   onFocus,
@@ -43,23 +45,38 @@ export function CommentComposer({
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+    setContent(e.target.value);
+
+  const handleClick = () => void handleSubmit();
+
+  const textareaRef = useCallback(
+    (el: HTMLTextAreaElement | null) => {
+      if (autoFocus) el?.focus();
+    },
+    [autoFocus],
+  );
+
   const isDisabled = !content.trim() || isSubmitting;
 
   return (
-    <div className={styles.form}>
+    <div className={styles.root}>
       <TextareaAutosize
         className={styles.textarea}
         disabled={isSubmitting}
-        onChange={(e) => setContent(e.target.value)}
+        minRows={2}
+        onChange={handleChange}
         onFocus={onFocus}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        ref={textareaRef}
         value={content}
       />
       <div className={styles.footer}>
         {onCancel && (
           <Button
             buttonStyle="transparent"
+            className={styles.cancelButton}
             disabled={isSubmitting}
             onClick={onCancel}
             size="small"
@@ -70,7 +87,7 @@ export function CommentComposer({
         )}
         <Button
           disabled={isDisabled}
-          onClick={() => void handleSubmit()}
+          onClick={handleClick}
           size="small"
           type="button"
         >

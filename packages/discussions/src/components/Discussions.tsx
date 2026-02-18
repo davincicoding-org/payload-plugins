@@ -4,7 +4,6 @@ import type { DocumentReference } from '@repo/common';
 import type { PopulatedComment } from '../types';
 import { CommentProvider } from './CommentProvider';
 import { CommentsPanel } from './CommentsPanel';
-import styles from './Discussions.module.css';
 
 export interface DiscussionsClientProps {
   readonly initialComments: PopulatedComment[];
@@ -18,14 +17,12 @@ export function DiscussionsClient({
   maxDepth,
 }: DiscussionsClientProps) {
   return (
-    <div className={styles.root}>
-      <CommentProvider
-        documentReference={documentReference}
-        initialComments={initialComments}
-        maxDepth={maxDepth}
-      >
-        <CommentsPanel />
-      </CommentProvider>
-    </div>
+    <CommentProvider
+      documentReference={documentReference}
+      initialComments={initialComments}
+      maxDepth={maxDepth}
+    >
+      <CommentsPanel />
+    </CommentProvider>
   );
 }

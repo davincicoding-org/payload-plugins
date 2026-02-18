@@ -46,6 +46,7 @@ export function CommentProvider({
           documentReference,
         });
         setComments((prev) => [populated, ...prev]);
+        setActiveReplyId(null);
         return;
       }
 

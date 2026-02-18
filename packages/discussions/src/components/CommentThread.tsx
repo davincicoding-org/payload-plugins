@@ -1,7 +1,6 @@
 'use client';
 
-import { Collapsible } from '@base-ui/react/collapsible';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { PopulatedComment } from '../types';
 import { CommentCard } from './CommentCard';
 import { CommentComposer } from './CommentComposer';
@@ -14,13 +13,21 @@ export interface CommentThreadProps {
 }
 
 export function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const pendingScrollRef = useRef(false);
   const { activeReplyId, maxDepth, openReply, closeReply, submitReply } =
     useCommentContext();
 
   const [repliesExpanded, setRepliesExpanded] = useState(depth === 0);
+  const [composerClosing, setComposerClosing] = useState(false);
 
   const isReplying = activeReplyId === comment.id;
+  const hasReplies = (comment.replies ?? []).length > 0;
   const showReplyButton = depth < maxDepth;
+
+  /** Keep composer in the DOM while the collapsible animates closed. */
+  const composerMounted = isReplying || composerClosing;
+
   const replies = useMemo(
     () =>
       [...(comment.replies ?? [])].sort(
@@ -30,45 +37,95 @@ export function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
     [comment.replies],
   );
 
+  const handleCancelReply = () => {
+    setComposerClosing(true);
+    closeReply();
+  };
+
   const handleReplyToggle = () => {
     if (isReplying) {
-      closeReply();
+      handleCancelReply();
     } else {
+      pendingScrollRef.current = true;
       openReply(comment.id);
-      setRepliesExpanded(true);
     }
   };
 
+  const handleToggleReplies = (expanded: boolean) => {
+    if (expanded) {
+      pendingScrollRef.current = true;
+    }
+    setRepliesExpanded(expanded);
+  };
+
+  const handlePanelTransitionEnd = (
+    e: React.TransitionEvent<HTMLDivElement>,
+  ) => {
+    if (e.target !== e.currentTarget || e.propertyName !== 'grid-template-rows')
+      return;
+
+    if (pendingScrollRef.current) {
+      pendingScrollRef.current = false;
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  };
+
+  const handleComposerTransitionEnd = (
+    e: React.TransitionEvent<HTMLDivElement>,
+  ) => {
+    if (
+      e.target === e.currentTarget &&
+      e.propertyName === 'grid-template-rows' &&
+      composerClosing
+    ) {
+      setComposerClosing(false);
+    }
+  };
+
+  const handleSubmitReply = (content: string) =>
+    submitReply(comment.id, content);
+
   return (
-    <div>
+    <div className={styles.root} ref={rootRef}>
       <CommentCard
         comment={comment}
         isReplying={isReplying}
         onReplyToggle={handleReplyToggle}
-        onToggleReplies={setRepliesExpanded}
+        onToggleReplies={handleToggleReplies}
         repliesCount={replies.length}
-        repliesExpanded={repliesExpanded}
+        repliesExpanded={repliesExpanded || isReplying}
         showReplyButton={showReplyButton}
       />
 
-      <Collapsible.Root open={repliesExpanded || isReplying}>
-        <Collapsible.Panel>
+      <div
+        className={styles.collapsiblePanel}
+        data-open={isReplying || (repliesExpanded && hasReplies) || undefined}
+        onTransitionEnd={handlePanelTransitionEnd}
+      >
+        <div>
           <div className={styles.replies}>
             {replies.map((reply) => (
               <CommentThread comment={reply} depth={depth + 1} key={reply.id} />
             ))}
 
-            {isReplying && (
-              <CommentComposer
-                onCancel={closeReply}
-                onSubmit={(content) => submitReply(comment.id, content)}
-                placeholder="Write a reply..."
-                submitLabel="Reply"
-              />
-            )}
+            <div
+              className={styles.collapsiblePanel}
+              data-open={isReplying || undefined}
+              onTransitionEnd={handleComposerTransitionEnd}
+            >
+              {composerMounted && (
+                <CommentComposer
+                  autoFocus
+                  onCancel={handleCancelReply}
+                  onSubmit={handleSubmitReply}
+                  placeholder="Write a reply..."
+                  submitLabel="Reply"
+                />
+              )}
+            </div>
           </div>
-        </Collapsible.Panel>
-      </Collapsible.Root>
+        </div>
+      </div>
     </div>
   );
 }

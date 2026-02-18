@@ -27,47 +27,53 @@ export function CommentCard({
 }: CommentCardProps) {
   const { i18n } = useTranslation();
 
-  const cardClassName = isReplying
-    ? `${styles.card} ${styles.sticky}`
-    : styles.card;
+  const handleToggleReplies = () => onToggleReplies(!repliesExpanded);
 
   return (
-    <div>
-      <div className={cardClassName}>
+    <div className={styles.root} data-sticky={isReplying}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.author}>
             {comment.author?.displayName || 'Unknown'}
           </span>
-          <span>{formatTimeToNow({ date: comment.createdAt, i18n })}</span>
+          <time className={styles.time} dateTime={comment.createdAt}>
+            {formatTimeToNow({ date: comment.createdAt, i18n })}
+          </time>
         </div>
         <div className={styles.content}>{comment.content}</div>
-      </div>
 
-      <div className={styles.actions}>
-        {showReplyButton && (
-          <Button
-            buttonStyle="transparent"
-            className={isReplying ? styles.cancelReply : undefined}
-            onClick={onReplyToggle}
-            size="small"
-            type="button"
-          >
-            {isReplying ? 'Cancel Reply' : 'Reply'}
-          </Button>
-        )}
+        <div className={styles.actions}>
+          {showReplyButton && (
+            <Button
+              buttonStyle="transparent"
+              extraButtonProps={{
+                'data-cancel': isReplying,
+              }}
+              onClick={onReplyToggle}
+              size="xsmall"
+              type="button"
+            >
+              {isReplying ? 'Cancel' : 'Reply'}
+            </Button>
+          )}
 
-        {repliesCount > 0 && (
-          <Button
-            buttonStyle="transparent"
-            onClick={() => onToggleReplies(!repliesExpanded)}
-            size="small"
-            type="button"
-          >
-            {repliesExpanded
-              ? `${repliesCount} replies \u2191`
-              : `${repliesCount} replies \u2193`}
-          </Button>
-        )}
+          {repliesCount > 0 && (
+            <>
+              <span className={styles.separator}>{'\u00B7'}</span>
+
+              <Button
+                buttonStyle="transparent"
+                disabled={isReplying}
+                onClick={handleToggleReplies}
+                size="xsmall"
+                type="button"
+              >
+                {repliesCount} {repliesCount === 1 ? 'reply' : 'replies'}{' '}
+                {!isReplying && <>{repliesExpanded ? '\u2191' : '\u2193'}</>}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,26 +1,39 @@
-.form {
-  border: 1px solid var(--theme-elevation-200);
-  border-radius: 0.5rem;
-  overflow: hidden;
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .textarea {
   width: 100%;
   padding: 0.75rem;
   outline: none;
-  border: none;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 0.5rem;
   color: var(--theme-text);
-  background-color: transparent;
+  background-color: var(--theme-elevation-50);
   resize: none;
   font-family: inherit;
   font-size: 0.875rem;
+}
+
+.textarea:focus {
+  border-color: var(--theme-elevation-400);
 }
 
 .footer {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
-  padding-inline: 0.5rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.5rem;
+
+  > button {
+    margin-block: 0;
+  }
+}
+
+.cancelButton {
+  color: var(--theme-elevation-500);
+  &:hover {
+    color: var(--theme-text);
+  }
 }

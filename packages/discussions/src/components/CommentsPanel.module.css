@@ -4,14 +4,6 @@
   gap: 2rem;
 }
 
-.scrollArea {
-  max-height: 80vh;
-}
-
-.viewport {
-  overscroll-behavior: contain;
-}
-
 .list {
   display: flex;
   flex-direction: column;
@@ -23,19 +15,4 @@
   text-align: center;
   color: var(--theme-elevation-500);
   font-size: 0.875rem;
-}
-
-.scrollbar {
-  display: flex;
-  padding: 1px;
-  background-color: var(--theme-elevation-100);
-  width: 8px;
-  box-sizing: border-box;
-}
-
-.thumb {
-  flex: 1;
-  background-color: var(--theme-elevation-500);
-  border-radius: 4px;
-  min-height: 24px;
 }

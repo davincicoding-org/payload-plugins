@@ -1,3 +1,33 @@
+.root {
+  scroll-margin-block: 2rem;
+}
+
+.collapsiblePanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+
+  /* Closing: fade out fast, then collapse height */
+  transition:
+    grid-template-rows 150ms ease-in 50ms,
+    opacity 50ms ease-out;
+
+  &[data-open] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+
+    /* Opening: expand height first, then fade content in */
+    transition:
+      grid-template-rows 150ms ease-out,
+      opacity 100ms ease-in 50ms;
+  }
+
+  > * {
+    min-height: 0;
+    overflow: clip;
+  }
+}
+
 .replies {
   display: flex;
   flex-direction: column;
