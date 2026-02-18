@@ -1,4 +1,5 @@
 .row {
+  position: relative;
   display: flex;
   align-items: stretch;
   border-bottom: 1px solid var(--theme-elevation-150);
@@ -61,27 +62,26 @@
 /* Menu trigger */
 
 .menuTrigger {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 0;
-  overflow: hidden;
+  width: 1.75rem;
   padding: 0;
   background: none;
   border: none;
   border-radius: var(--style-radius-s);
   cursor: pointer;
   color: var(--theme-elevation-400);
-  transition:
-    width 120ms ease,
-    opacity 120ms ease;
   opacity: 0;
+  transition: opacity 120ms ease;
 }
 
 .row:hover .menuTrigger,
 .menuTrigger[data-popup-open] {
-  width: 1.75rem;
   opacity: 1;
 }
 
