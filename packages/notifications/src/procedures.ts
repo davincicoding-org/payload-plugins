@@ -4,10 +4,24 @@ import type { NotificationData } from './types';
 import { markReadSchema, subscriptionSchema } from './types';
 
 export const ENDPOINTS = {
-  listNotifications: defineProcedure({
-    path: '/notifications-plugin/list',
+  unread: defineProcedure({
+    path: '/notifications-plugin/unread',
     method: 'get',
-  }).returns<{ docs: NotificationData[] }>(),
+    input: z.object({ since: z.string().optional() }),
+  }).returns<{ docs: NotificationData[]; timestamp: string }>(),
+
+  read: defineProcedure({
+    path: '/notifications-plugin/read',
+    method: 'get',
+    input: z.object({
+      page: z.coerce.number().optional().default(1),
+      limit: z.coerce.number().optional().default(10),
+    }),
+  }).returns<{
+    docs: NotificationData[];
+    hasNextPage: boolean;
+    totalDocs: number;
+  }>(),
 
   markRead: defineProcedure({
     path: '/notifications-plugin/mark-read',
@@ -19,11 +33,6 @@ export const ENDPOINTS = {
     path: '/notifications-plugin/mark-all-read',
     method: 'post',
   }).returns<{ success: true }>(),
-
-  unreadCount: defineProcedure({
-    path: '/notifications-plugin/unread-count',
-    method: 'get',
-  }).returns<{ count: number }>(),
 
   updatePreferences: defineProcedure({
     path: '/notifications-plugin/preferences',
