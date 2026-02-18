@@ -4,17 +4,29 @@ import type { Notification } from '@/payload-types';
 import { ENDPOINTS } from '@/procedures';
 import type { NotificationData } from '@/types';
 
-export const listNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
-  ENDPOINTS.listNotifications.endpoint(async (req) => {
+export const unreadNotificationsEndpoint = (
+  notificationsSlug: CollectionSlug,
+) =>
+  ENDPOINTS.unread.endpoint(async (req, { since }) => {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const timestamp = new Date().toISOString();
+
+    const where: Record<string, unknown> = {
+      and: [
+        { recipient: { equals: req.user.id } },
+        { readAt: { exists: false } },
+        ...(since ? [{ createdAt: { greater_than: since } }] : []),
+      ],
+    };
+
     const result = await req.payload.find({
       collection: notificationsSlug as 'notifications',
-      where: { recipient: { equals: req.user.id } },
+      where,
       sort: '-createdAt',
-      limit: 20,
+      limit: 0,
       depth: 0,
     });
 
@@ -31,10 +43,9 @@ export const listNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
       createdAt: doc.createdAt,
     }));
 
-    return { docs };
+    return { docs, timestamp };
   });
 
-/** Resolve the stored message into a plain display string. */
 function resolveMessage(doc: Notification): string {
   return resolveMessageAtReadTime(doc.message, {
     meta: doc.meta as Record<string, unknown> | undefined,
