@@ -1,0 +1,10 @@
+.replies {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--theme-elevation-200);
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+}
