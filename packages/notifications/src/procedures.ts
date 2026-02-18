@@ -46,8 +46,8 @@ export const ENDPOINTS = {
   openNotification: defineProcedure({
     path: '/notifications-plugin/open',
     method: 'get',
-    input: markReadSchema,
-  }).returns<void>(),
+    input: markReadSchema.extend({ json: z.literal('true').optional() }),
+  }).returns<{ url: string | null }>(),
 
   emailUnsubscribe: defineProcedure({
     path: '/notifications-plugin/email-unsubscribe',

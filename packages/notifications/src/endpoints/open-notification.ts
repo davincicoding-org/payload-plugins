@@ -2,9 +2,39 @@ import { getAdminURL, resolveDocumentID } from '@repo/common';
 import type { CollectionSlug } from 'payload';
 import { ENDPOINTS } from '@/procedures';
 
-/** Marks a notification as read and redirects to its target URL. */
+/** Resolves the target URL for a notification, or null if there's no target. */
+function resolveTargetURL(
+  req: Parameters<Parameters<typeof ENDPOINTS.openNotification.endpoint>[0]>[0],
+  notification: {
+    url?: string | null;
+    documentReference?: {
+      entity?: string | null;
+      slug?: string | null;
+      documentId?: string | null;
+    } | null;
+  },
+): string | null {
+  if (notification.url) return notification.url;
+
+  if (!notification.documentReference) return null;
+
+  const ref = notification.documentReference;
+  if (!ref.slug) return null;
+
+  const path =
+    ref.entity === 'collection' && ref.documentId
+      ? (`/collections/${ref.slug}/${ref.documentId}` as const)
+      : (`/globals/${ref.slug}` as const);
+
+  return getAdminURL({ req, path });
+}
+
+/**
+ * Marks a notification as read and either redirects (for email links)
+ * or returns JSON with the resolved URL (for in-app use with `?json=true`).
+ */
 export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
-  ENDPOINTS.openNotification.endpoint(async (req, { id }) => {
+  ENDPOINTS.openNotification.endpoint(async (req, { id, json }) => {
     if (!req.user) {
       const loginURL = getAdminURL({ req, path: '/login' });
       const apiRoute = req.payload.config.routes.api;
@@ -39,21 +69,11 @@ export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
       });
     }
 
-    // Explicitly passed URL wins
-    if (notification.url) {
-      return Response.redirect(notification.url, 302);
+    const url = resolveTargetURL(req, notification);
+
+    if (json === 'true') {
+      return { url };
     }
 
-    if (!notification.documentReference) {
-      return Response.redirect(getAdminURL({ req, path: '' }), 302);
-    }
-
-    // Derive from document reference
-    const ref = notification.documentReference;
-    const path =
-      ref.entity === 'collection' && ref.documentId
-        ? (`/collections/${ref.slug}/${ref.documentId}` as const)
-        : (`/globals/${ref.slug}` as const);
-
-    return Response.redirect(getAdminURL({ req, path }), 302);
+    return Response.redirect(url ?? getAdminURL({ req, path: '' }), 302);
   });

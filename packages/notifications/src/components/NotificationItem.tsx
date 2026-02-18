@@ -3,6 +3,7 @@
 import { Menu } from '@base-ui/react/menu';
 import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
 import { IconDotsVertical } from '@tabler/icons-react';
+import { ENDPOINTS } from '@/procedures';
 import type { NotificationData, StoredDocumentReference } from '@/types';
 import styles from './NotificationItem.module.css';
 
@@ -24,9 +25,19 @@ export function NotificationItem({
   const { i18n } = useTranslation();
   const isUnread = !notification.readAt;
 
-  const handleClick = () => {
-    // The /open endpoint marks as read and redirects
-    window.location.href = `${apiRoute}/notifications-plugin/open?id=${notification.id}`;
+  const handleClick = async () => {
+    const { url } = await ENDPOINTS.openNotification.call(apiRoute, {
+      id: notification.id,
+      json: 'true',
+    });
+
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+
+    // No target — just update local state since the server already marked it read
+    if (isUnread) onMarkRead(notification.id);
   };
 
   return (
