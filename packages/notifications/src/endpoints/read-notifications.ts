@@ -1,0 +1,51 @@
+import type { CollectionSlug } from 'payload';
+import { resolveMessageAtReadTime } from '@/message';
+import type { Notification } from '@/payload-types';
+import { ENDPOINTS } from '@/procedures';
+import type { NotificationData } from '@/types';
+
+export const readNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
+  ENDPOINTS.read.endpoint(async (req, { page, limit }) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const result = await req.payload.find({
+      collection: notificationsSlug as 'notifications',
+      where: {
+        and: [
+          { recipient: { equals: req.user.id } },
+          { readAt: { exists: true } },
+        ],
+      },
+      sort: '-readAt',
+      page,
+      limit,
+      depth: 0,
+    });
+
+    const docs: NotificationData[] = result.docs.map((doc) => ({
+      id: doc.id,
+      event: doc.event,
+      message: resolveMessage(doc),
+      readAt: doc.readAt,
+      documentReference: {
+        entity: doc.documentReference?.entity ?? 'collection',
+        slug: doc.documentReference?.slug ?? '',
+        documentId: doc.documentReference?.documentId ?? undefined,
+      },
+      createdAt: doc.createdAt,
+    }));
+
+    return {
+      docs,
+      hasNextPage: result.hasNextPage,
+      totalDocs: result.totalDocs,
+    };
+  });
+
+function resolveMessage(doc: Notification): string {
+  return resolveMessageAtReadTime(doc.message, {
+    meta: doc.meta as Record<string, unknown> | undefined,
+  });
+}
