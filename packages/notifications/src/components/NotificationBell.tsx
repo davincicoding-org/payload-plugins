@@ -144,8 +144,8 @@ function useUnreadCount(apiRoute: string, pollInterval: number) {
 
   const refreshUnreadCount = useCallback(async () => {
     try {
-      const { count } = await ENDPOINTS.unreadCount.call(apiRoute);
-      setUnreadCount(count);
+      const { docs } = await ENDPOINTS.unread.call(apiRoute, {});
+      setUnreadCount(docs.length);
     } catch {
       // Poll will retry on next interval
     }
@@ -189,8 +189,11 @@ function useNotificationList({ apiRoute }: { apiRoute: string }) {
   const fetchNotifications = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { docs } = await ENDPOINTS.listNotifications.call(apiRoute);
-      setNotifications(docs);
+      const [unreadResult, readResult] = await Promise.all([
+        ENDPOINTS.unread.call(apiRoute, {}),
+        ENDPOINTS.read.call(apiRoute, { page: 1, limit: 10 }),
+      ]);
+      setNotifications([...unreadResult.docs, ...readResult.docs]);
     } finally {
       setIsLoading(false);
     }

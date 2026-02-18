@@ -1,8 +1,6 @@
-import type { CollectionSlug } from 'payload';
-import { resolveMessageAtReadTime } from '@/message';
-import type { Notification } from '@/payload-types';
+import type { CollectionSlug, Where } from 'payload';
 import { ENDPOINTS } from '@/procedures';
-import type { NotificationData } from '@/types';
+import { mapNotification } from './map-notification';
 
 export const unreadNotificationsEndpoint = (
   notificationsSlug: CollectionSlug,
@@ -14,7 +12,7 @@ export const unreadNotificationsEndpoint = (
 
     const timestamp = new Date().toISOString();
 
-    const where: Record<string, unknown> = {
+    const where: Where = {
       and: [
         { recipient: { equals: req.user.id } },
         { readAt: { exists: false } },
@@ -30,24 +28,5 @@ export const unreadNotificationsEndpoint = (
       depth: 0,
     });
 
-    const docs: NotificationData[] = result.docs.map((doc) => ({
-      id: doc.id,
-      event: doc.event,
-      message: resolveMessage(doc),
-      readAt: doc.readAt,
-      documentReference: {
-        entity: doc.documentReference?.entity ?? 'collection',
-        slug: doc.documentReference?.slug ?? '',
-        documentId: doc.documentReference?.documentId ?? undefined,
-      },
-      createdAt: doc.createdAt,
-    }));
-
-    return { docs, timestamp };
+    return { docs: result.docs.map(mapNotification), timestamp };
   });
-
-function resolveMessage(doc: Notification): string {
-  return resolveMessageAtReadTime(doc.message, {
-    meta: doc.meta as Record<string, unknown> | undefined,
-  });
-}

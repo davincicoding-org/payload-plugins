@@ -1,8 +1,6 @@
 import type { CollectionSlug } from 'payload';
-import { resolveMessageAtReadTime } from '@/message';
-import type { Notification } from '@/payload-types';
 import { ENDPOINTS } from '@/procedures';
-import type { NotificationData } from '@/types';
+import { mapNotification } from './map-notification';
 
 export const readNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
   ENDPOINTS.read.endpoint(async (req, { page, limit }) => {
@@ -24,28 +22,9 @@ export const readNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
       depth: 0,
     });
 
-    const docs: NotificationData[] = result.docs.map((doc) => ({
-      id: doc.id,
-      event: doc.event,
-      message: resolveMessage(doc),
-      readAt: doc.readAt,
-      documentReference: {
-        entity: doc.documentReference?.entity ?? 'collection',
-        slug: doc.documentReference?.slug ?? '',
-        documentId: doc.documentReference?.documentId ?? undefined,
-      },
-      createdAt: doc.createdAt,
-    }));
-
     return {
-      docs,
+      docs: result.docs.map(mapNotification),
       hasNextPage: result.hasNextPage,
       totalDocs: result.totalDocs,
     };
   });
-
-function resolveMessage(doc: Notification): string {
-  return resolveMessageAtReadTime(doc.message, {
-    meta: doc.meta as Record<string, unknown> | undefined,
-  });
-}
