@@ -158,3 +158,27 @@
   color: var(--theme-elevation-400);
   font-size: 0.8125rem;
 }
+
+/* Show older / Show more */
+.showOlder {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: none;
+  color: var(--theme-elevation-500);
+  font-size: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid var(--theme-elevation-100);
+}
+
+.showOlder:hover {
+  background-color: var(--theme-elevation-50);
+  color: var(--theme-text);
+}
+
+.showOlder:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
