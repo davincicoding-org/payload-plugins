@@ -1,12 +1,11 @@
 import type { DocumentID, DocumentReference } from '@repo/common';
-import { getServerURL } from '@repo/common';
+import { getApiURL } from '@repo/common';
 import type { BasePayload, PayloadRequest } from 'payload';
-import { signUnsubscribeToken } from './email-token';
+import { signUnsubscribeToken } from './email/email-token';
 import type {
-  MinimalNotification,
-  NotificationEmailConfig,
   NotificationEmailLinks,
   ResolvedUser,
+  StoredDocumentReference,
 } from './types';
 
 /**
@@ -42,61 +41,28 @@ export async function resolveUser(
   return { ...user, displayName };
 }
 
-/** Build the `openURL` and optional `unsubscribeURL` for notification emails. */
-export function generateEmailLinks(
-  req: PayloadRequest,
-  {
-    notificationId,
-    recipientId,
-    url,
-    documentReference,
-  }: {
-    notificationId: string | undefined;
-    recipientId: DocumentID;
-    url: string | undefined;
-    documentReference: DocumentReference | undefined;
-  },
-): NotificationEmailLinks {
-  const serverURL = getServerURL(req);
-  const apiRoute = req.payload.config.routes.api;
-
-  const openURL = notificationId
-    ? `${serverURL}${apiRoute}/notifications-plugin/open?id=${notificationId}`
-    : (url ?? '#');
-
-  let unsubscribeURL: string | undefined;
-  if (documentReference) {
-    const token = signUnsubscribeToken(req.payload.config.secret, {
-      userId: recipientId,
-      documentReference,
-    });
-    unsubscribeURL = `${serverURL}${apiRoute}/notifications-plugin/email-unsubscribe?token=${token}`;
-  }
-
-  return { openURL, unsubscribeURL };
+/** Convert a `DocumentReference` to the flat shape stored in the group field. */
+export function toStoredReference(
+  ref: DocumentReference,
+): StoredDocumentReference {
+  return {
+    entity: ref.entity,
+    slug: ref.slug,
+    documentId: ref.entity === 'collection' ? String(ref.id) : undefined,
+  };
 }
 
-export async function sendNotificationEmail(
-  req: PayloadRequest,
-  {
-    emailConfig,
-    notification,
-    recipient,
-    links,
-  }: {
-    emailConfig: NotificationEmailConfig;
-    notification: MinimalNotification;
-    recipient: ResolvedUser;
-    links: NotificationEmailLinks;
-  },
-): Promise<void> {
-  try {
-    const [html, subject] = await Promise.all([
-      emailConfig.generateHTML({ notification, recipient, links }),
-      emailConfig.generateSubject({ notification, recipient, links }),
-    ]);
-    await req.payload.sendEmail({ to: recipient.email, subject, html });
-  } catch (err) {
-    console.error('[payload-notifications] Email delivery failed:', err);
+/** Convert the flat stored shape back to a `DocumentReference` discriminated union. */
+export function toDocumentReference(
+  ref: StoredDocumentReference,
+): DocumentReference {
+  if (ref.entity === 'collection') {
+    if (!ref.documentId) {
+      throw new Error(
+        `Collection reference "${ref.slug}" is missing a documentId`,
+      );
+    }
+    return { entity: ref.entity, slug: ref.slug, id: ref.documentId };
   }
+  return { entity: ref.entity, slug: ref.slug };
 }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { defaultGenerateHTML, defaultGenerateSubject } from './default-email';
 import type {
   MinimalNotification,
   NotificationEmailLinks,
   ResolvedUser,
-} from './types';
+} from '../types';
+import { defaultGenerateHTML, defaultGenerateSubject } from './default-email';
 
 const notification: MinimalNotification = {
   message: 'Alice commented on your post',

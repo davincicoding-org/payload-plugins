@@ -1,6 +1,6 @@
 import { documentReferenceSchema } from '@repo/common';
 import { unsubscribe } from '@/api';
-import { verifyUnsubscribeToken } from '@/email-token';
+import { verifyUnsubscribeToken } from '@/email/email-token';
 import { ENDPOINTS } from '@/procedures';
 
 function escapeHTML(str: string): string {

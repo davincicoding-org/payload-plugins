@@ -126,7 +126,6 @@ export interface User {
   id: string;
   notificationPreferences?: {
     emailEnabled?: boolean | null;
-    inAppEnabled?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -293,7 +292,6 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         emailEnabled?: T;
-        inAppEnabled?: T;
       };
   updatedAt?: T;
   createdAt?: T;

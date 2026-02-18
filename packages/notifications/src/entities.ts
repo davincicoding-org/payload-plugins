@@ -52,6 +52,7 @@ export const Notifications = createCollectionConfigFactory({
           options: ['collection', 'global'],
         },
         { name: 'slug', type: 'text', index: true },
+
         { name: 'documentId', type: 'text', index: true },
       ],
     },

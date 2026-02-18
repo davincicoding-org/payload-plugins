@@ -2,7 +2,7 @@ import type {
   MinimalNotification,
   NotificationEmailLinks,
   ResolvedUser,
-} from './types';
+} from '../types';
 
 function escapeHTML(str: string): string {
   return str

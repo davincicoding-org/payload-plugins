@@ -6,7 +6,12 @@ import {
 } from '@repo/common';
 import type { PayloadRequest } from 'payload';
 import { z } from 'zod';
+import type { NotificationsPluginConfig } from '.';
 import type { User } from './payload-types';
+
+export type ResolvedPluginOptions<
+  K extends keyof NotificationsPluginConfig = keyof NotificationsPluginConfig,
+> = Pick<Required<NotificationsPluginConfig>, K>;
 
 export interface ResolvedUser extends User {
   displayName: string;
@@ -27,7 +32,7 @@ export interface NotificationEmailConfig {
   }) => string | Promise<string>;
 }
 
-export type NotifactionCallback = (args: {
+export type NotificationCallback = (args: {
   req: PayloadRequest;
   notification: MinimalNotification;
   recipient: ResolvedUser;
@@ -46,6 +51,16 @@ export interface NotifyInput {
 export interface MinimalNotification {
   message: string;
   event: string;
+}
+
+export interface NotificationData {
+  id: string | number;
+  event: string;
+  /** Pre-resolved message string for display. */
+  message: string;
+  readAt?: string | null;
+  documentReference: StoredDocumentReference;
+  createdAt: string;
 }
 
 export interface NotificationEmailLinks {

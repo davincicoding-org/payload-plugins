@@ -2,26 +2,15 @@
 
 import { Menu } from '@base-ui/react/menu';
 import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
-import type { DocumentReference } from '@repo/common';
 import { IconDotsVertical } from '@tabler/icons-react';
-import type { StoredDocumentReference } from '@/types';
+import type { NotificationData, StoredDocumentReference } from '@/types';
 import styles from './NotificationItem.module.css';
-
-export interface NotificationData {
-  id: string | number;
-  event: string;
-  /** Pre-resolved message string for display. */
-  message: string;
-  readAt?: string | null;
-  documentReference?: StoredDocumentReference | null;
-  createdAt: string;
-}
 
 interface NotificationItemProps {
   notification: NotificationData;
   apiRoute: string;
   onMarkRead: (id: string | number) => void;
-  onUnsubscribe: (documentReference: DocumentReference) => void;
+  onUnsubscribe: (documentReference: StoredDocumentReference) => void;
   onDelete: (id: string | number) => void;
 }
 
@@ -34,9 +23,6 @@ export function NotificationItem({
 }: NotificationItemProps) {
   const { i18n } = useTranslation();
   const isUnread = !notification.readAt;
-  const canUnsubscribe =
-    !!notification.documentReference?.entity &&
-    !!notification.documentReference?.slug;
 
   const handleClick = () => {
     // The /open endpoint marks as read and redirects
@@ -75,21 +61,10 @@ export function NotificationItem({
                   Mark as read
                 </Menu.Item>
               )}
-              {canUnsubscribe && (
+              {notification.documentReference && (
                 <Menu.Item
                   className={styles.menuItem}
-                  onClick={() => {
-                    const ref = notification.documentReference!;
-                    const docRef: DocumentReference =
-                      ref.entity === 'collection'
-                        ? {
-                            entity: 'collection',
-                            slug: ref.slug,
-                            id: ref.documentId!,
-                          }
-                        : { entity: 'global', slug: ref.slug };
-                    onUnsubscribe(docRef);
-                  }}
+                  onClick={() => onUnsubscribe(notification.documentReference)}
                 >
                   Unsubscribe
                 </Menu.Item>

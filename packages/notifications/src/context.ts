@@ -1,13 +1,12 @@
 import type { CollectionSlug, Config, SanitizedConfig } from 'payload';
-import type { NotifactionCallback, NotificationEmailConfig } from './types';
-
-const PLUGIN_KEY = 'notifications-plugin';
+import { PLUGIN_KEY } from './const';
+import type { NotificationCallback, NotificationEmailConfig } from './types';
 
 export interface NotificationPluginContext {
   collectionSlugs: Record<'notifications' | 'subscriptions', CollectionSlug>;
   pollInterval: number;
   email: NotificationEmailConfig | undefined;
-  onNotify: NotifactionCallback | undefined;
+  onNotify: NotificationCallback | undefined;
 }
 
 /**

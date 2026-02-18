@@ -1,11 +1,8 @@
 import { type DocumentReference, fetchDocumentByReference } from '@repo/common';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
 import { getPluginContext } from './context';
-import {
-  generateEmailLinks,
-  resolveUser,
-  sendNotificationEmail,
-} from './helpers';
+import { sendNotificationEmail } from './email';
+import { resolveUser, toStoredReference } from './helpers';
 import { resolveMessageAtReadTime, toMessage } from './message';
 import type {
   MessageContext,
@@ -46,33 +43,21 @@ export async function notify(
 
   const recipient = await resolveUser(req.payload, input.recipient);
 
-  let notificationId: string | undefined;
-
-  if (recipient.notificationPreferences?.inAppEnabled) {
-    const doc = await req.payload.create({
-      collection: ctx.collectionSlugs.notifications as 'notifications',
-      data: {
-        recipient: input.recipient as string,
-        event: input.event,
-        actor: input.actor as string,
-        message: serializedMessage,
-        url: input.url,
-        meta: input.meta,
-        documentReference: input.documentReference,
-      },
-      req,
-    });
-    notificationId = String(doc.id);
-  }
+  const notificationDoc = await req.payload.create({
+    collection: ctx.collectionSlugs.notifications as 'notifications',
+    data: {
+      recipient: input.recipient as string,
+      event: input.event,
+      actor: input.actor as string,
+      message: serializedMessage,
+      url: input.url,
+      meta: input.meta,
+      documentReference: input.documentReference,
+    },
+    req,
+  });
 
   if (ctx.email && recipient.notificationPreferences?.emailEnabled) {
-    const links = generateEmailLinks(req, {
-      notificationId,
-      recipientId: input.recipient,
-      url: input.url,
-      documentReference: input.documentReference,
-    });
-
     await sendNotificationEmail(req, {
       emailConfig: ctx.email,
       notification: {
@@ -80,7 +65,8 @@ export async function notify(
         event: input.event,
       },
       recipient,
-      links,
+      notificationId: notificationDoc.id,
+      documentReference: input.documentReference,
     });
   }
 
@@ -169,15 +155,6 @@ export async function getSubscribers(
   return results.docs.map(({ user }) =>
     typeof user === 'object' ? user.id : user,
   );
-}
-
-/** Convert a DocumentReference to the flat shape stored in the group field. */
-function toStoredReference(ref: DocumentReference): StoredDocumentReference {
-  return {
-    entity: ref.entity,
-    slug: ref.slug,
-    documentId: ref.entity === 'collection' ? String(ref.id) : undefined,
-  };
 }
 
 /** Build the where clause to match a stored document reference. */
