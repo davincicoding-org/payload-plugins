@@ -152,9 +152,30 @@ function useUnreadCount(apiRoute: string, pollInterval: number) {
   }, [apiRoute]);
 
   useEffect(() => {
-    refreshUnreadCount();
-    const interval = setInterval(refreshUnreadCount, pollInterval * 1000);
-    return () => clearInterval(interval);
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const start = () => {
+      refreshUnreadCount();
+      interval = setInterval(refreshUnreadCount, pollInterval * 1000);
+    };
+
+    const stop = () => {
+      if (interval) clearInterval(interval);
+      interval = null;
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+
+    start();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [refreshUnreadCount, pollInterval]);
 
   return { unreadCount, refreshUnreadCount };
