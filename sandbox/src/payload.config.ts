@@ -136,10 +136,7 @@ export default buildConfig({
   plugins: [
     invitationsPlugin({}),
     notificationsPlugin({
-      email: {
-        generateHTML: ({ notification }) => `<p>${notification.message}</p>`,
-        generateSubject: ({ notification }) => notification.message,
-      },
+      email: true,
     }),
     discussionsPlugin({
       collections: ['feature-requests'],

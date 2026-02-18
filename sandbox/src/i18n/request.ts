@@ -1,6 +1,6 @@
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
-import { fetchCachedMessages } from '@/app/server';
+import { fetchCachedMessages } from '@/server';
 import { routing } from './routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -10,7 +10,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     : routing.defaultLocale;
 
   const messages = await fetchCachedMessages(locale);
-
+  console.log(messages);
   return {
     locale,
     messages,

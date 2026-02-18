@@ -140,7 +140,6 @@ export interface User {
   joinedAt?: string | null;
   notificationPreferences?: {
     emailEnabled?: boolean | null;
-    inAppEnabled?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -218,7 +217,7 @@ export interface FeatureRequest {
 export interface Comment {
   id: number;
   content: string;
-  author?: (number | null) | User;
+  author: number | User;
   replies?: (number | Comment)[] | null;
   updatedAt: string;
   createdAt: string;
@@ -233,7 +232,21 @@ export interface Notification {
   recipient: number | User;
   event: string;
   actor?: (number | null) | User;
-  message: string;
+  message:
+    | {
+        type: 'static';
+        value: string;
+      }
+    | {
+        type: 'live';
+        parts: (
+          | string
+          | {
+              type: 'actor' | 'document' | 'meta';
+              field: string;
+            }
+        )[];
+      };
   url?: string | null;
   meta?:
     | {
@@ -244,8 +257,11 @@ export interface Notification {
     | number
     | boolean
     | null;
-  subscription?: (number | null) | Subscription;
-  documentId?: string | null;
+  documentReference?: {
+    entity?: ('collection' | 'global') | null;
+    slug?: string | null;
+    documentId?: string | null;
+  };
   readAt?: string | null;
   emailSentAt?: string | null;
   emailError?: string | null;
@@ -259,9 +275,11 @@ export interface Notification {
 export interface Subscription {
   id: number;
   user: number | User;
-  documentId: string;
-  collectionSlug: string;
-  reason: 'manual' | 'auto';
+  documentReference: {
+    entity: 'collection' | 'global';
+    slug: string;
+    documentId?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -409,7 +427,6 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         emailEnabled?: T;
-        inAppEnabled?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -472,8 +489,13 @@ export interface NotificationsSelect<T extends boolean = true> {
   message?: T;
   url?: T;
   meta?: T;
-  subscription?: T;
-  documentId?: T;
+  documentReference?:
+    | T
+    | {
+        entity?: T;
+        slug?: T;
+        documentId?: T;
+      };
   readAt?: T;
   emailSentAt?: T;
   emailError?: T;
@@ -486,9 +508,13 @@ export interface NotificationsSelect<T extends boolean = true> {
  */
 export interface SubscriptionsSelect<T extends boolean = true> {
   user?: T;
-  documentId?: T;
-  collectionSlug?: T;
-  reason?: T;
+  documentReference?:
+    | T
+    | {
+        entity?: T;
+        slug?: T;
+        documentId?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

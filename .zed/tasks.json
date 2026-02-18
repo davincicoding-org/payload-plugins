@@ -28,8 +28,22 @@
     "hide": "always"
   },
   {
+    "label": "dev:notifications",
+    "command": "pnpm --filter ./packages/notifications dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
     "label": "dev:smart-cache",
     "command": "pnpm --filter ./packages/smart-cache dev",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "hide": "always"
+  },
+  {
+    "label": "dev:smart-deletion",
+    "command": "pnpm --filter ./packages/smart-deletion dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
