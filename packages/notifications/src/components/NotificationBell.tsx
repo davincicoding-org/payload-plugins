@@ -28,9 +28,12 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
   } = useConfig();
   const { user } = useAuth<User>();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [state, dispatch] = useReducer(notificationReducer, INITIAL_STATE);
 
-  useUnreadPolling(apiRoute, pollInterval, state, dispatch);
+  useUnreadPolling(apiRoute, pollInterval, state, dispatch, mounted);
   const { loadMore, isLoadingRead } = useReadNotifications(
     apiRoute,
     state,
@@ -46,15 +49,25 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
     user,
   );
 
+  const bellIcon = (
+    <div className={styles.bellIcon}>
+      <IconBell size={20} strokeWidth={1.5} />
+      {state.unread.length > 0 && (
+        <span className={styles.indicator}>{state.unread.length}</span>
+      )}
+    </div>
+  );
+
+  // Render a static bell during SSR to avoid hydration mismatch from
+  // Base UI's Popover portal and floating-ui context.
+  if (!mounted) {
+    return <Button buttonStyle="tab">{bellIcon}</Button>;
+  }
+
   return (
     <Popover.Root>
       <Popover.Trigger render={<Button buttonStyle="tab" />}>
-        <div className={styles.bellIcon}>
-          <IconBell size={20} strokeWidth={1.5} />
-          {state.unread.length > 0 && (
-            <span className={styles.indicator}>{state.unread.length}</span>
-          )}
-        </div>
+        {bellIcon}
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner align="start" sideOffset={8}>
@@ -162,6 +175,7 @@ function useUnreadPolling(
   pollInterval: number,
   state: NotificationState,
   dispatch: React.Dispatch<NotificationAction>,
+  enabled: boolean,
 ) {
   const timestampRef = useRef(state.pollTimestamp);
   timestampRef.current = state.pollTimestamp;
@@ -190,6 +204,8 @@ function useUnreadPolling(
   }, [apiRoute, dispatch]);
 
   useEffect(() => {
+    if (!enabled) return;
+
     let interval: ReturnType<typeof setInterval> | null = null;
 
     const start = () => {
@@ -214,7 +230,7 @@ function useUnreadPolling(
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [poll, pollInterval]);
+  }, [poll, pollInterval, enabled]);
 }
 
 /** On-demand paginated loading of read notifications. */
