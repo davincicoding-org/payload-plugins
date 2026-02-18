@@ -1,20 +1,19 @@
 # payload-invitations
 
-<!-- One-sentence tagline: explain what this plugin does in plain language -->
+Invite-only user onboarding for Payload CMS with email invitations, token-based acceptance, and automatic password setup.
 
 [![npm version](https://img.shields.io/npm/v/payload-invitations)](https://www.npmjs.com/package/payload-invitations)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Overview
 
-<!-- 2-4 sentences: what problem does this solve, what approach does it take, what are the key integration points -->
+Payload lets anyone with admin access create users, but there is no built-in way to invite someone by email and let them set their own password. This plugin turns user creation into an invitation flow: admins enter only an email, the plugin sends an invitation link, and the invitee chooses a password on a branded acceptance page. It hooks into Payload's existing email-verification mechanism so there is no extra collection to manage.
 
 **Features**
 
-<!-- 4-8 bullet points. Each starts with a **bold keyword** followed by a brief explanation. Sourced from the plugin's actual capabilities in src/index.ts -->
-
-- **Feature** -- explanation
-- ...
+- **Email-only creation** -- admins enter just an email. Password and auth fields are hidden automatically.
+- **Customizable invitation email** -- full control over the email subject and HTML body.
+- **Branded acceptance page** -- invitees set their own password and are logged in immediately.
 
 ## Installation
 
@@ -24,19 +23,35 @@ pnpm add payload-invitations
 
 ## Usage
 
-<!-- Show the most common setup: importing the plugin, adding it to payload.config.ts, and the primary use case. Code must match actual exports. -->
-
 ```ts
 // payload.config.ts
+import { buildConfig } from "payload";
+import { invitationsPlugin } from "payload-invitations";
+
+export default buildConfig({
+  // ...
+  plugins: [invitationsPlugin()],
+});
 ```
+
+To customize the invitation email:
+
+```ts
+invitationsPlugin({
+  generateInvitationEmailHTML: ({ invitationURL, user }) =>
+    `<p>Hi ${user.name}, <a href="${invitationURL}">accept your invitation</a>.</p>`,
+  generateInvitationEmailSubject: () => "You're invited!",
+})
+```
+
+> **Prerequisites:** Your Payload config must have `admin.user` set to a valid auth collection and an email adapter configured. The plugin warns and no-ops if either is missing.
 
 ### Options
 
-<!-- Table of all config options from the plugin's TypeScript interface. Source from src/index.ts config type and destructured defaults. -->
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| | | | |
+| Option                          | Type                                                        | Default                               | Description                                          |
+| ------------------------------- | ----------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------- |
+| `generateInvitationEmailHTML`   | `(args: { req, invitationURL, user }) => string \| Promise` | Simple HTML with an acceptance link   | Customize the invitation email body.                 |
+| `generateInvitationEmailSubject`| `(args: { req, invitationURL, user }) => string \| Promise` | `"You have been invited"`             | Customize the invitation email subject line.         |
 
 ## Contributing
 
@@ -54,17 +69,17 @@ pnpm --filter payload-invitations dev
 pnpm --filter sandbox dev
 ```
 
-The `sandbox/` directory is a Next.js + Payload app that imports plugins via `workspace:*` — use it to test changes locally.
+The `sandbox/` directory is a Next.js + Payload app that imports plugins via `workspace:*` -- use it to test changes locally.
 
 ### Code quality
 
-- **Formatting & linting** — handled by [Biome](https://biomejs.dev/), enforced on commit via husky + lint-staged.
-- **Commits** — must follow [Conventional Commits](https://www.conventionalcommits.org/) with a valid scope (e.g. `fix(payload-invitations): ...`).
-- **Changesets** — please include a [changeset](https://github.com/changesets/changesets) in your PR by running `pnpm release`.
+- **Formatting & linting** -- handled by [Biome](https://biomejs.dev/), enforced on commit via husky + lint-staged.
+- **Commits** -- must follow [Conventional Commits](https://www.conventionalcommits.org/) with a valid scope (e.g. `fix(payload-invitations): ...`).
+- **Changesets** -- please include a [changeset](https://github.com/changesets/changesets) in your PR by running `pnpm release`.
 
 ### Issues & PRs
 
-Bug reports and feature requests are welcome — [open an issue](https://github.com/davincicoding-org/payload-plugins/issues).
+Bug reports and feature requests are welcome -- [open an issue](https://github.com/davincicoding-org/payload-plugins/issues).
 
 ## License
 
