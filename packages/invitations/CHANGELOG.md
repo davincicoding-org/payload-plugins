@@ -1,5 +1,15 @@
 # payload-invitations
 
+## 0.1.0
+
+### Minor Changes
+
+- [`71a9c33`](https://github.com/davincicoding-org/payload-plugins/commit/71a9c33b64e576a230e7eeca75b364389dcf882f) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Simplify email field setup by always creating the virtual field instead of searching for an existing one. Add README with usage, features, and configuration options. Update internal dependency for renamed common API.
+
+### Patch Changes
+
+- [`bd14968`](https://github.com/davincicoding-org/payload-plugins/commit/bd14968295ee0170f3c0fedc55673d74d577678b) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Simplify email field setup by always prepending a virtual \_email field instead of searching for and mutating an existing email field.
+
 ## 0.0.3
 
 ### Patch Changes
