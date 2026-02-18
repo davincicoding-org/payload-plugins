@@ -1,4 +1,8 @@
-import { type DocumentReference, fetchDocumentByReference } from '@repo/common';
+import {
+  type DocumentID,
+  type DocumentReference,
+  fetchDocumentByReference,
+} from '@repo/common';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
 import { getPluginContext } from './context';
 import { sendNotificationEmail } from './email';
@@ -7,12 +11,13 @@ import { resolveMessageAtReadTime, toMessage } from './message';
 import type {
   MessageContext,
   NotifyInput,
+  ResolvedActor,
   StoredDocumentReference,
 } from './types';
 
-export async function notify(
+export async function notify<Actor extends DocumentID | null>(
   req: PayloadRequest,
-  input: NotifyInput,
+  input: NotifyInput<Actor>,
 ): Promise<void> {
   const ctx = getPluginContext(req.payload.config);
   if (!req.payload.config.admin?.user) return;
@@ -20,7 +25,7 @@ export async function notify(
   // Resolve actor display name if provided
   const actor = input.actor
     ? await resolveUser(req.payload, input.actor)
-    : undefined;
+    : null;
 
   // Fetch the referenced document if provided
   const document = input.documentReference
@@ -28,8 +33,8 @@ export async function notify(
     : undefined;
 
   // Build message context from resolved data
-  const messageContext: MessageContext = {
-    actor,
+  const messageContext: MessageContext<Actor> = {
+    actor: actor as Actor extends DocumentID ? ResolvedActor : null,
     document: document as Record<string, unknown> | undefined,
     meta: input.meta,
   };

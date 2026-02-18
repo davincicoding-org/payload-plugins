@@ -38,11 +38,11 @@ export type NotificationCallback = (args: {
   recipient: ResolvedUser;
 }) => void | Promise<void>;
 
-export interface NotifyInput {
+export interface NotifyInput<Actor extends DocumentID | null> {
   recipient: DocumentID;
   event: string;
-  actor?: DocumentID;
-  message: string | MessageFn | LiveMessage;
+  actor: Actor;
+  message: string | MessageFn<Actor> | LiveMessage;
   url?: string;
   meta?: Record<string, unknown>;
   documentReference?: DocumentReference;
@@ -96,15 +96,23 @@ export type LiveMessageToken = z.infer<typeof liveMessageTokenSchema>;
 
 export type LiveMessage = Readonly<z.infer<typeof liveMessageSchema>>;
 
+/** Resolved actor data available inside a {@link MessageFn}. */
+export interface ResolvedActor {
+  id: string | number;
+  displayName: string;
+}
+
 /** Context passed to a `MessageFn` when resolving the notification message. */
-export interface MessageContext {
-  actor?: { id: string | number; displayName: string };
+export interface MessageContext<Actor extends DocumentID | null> {
+  actor: Actor extends DocumentID ? ResolvedActor : null;
   document?: Record<string, unknown>;
   meta?: Record<string, unknown>;
 }
 
 /** A function that receives context and returns a resolved message string. */
-export type MessageFn = (ctx: MessageContext) => string;
+export type MessageFn<Actor extends DocumentID | null> = (
+  ctx: MessageContext<Actor>,
+) => string;
 
 // ── Endpoint schemas ───────────────────────────────────────────────────
 

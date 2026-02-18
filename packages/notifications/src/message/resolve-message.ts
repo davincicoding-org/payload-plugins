@@ -1,27 +1,35 @@
-import { uncaughtSwitchCase } from '@repo/common';
+import { type DocumentID, uncaughtSwitchCase } from '@repo/common';
 import type { Notification } from '@/payload-types';
 import type {
   LiveMessage,
   LiveMessageToken,
   MessageContext,
   MessageFn,
+  ResolvedActor,
 } from '../types';
+
+/** Widened context used by internal resolution helpers that don't need the generic. */
+type ResolutionContext = {
+  actor?: ResolvedActor | null;
+  document?: Record<string, unknown>;
+  meta?: Record<string, unknown>;
+};
 
 /**
  * Convert a message input into the shape stored in the database.
  * - Plain strings and MessageFn results become `{ type: 'static', value }`.
  * - LiveMessage objects become `{ type: 'dynamic', parts }`.
  */
-export function serializeMessage(
-  message: string | MessageFn | LiveMessage,
-  context: Partial<MessageContext>,
+export function serializeMessage<Actor extends DocumentID | null>(
+  message: string | MessageFn<Actor> | LiveMessage,
+  context: Partial<MessageContext<Actor>>,
 ): Notification['message'] {
   if (typeof message === 'string') {
     return { type: 'static', value: message };
   }
 
   if (typeof message === 'function') {
-    const value = message(context as MessageContext);
+    const value = message(context as MessageContext<Actor>);
     return { type: 'static', value };
   }
 
@@ -35,7 +43,7 @@ export function serializeMessage(
  */
 export function resolveMessageAtReadTime(
   message: Notification['message'],
-  context: Partial<MessageContext>,
+  context: ResolutionContext,
 ): string {
   switch (message.type) {
     case 'static':
@@ -54,13 +62,13 @@ export function resolveMessageAtReadTime(
 
 function resolveToken(
   token: LiveMessageToken,
-  context: Partial<MessageContext>,
+  context: ResolutionContext,
 ): string {
   switch (token.type) {
     case 'actor': {
       const actor = context.actor;
       if (!actor) return '';
-      const value = actor[token.field as keyof typeof actor];
+      const value = actor[token.field as keyof ResolvedActor];
       return typeof value === 'string' ? value : String(value ?? '');
     }
     case 'document': {
