@@ -1,8 +1,14 @@
 import { defineProcedure } from '@repo/common';
 import { z } from 'zod';
+import type { NotificationData } from './types';
 import { markReadSchema, subscriptionSchema } from './types';
 
 export const ENDPOINTS = {
+  listNotifications: defineProcedure({
+    path: '/notifications-plugin/list',
+    method: 'get',
+  }).returns<{ docs: NotificationData[] }>(),
+
   markRead: defineProcedure({
     path: '/notifications-plugin/mark-read',
     method: 'post',
@@ -18,6 +24,12 @@ export const ENDPOINTS = {
     path: '/notifications-plugin/unread-count',
     method: 'get',
   }).returns<{ count: number }>(),
+
+  updatePreferences: defineProcedure({
+    path: '/notifications-plugin/preferences',
+    method: 'post',
+    input: z.object({ emailEnabled: z.boolean() }),
+  }).returns<{ success: true }>(),
 
   unsubscribe: defineProcedure({
     path: '/notifications-plugin/unsubscribe',

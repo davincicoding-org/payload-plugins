@@ -1,16 +1,21 @@
 import type { CollectionSlug, Plugin } from 'payload';
+import type { NotificationBellProps } from './components/NotificationBell';
 import { attachPluginContext } from './context';
-import { defaultGenerateHTML, defaultGenerateSubject } from './default-email';
+import {
+  defaultGenerateHTML,
+  defaultGenerateSubject,
+} from './email/default-email';
 import { deleteNotificationEndpoint } from './endpoints/delete-notification';
 import { emailUnsubscribeEndpoint } from './endpoints/email-unsubscribe';
+import { listNotificationsEndpoint } from './endpoints/list-notifications';
 import { markAllReadEndpoint } from './endpoints/mark-all-read';
 import { markReadEndpoint } from './endpoints/mark-read';
 import { openNotificationEndpoint } from './endpoints/open-notification';
 import { unreadCountEndpoint } from './endpoints/unread-count';
 import { unsubscribeEndpoint } from './endpoints/unsubscribe';
+import { updatePreferencesEndpoint } from './endpoints/update-preferences';
 import { Notifications, Subscriptions } from './entities';
-
-import type { NotifactionCallback, NotificationEmailConfig } from './types';
+import type { NotificationCallback, NotificationEmailConfig } from './types';
 
 export { getSubscribers, notify, subscribe, unsubscribe } from './api';
 export { createLiveMessage } from './message';
@@ -24,9 +29,9 @@ export type {
 
 export interface NotificationsPluginConfig {
   /** Email channel configuration. Pass `true` for default templates, or provide custom functions. */
-  email?: true | NotificationEmailConfig;
+  email?: true | Partial<NotificationEmailConfig>;
   /** External callback fired for every notification. */
-  onNotify?: NotifactionCallback;
+  onNotify?: NotificationCallback;
   /** Slug for the notifications collection. @default "notifications" */
   notificationsSlug?: string;
   /** Slug for the subscriptions collection. @default "subscriptions" */
@@ -46,12 +51,13 @@ export const notificationsPlugin = ({
   const subsSlug = subscriptionsSlug as CollectionSlug;
 
   const resolvedEmail: NotificationEmailConfig | undefined =
-    email === true
+    email !== undefined
       ? {
           generateSubject: defaultGenerateSubject,
           generateHTML: defaultGenerateHTML,
+          ...(typeof email === 'object' ? email : {}),
         }
-      : email;
+      : undefined;
 
   return (config) => {
     attachPluginContext(config, {
@@ -86,12 +92,6 @@ export const notificationsPlugin = ({
             defaultValue: true,
             label: 'Email notifications',
           },
-          {
-            name: 'inAppEnabled',
-            type: 'checkbox',
-            defaultValue: true,
-            label: 'In-app notifications',
-          },
         ],
       });
     }
@@ -99,9 +99,11 @@ export const notificationsPlugin = ({
     // Attach Endpoints
     config.endpoints ??= [];
     config.endpoints.push(
+      listNotificationsEndpoint(notifSlug),
       markReadEndpoint(notifSlug),
       markAllReadEndpoint(notifSlug),
       unreadCountEndpoint(notifSlug),
+      updatePreferencesEndpoint(),
       deleteNotificationEndpoint(notifSlug),
       openNotificationEndpoint(notifSlug),
       unsubscribeEndpoint(),
@@ -114,7 +116,9 @@ export const notificationsPlugin = ({
     config.admin.components.actions ??= [];
     config.admin.components.actions.push({
       path: 'payload-notifications/client#NotificationBell',
-      clientProps: { pollInterval },
+      clientProps: {
+        pollInterval,
+      } satisfies NotificationBellProps,
     });
 
     return config;
