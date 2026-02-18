@@ -7,10 +7,12 @@ import {
   lstatSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
   rmSync,
   symlinkSync,
   unlinkSync,
   watch,
+  writeFileSync,
 } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,7 +35,8 @@ const commonBin = path.join(commonDir, 'node_modules', '.bin');
 process.env.PATH = [localBin, commonBin, process.env.PATH].join(path.delimiter);
 
 const ASSET_RE = /\.(css|scss|html|json|ttf|woff|woff2|eot|svg|jpg|png)$/;
-const TEST_IGNORE = '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx';
+const SWC_IGNORE =
+  '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/payload-types.ts';
 const tsconfig = existsSync(path.join(cwd, 'tsconfig.build.json'))
   ? 'tsconfig.build.json'
   : 'tsconfig.json';
@@ -63,6 +66,23 @@ function removeCommonSymlink() {
 
 /** @param {string} cmd @param {import('node:child_process').ExecSyncOptions} [o] */
 const exec = (cmd, o) => execSync(cmd, { cwd, stdio: 'inherit', ...o });
+
+/**
+ * Remove the `declare module 'payload'` augmentation from the built
+ * payload-types.d.ts so plugins don't pollute the consumer's type space.
+ * The interfaces themselves (User, Notification, etc.) are kept so that
+ * exported plugin types referencing them still resolve.
+ */
+function stripPayloadAugmentation() {
+  const dts = path.join(cwd, 'dist', 'payload-types.d.ts');
+  if (!existsSync(dts)) return;
+  const content = readFileSync(dts, 'utf-8');
+  const stripped = content.replace(
+    /\n*declare module ['"]payload['"] \{[\s\S]*?\n\}\n/,
+    '\n',
+  );
+  if (stripped !== content) writeFileSync(dts, stripped);
+}
 
 function copyAssets() {
   const srcDir = path.join(cwd, 'src');
@@ -118,7 +138,7 @@ if (opts.watch) {
     swcrc,
     '--strip-leading-paths',
     '--ignore',
-    TEST_IGNORE,
+    SWC_IGNORE,
     '--watch',
   ]);
   start('tsc', [
@@ -141,10 +161,11 @@ if (opts.watch) {
   try {
     copyAssets();
     exec(
-      `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${TEST_IGNORE}"`,
+      `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${SWC_IGNORE}"`,
     );
     exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
     exec(`tsc-alias -p ${tsconfig}`);
+    stripPayloadAugmentation();
   } finally {
     removeCommonSymlink();
   }
