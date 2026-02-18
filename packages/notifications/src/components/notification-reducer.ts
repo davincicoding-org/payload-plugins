@@ -26,7 +26,7 @@ export type NotificationAction =
       docs: NotificationData[];
       hasNextPage: boolean;
     }
-  | { type: 'MARK_READ'; id: string | number }
+  | { type: 'MARK_READ'; id: string | number; readAt: string }
   | { type: 'MARK_ALL_READ' }
   | { type: 'DELETE_NOTIFICATION'; id: string | number };
 
@@ -63,13 +63,13 @@ export function notificationReducer(
 
     case 'MARK_READ': {
       const item = state.unread.find((n) => n.id === action.id);
+      if (!item) return state;
       return {
         ...state,
         unread: state.unread.filter((n) => n.id !== action.id),
-        read:
-          state.isReadLoaded && item
-            ? [{ ...item, readAt: new Date().toISOString() }, ...state.read]
-            : state.read,
+        read: state.isReadLoaded
+          ? [{ ...item, readAt: action.readAt }, ...state.read]
+          : state.read,
       };
     }
 

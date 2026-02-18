@@ -89,12 +89,14 @@ describe('notificationReducer', () => {
       const result = notificationReducer(state, {
         type: 'MARK_READ',
         id: '1',
+        readAt: '2026-01-01T00:05:00.000Z',
       });
       expect(result.unread).toHaveLength(1);
       expect(result.unread[0]!.id).toBe('2');
     });
 
     it('should prepend to read list when read is loaded', () => {
+      const readAt = '2026-01-01T00:05:00.000Z';
       const state: NotificationState = {
         ...INITIAL_STATE,
         unread: [makeNotification({ id: '1' })],
@@ -106,11 +108,12 @@ describe('notificationReducer', () => {
       const result = notificationReducer(state, {
         type: 'MARK_READ',
         id: '1',
+        readAt,
       });
       expect(result.unread).toHaveLength(0);
       expect(result.read).toHaveLength(2);
       expect(result.read[0]!.id).toBe('1');
-      expect(result.read[0]!.readAt).toBeTruthy();
+      expect(result.read[0]!.readAt).toBe(readAt);
     });
 
     it('should not add to read list when read is not loaded', () => {
@@ -122,9 +125,23 @@ describe('notificationReducer', () => {
       const result = notificationReducer(state, {
         type: 'MARK_READ',
         id: '1',
+        readAt: '2026-01-01T00:05:00.000Z',
       });
       expect(result.unread).toHaveLength(0);
       expect(result.read).toHaveLength(0);
+    });
+
+    it('should return same state when id is not found', () => {
+      const state: NotificationState = {
+        ...INITIAL_STATE,
+        unread: [makeNotification({ id: '1' })],
+      };
+      const result = notificationReducer(state, {
+        type: 'MARK_READ',
+        id: 'nonexistent',
+        readAt: '2026-01-01T00:05:00.000Z',
+      });
+      expect(result).toBe(state);
     });
   });
 
