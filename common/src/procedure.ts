@@ -108,6 +108,7 @@ function createProcedure<TInput, TOutput>(
 
         if (input) {
           for (const [key, value] of Object.entries(input)) {
+            if (value == null) continue;
             if (resolvedPath.includes(`:${key}`)) {
               resolvedPath = resolvedPath.replace(
                 `:${key}`,

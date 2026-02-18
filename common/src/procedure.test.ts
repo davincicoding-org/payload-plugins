@@ -156,6 +156,30 @@ describe('procedure.call', () => {
     );
   });
 
+  test('omits undefined and null values from GET query params', async () => {
+    const schema = z.object({
+      since: z.string().optional(),
+      other: z.string().optional(),
+    });
+    const procedure = defineProcedure({
+      path: '/items',
+      method: 'get',
+      input: schema,
+    }).returns<{ ok: boolean }>();
+
+    globalThis.fetch = vi.fn(async () => Response.json({ ok: true })) as any;
+
+    await procedure.call('https://api.test', {
+      since: undefined,
+      other: undefined,
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      'https://api.test/items',
+      expect.objectContaining({ method: 'GET' }),
+    );
+  });
+
   test('throws on non-OK response', async () => {
     const procedure = defineProcedure({
       path: '/fail',
