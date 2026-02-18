@@ -6,8 +6,7 @@ describe('createCommentSchema', () => {
   test('validates valid input', () => {
     const result = createCommentSchema.safeParse({
       content: 'Hello world',
-      documentCollectionSlug: 'posts',
-      documentId: '123',
+      documentReference: { entity: 'collection', slug: 'posts', id: '123' },
     });
     expect(result.success).toBe(true);
   });
@@ -15,32 +14,29 @@ describe('createCommentSchema', () => {
   test('validates with numeric documentId', () => {
     const result = createCommentSchema.safeParse({
       content: 'Hello world',
-      documentCollectionSlug: 'posts',
-      documentId: 42,
+      documentReference: { entity: 'collection', slug: 'posts', id: 42 },
     });
     expect(result.success).toBe(true);
   });
 
   test('rejects missing content', () => {
     const result = createCommentSchema.safeParse({
-      documentCollectionSlug: 'posts',
-      documentId: '123',
+      documentReference: { entity: 'collection', slug: 'posts', id: '123' },
     });
     expect(result.success).toBe(false);
   });
 
-  test('rejects missing documentCollectionSlug', () => {
+  test('rejects missing documentReference', () => {
     const result = createCommentSchema.safeParse({
       content: 'Hello',
-      documentId: '123',
     });
     expect(result.success).toBe(false);
   });
 
-  test('rejects missing documentId', () => {
+  test('rejects invalid documentReference', () => {
     const result = createCommentSchema.safeParse({
       content: 'Hello',
-      documentCollectionSlug: 'posts',
+      documentReference: { slug: 'posts', id: '123' },
     });
     expect(result.success).toBe(false);
   });
