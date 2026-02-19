@@ -1,12 +1,18 @@
 import type { BasePayload } from 'payload';
-import { getPluginContext } from '@/utils/config';
+import { pluginContext } from '@/const';
 import { getErrorMessage } from '@/utils/error-handling';
 
 export async function fetchMessagesFromPayload(
   payload: BasePayload,
   locale: string,
 ) {
-  const { collectionSlug, storage } = getPluginContext(payload.config);
+  const ctx = pluginContext.get(payload.config);
+  if (!ctx) {
+    throw new Error(
+      'payload-intl plugin context not found. Is the plugin registered?',
+    );
+  }
+  const { collectionSlug, storage } = ctx;
 
   const {
     docs: [doc],

@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-vi.mock('@/utils/config', () => ({
-  getPluginContext: vi.fn(),
+vi.mock('@/const', () => ({
+  pluginContext: {
+    get: vi.fn(),
+  },
 }));
 
 vi.mock('@/utils/error-handling', () => ({
   getErrorMessage: vi.fn(),
 }));
 
-import { getPluginContext } from '@/utils/config';
+import { pluginContext } from '@/const';
 
 describe('fetchMessagesFromPayload', () => {
   beforeEach(() => {
@@ -24,7 +26,7 @@ describe('fetchMessagesFromPayload', () => {
       config: {},
     };
 
-    vi.mocked(getPluginContext).mockReturnValue({
+    vi.mocked(pluginContext.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -42,7 +44,7 @@ describe('fetchMessagesFromPayload', () => {
       config: {},
     };
 
-    vi.mocked(getPluginContext).mockReturnValue({
+    vi.mocked(pluginContext.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });

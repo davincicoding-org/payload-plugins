@@ -1,5 +1,5 @@
 import type { BasePayload } from 'payload';
-import { getPluginContext } from './utils/config';
+import { pluginContext } from './const';
 
 /**
  * Detects documents stored in a format that does not match the
@@ -8,7 +8,9 @@ import { getPluginContext } from './utils/config';
 export async function migrateStorageStrategy(
   payload: BasePayload,
 ): Promise<void> {
-  const { collectionSlug, storage } = getPluginContext(payload.config);
+  const ctx = pluginContext.get(payload.config);
+  if (!ctx) return;
+  const { collectionSlug, storage } = ctx;
 
   const { docs } = await payload.find({
     collection: collectionSlug as 'messages',

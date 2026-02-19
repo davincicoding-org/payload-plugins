@@ -1,5 +1,6 @@
 import type { Plugin } from 'payload';
 import type { MessagesViewProps } from './components/MessagesView';
+import { pluginContext } from './const';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
 import type {
@@ -8,7 +9,7 @@ import type {
   MessagesSchema,
   StorageStrategy,
 } from './types.ts';
-import { attachPluginContext, getSupportedLocales } from './utils/config';
+import { getSupportedLocales } from './utils/config';
 
 export interface MessagesPluginConfig {
   schema: MessagesSchema;
@@ -81,7 +82,7 @@ export const intlPlugin =
       },
     };
 
-    attachPluginContext(config, {
+    pluginContext.set(config, {
       collectionSlug,
       storage,
     });

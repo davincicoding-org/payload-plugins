@@ -1,7 +1,7 @@
 import type { Endpoint, File, PayloadRequest } from 'payload';
-import { ENDPOINTS } from '@/const';
+import { ENDPOINTS, pluginContext } from '@/const';
 import type { Messages, Translations } from '@/types';
-import { getPluginContext, getSupportedLocales } from '@/utils/config';
+import { getSupportedLocales } from '@/utils/config';
 
 export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
   async (req: PayloadRequest) => {
@@ -18,7 +18,11 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
     const supportedLocales = getSupportedLocales(
       req.payload.config.localization,
     );
-    const { collectionSlug, storage } = getPluginContext(req.payload.config);
+    const ctx = pluginContext.get(req.payload.config);
+    if (!ctx) {
+      return Response.json({ error: 'Plugin not configured' }, { status: 500 });
+    }
+    const { collectionSlug, storage } = ctx;
 
     for (const locale of supportedLocales) {
       const messages = data[locale];

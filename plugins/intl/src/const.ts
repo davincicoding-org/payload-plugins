@@ -1,4 +1,16 @@
-import { defineProcedure } from '@davincicoding/payload-plugin-kit';
+import {
+  createPluginContext,
+  defineProcedure,
+} from '@davincicoding/payload-plugin-kit';
+import { z } from 'zod/v4-mini';
+
+export const pluginContext = createPluginContext(
+  'payload-intl',
+  z.object({
+    collectionSlug: z.string(),
+    storage: z.enum(['db', 'upload']),
+  }),
+);
 
 export const ENDPOINTS = {
   setMessages: defineProcedure({

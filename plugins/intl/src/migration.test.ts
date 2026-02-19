@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { migrateStorageStrategy } from './migration';
 
-vi.mock('./utils/config', () => ({
-  getPluginContext: vi.fn(),
+vi.mock('./const', () => ({
+  pluginContext: {
+    get: vi.fn(),
+  },
 }));
 
-import { getPluginContext } from './utils/config';
+import { pluginContext } from './const';
 
-const mockedGetPluginContext = vi.mocked(getPluginContext);
+const mockedGet = vi.mocked(pluginContext.get);
 
 function createMockPayload(docs: Record<string, unknown>[]) {
   return {
@@ -33,7 +35,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should skip when no documents exist', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -45,7 +47,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should skip documents that already match the current strategy (db with data)', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -59,7 +61,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should skip documents that already match the current strategy (upload with url)', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'upload',
     });
@@ -73,7 +75,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should migrate from upload to db when storage is db and doc has url but no data', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -92,7 +94,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should continue on fetch failure during upload-to-db migration', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -111,7 +113,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should handle errors during upload-to-db migration gracefully', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -128,7 +130,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should migrate from db to upload when storage is upload and doc has data but no url', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'upload',
     });
@@ -152,7 +154,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should include correct JSON content in the uploaded file during db-to-upload migration', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'upload',
     });
@@ -170,7 +172,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should handle errors during db-to-upload migration gracefully', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'upload',
     });
@@ -183,7 +185,7 @@ describe('migrateStorageStrategy', () => {
   });
 
   test('should migrate multiple documents in sequence', async () => {
-    mockedGetPluginContext.mockReturnValue({
+    mockedGet.mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
