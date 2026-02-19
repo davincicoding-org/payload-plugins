@@ -42,7 +42,7 @@ describe('procedure.endpoint', () => {
 
     // Mock addDataAndFileToRequest
     vi.doMock('payload', () => ({
-      addDataAndFileToRequest: vi.fn(async (req: any) => {
+      addDataAndFileToRequest: vi.fn(async (_req: unknown) => {
         // data is already set in the mock req
       }),
     }));
@@ -52,6 +52,7 @@ describe('procedure.endpoint', () => {
       searchParams: new URLSearchParams(),
       routeParams: {},
       headers: new Headers(),
+      // biome-ignore lint/suspicious/noExplicitAny: test mock
     } as any;
 
     const response = await endpoint.handler(mockReq);
@@ -75,6 +76,7 @@ describe('procedure.endpoint', () => {
       searchParams: new URLSearchParams(),
       routeParams: { id: '42' },
       headers: new Headers(),
+      // biome-ignore lint/suspicious/noExplicitAny: test mock
     } as any;
 
     const response = await endpoint.handler(mockReq);
@@ -86,6 +88,7 @@ describe('procedure.endpoint', () => {
     const procedure = defineProcedure({ path: '/test', method: 'get' });
     const endpoint = procedure.endpoint(async () => ({ ok: true }));
 
+    // biome-ignore lint/suspicious/noExplicitAny: test mock
     const mockReq = { headers: new Headers() } as any;
     const response = await endpoint.handler(mockReq);
     expect(response).toBeInstanceOf(Response);
@@ -99,6 +102,7 @@ describe('procedure.endpoint', () => {
     const customResponse = new Response('custom', { status: 201 });
     const endpoint = procedure.endpoint(async () => customResponse);
 
+    // biome-ignore lint/suspicious/noExplicitAny: test mock
     const mockReq = { headers: new Headers() } as any;
     const response = await endpoint.handler(mockReq);
     expect(response).toBe(customResponse);
@@ -124,6 +128,7 @@ describe('procedure.call', () => {
       input: schema,
     }).returns<{ ok: boolean }>();
 
+    // biome-ignore lint/suspicious/noExplicitAny: test mock
     globalThis.fetch = vi.fn(async () => Response.json({ ok: true })) as any;
 
     await procedure.call('https://api.test', { id: '42', format: 'json' });
@@ -142,6 +147,7 @@ describe('procedure.call', () => {
       input: schema,
     }).returns<{ id: string }>();
 
+    // biome-ignore lint/suspicious/noExplicitAny: test mock
     globalThis.fetch = vi.fn(async () => Response.json({ id: '1' })) as any;
 
     await procedure.call('https://api.test', { name: 'Test' });
@@ -167,6 +173,7 @@ describe('procedure.call', () => {
       input: schema,
     }).returns<{ ok: boolean }>();
 
+    // biome-ignore lint/suspicious/noExplicitAny: test mock
     globalThis.fetch = vi.fn(async () => Response.json({ ok: true })) as any;
 
     await procedure.call('https://api.test', {
@@ -189,6 +196,7 @@ describe('procedure.call', () => {
     globalThis.fetch = vi.fn(
       async () =>
         new Response('Not Found', { status: 404, statusText: 'Not Found' }),
+      // biome-ignore lint/suspicious/noExplicitAny: test mock
     ) as any;
 
     await expect(procedure.call('https://api.test')).rejects.toThrow(

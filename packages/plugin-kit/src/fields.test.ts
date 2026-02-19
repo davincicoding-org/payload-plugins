@@ -15,7 +15,7 @@ describe('findFields', () => {
     ];
     const result = findFields(fields, isRelationship);
     expect(result).toHaveLength(1);
-    expect(result[0]!.name).toBe('author');
+    expect(result[0]?.name).toBe('author');
   });
 
   test('recurses into fields property (group)', () => {
@@ -28,7 +28,7 @@ describe('findFields', () => {
     ];
     const result = findFields(fields, isRelationship);
     expect(result).toHaveLength(1);
-    expect(result[0]!.name).toBe('ref');
+    expect(result[0]?.name).toBe('ref');
   });
 
   test('recurses into blocks', () => {
@@ -48,7 +48,7 @@ describe('findFields', () => {
     ];
     const result = findFields(fields, isRelationship);
     expect(result).toHaveLength(1);
-    expect(result[0]!.name).toBe('link');
+    expect(result[0]?.name).toBe('link');
   });
 
   test('recurses into tabs', () => {
@@ -67,7 +67,7 @@ describe('findFields', () => {
     ];
     const result = findFields(fields, isRelationship);
     expect(result).toHaveLength(1);
-    expect(result[0]!.name).toBe('owner');
+    expect(result[0]?.name).toBe('owner');
   });
 
   test('returns empty for leaf types with no match', () => {
