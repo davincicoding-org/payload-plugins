@@ -10,6 +10,7 @@ import type {
   Locale,
   Messages,
   MessagesSchema,
+  NormalizedScope,
   Translations,
 } from '@/types';
 import { JsonImport } from './actions/JsonImport';
@@ -24,6 +25,7 @@ interface MessagesFormProps {
   defaultLocale: Locale;
   activeLocale: Locale;
   schema: MessagesSchema;
+  scopes: Map<string, NormalizedScope>;
   tabs?: boolean;
   values: Translations<DeepPartial<Messages>>;
   endpointUrl: string;
@@ -34,6 +36,7 @@ export function MessagesForm({
   defaultLocale,
   activeLocale,
   schema,
+  scopes,
   tabs = false,
   values,
   endpointUrl,

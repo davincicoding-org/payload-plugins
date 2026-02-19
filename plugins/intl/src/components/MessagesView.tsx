@@ -21,7 +21,7 @@ export interface MessagesViewProps {
   fullSchema?: Messages;
   tabs: boolean | undefined;
   access: MessagesGuard;
-  scopes?: Map<string, NormalizedScope>;
+  scopes: Map<string, NormalizedScope>;
 }
 
 export async function MessagesView({
@@ -31,6 +31,7 @@ export async function MessagesView({
   params,
   payload,
   schema,
+  scopes,
   searchParams,
   tabs = false,
 }: AdminViewServerProps & MessagesViewProps) {
@@ -83,6 +84,7 @@ export async function MessagesView({
           endpointUrl={endpointUrl}
           locales={locales}
           schema={schema}
+          scopes={scopes}
           tabs={tabs}
           values={translations}
         />
