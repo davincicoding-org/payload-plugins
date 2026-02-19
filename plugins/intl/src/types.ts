@@ -17,6 +17,22 @@ export type MessagesHooks = {
 
 export type StorageStrategy = 'db' | 'upload';
 
+export type ScopePosition = 'tab' | 'sidebar';
+
+export type ScopeConfig =
+  | ScopePosition
+  | {
+      position: ScopePosition;
+      existingFieldsTabLabel?: string;
+    };
+
+export type Scopes = string[] | Record<string, ScopeConfig>;
+
+export interface NormalizedScope {
+  readonly position: ScopePosition;
+  readonly existingFieldsTabLabel?: string;
+}
+
 export type MessagesGuard = (req: PayloadRequest) => boolean | Promise<boolean>;
 
 /* MARK: Messages */
