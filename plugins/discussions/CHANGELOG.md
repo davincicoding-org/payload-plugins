@@ -1,5 +1,12 @@
 # payload-discussions
 
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`1b4aa68`](https://github.com/davincicoding-org/payload-plugins/commit/1b4aa68bd191e2fc45d31ea4a417deb0b0975054)]:
+  - @davincicoding/payload-utils@0.0.3
+
 ## 1.1.3
 
 ### Patch Changes

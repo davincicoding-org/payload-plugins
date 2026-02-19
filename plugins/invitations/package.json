@@ -1,6 +1,6 @@
 {
   "name": "payload-invitations",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Payload CMS plugin that replaces the default user creation flow with a streamlined invitation system.",
   "keywords": [
     "payload"
