@@ -54,6 +54,25 @@ export default buildConfig({
 });
 ```
 
+#### Scoped messages on globals
+
+Colocate translations with the globals they belong to by adding `scopes`:
+
+```ts
+intlPlugin({
+  schema: {
+    navigation: { home: "Home", about: "About" },
+    common: { greeting: "Hello {name}!" },
+  },
+  scopes: ["navigation"],
+  // or with position control:
+  // scopes: { navigation: 'sidebar' }
+  // scopes: { navigation: { position: 'tab', existingFieldsTabLabel: 'Nav Fields' } }
+});
+```
+
+The `navigation` key will be edited on the `navigation` global (in a Messages tab by default), while `common` stays in the `/intl` view.
+
 Fetch messages in your application:
 
 ```ts
@@ -67,13 +86,14 @@ const messages = await fetchMessages(payload, "en");
 | Option           | Type                                                   | Default                      | Description                                                                                                                                             |
 | ---------------- | ------------------------------------------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `schema`         | `MessagesSchema`                                       | —                            | Required. Nested object defining message keys and ICU templates. Leaf values are ICU MessageFormat strings, optionally prefixed with a `[description]`. |
-| `collectionSlug` | `string`                                               | `'messages'`                 | Slug of the collection used to store translation files.                                                                                                 |
+| `storage`        | `'db' \| 'upload'`                                     | `'db'`                       | `'db'` stores translations as JSON in the database. `'upload'` stores them as uploaded `.json` files for CDN/static hosting.                            |
+| `scopes`         | `MessagesScopesConfig`                                 | —                            | Colocate translation editing with Payload globals. Maps top-level schema keys to globals, adding a Messages tab or sidebar. Accepts an array of slugs or a record with position config. |
+| `tabs`           | `boolean`                                              | `false`                      | When enabled, top-level schema keys are rendered as tabs in the admin UI.                                                                               |
+| `collectionSlug` | `string`                                               | `'messages'`                 | Slug of the collection used to store translation documents.                                                                                             |
 | `editorAccess`   | `(req: PayloadRequest) => boolean \| Promise<boolean>` | `(req) => req.user !== null` | Access control function that determines who can edit messages.                                                                                          |
 | `hooks`          | `MessagesHooks`                                        | `{}`                         | Collection hooks. Extends Payload's collection hooks with an additional `afterUpdate` callback fired when translations are saved.                       |
-| `storage`        | `'db' \| 'upload'`                                     | `'db'`                       | `'db'` stores translations as JSON in the database. `'upload'` stores them as uploaded `.json` files for CDN/static hosting.                            |
 
 > **Note:** Switching between storage strategies on an existing deployment is not yet supported automatically. When the database schema changes (e.g. dropping upload columns), the migration data is lost before the app can read it. A safe migration path will be provided in a future release. For now, export your translations before switching strategies.
-| `tabs`           | `boolean`                                              | `false`                      | When enabled, top-level keys in the schema are rendered as tabs in the admin UI.                                                                        |
 
 ## Contributing
 

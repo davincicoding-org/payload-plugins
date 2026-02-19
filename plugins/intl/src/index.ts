@@ -5,30 +5,19 @@ import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
 import { injectScopeIntoGlobal } from './globals';
 import type {
-  MessagesGuard,
+  EditorAccessGuard,
   MessagesHooks,
   MessagesSchema,
-  Scopes,
-  StorageStrategy,
+  MessagesScopesConfig,
 } from './types.ts';
 import { getSupportedLocales } from './utils/config';
 import { normalizeScopes } from './utils/scopes';
 
+export { fetchMessages } from './requests/fetchMessages';
+
 export interface MessagesPluginConfig {
+  /** Nested object defining message keys and ICU templates. */
   schema: MessagesSchema;
-  /**
-   * The slug of the collection to use for the messages.
-   *
-   * @default `messages`
-   */
-  collectionSlug?: string;
-  /**
-   * Access control for allowing to edit the messages.
-   *
-   * @default `(req) => req.user !== null // Authenticated users only`
-   */
-  editorAccess?: MessagesGuard;
-  hooks?: MessagesHooks;
   /**
    * Where translated messages are persisted.
    *
@@ -38,10 +27,48 @@ export interface MessagesPluginConfig {
    *
    * @default 'db'
    */
-  storage?: StorageStrategy;
+  storage?: 'db' | 'upload';
+  /**
+   * Colocate translation editing with Payload globals. Each entry maps a
+   * top-level schema key to a global with the same slug, adding a Messages
+   * tab or sidebar to that global's edit view.
+   *
+   * Accepts an array of slugs (defaults to `'tab'` position) or a record
+   * mapping slugs to `'tab' | 'sidebar' | { position, existingFieldsTabLabel? }`.
+   */
+  scopes?: MessagesScopesConfig;
+  /**
+   * When enabled, top-level schema keys are rendered as tabs in the
+   * admin UI instead of a flat list.
+   *
+   * @default false
+   */
   tabs?: boolean;
-  scopes?: Scopes;
+  /**
+   * The slug of the collection used to store translation documents.
+   *
+   * @default 'messages'
+   */
+  collectionSlug?: string;
+  /**
+   * Access control for allowing to edit the messages.
+   *
+   * @default `(req) => req.user !== null`
+   */
+  editorAccess?: EditorAccessGuard;
+  /**
+   * Collection hooks for the messages collection. Extends Payload's
+   * collection hooks with an additional `afterUpdate` callback.
+   */
+  hooks?: MessagesHooks;
 }
+
+export type {
+  MessagesScopesConfig,
+  MessagesSchema,
+  MessagesHooks,
+  EditorAccessGuard,
+};
 
 export const intlPlugin =
   ({
@@ -68,6 +95,8 @@ export const intlPlugin =
       Object.entries(schema).filter(([key]) => !scopeKeys.has(key)),
     );
 
+    /* Add admin components */
+
     config.admin ??= {};
     config.admin.components ??= {};
     config.admin.components.actions ??= [];
@@ -88,11 +117,13 @@ export const intlPlugin =
             schema: viewSchema,
             scopes,
             tabs,
-          } as MessagesViewProps,
+          } satisfies MessagesViewProps,
         },
         path: '/intl',
       },
     };
+
+    /* Configure Scopes */
 
     if (scopes.size > 0) {
       config.globals = (config.globals ?? []).map((global) => {
@@ -115,15 +146,3 @@ export const intlPlugin =
 
     return config;
   };
-
-export { fetchMessages } from './requests/fetchMessages';
-
-export type {
-  Messages,
-  MessagesSchema,
-  NormalizedScope,
-  ScopeConfig,
-  ScopePosition,
-  Scopes,
-  StorageStrategy,
-} from './types.ts';
