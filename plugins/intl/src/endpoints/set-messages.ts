@@ -18,39 +18,61 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
     const supportedLocales = getSupportedLocales(
       req.payload.config.localization,
     );
-    const { collectionSlug } = getPluginContext(req.payload.config);
+    const { collectionSlug, storage } = getPluginContext(req.payload.config);
 
     for (const locale of supportedLocales) {
       const messages = data[locale];
       if (!messages) continue;
 
-      const rawFile = new File(
-        [JSON.stringify(messages)],
-        `${locale}-${Date.now()}.json`,
-        {
-          type: 'application/json',
-        },
-      );
+      if (storage === 'db') {
+        // Generated types reflect the upload collection shape and lack the
+        // json `data` field added by the db strategy at runtime.
+        const collection = collectionSlug as 'messages';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateData = { data: messages } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const createData = { locale, data: messages } as any;
 
-      const file: File = {
-        name: rawFile.name,
-        data: Buffer.from(await rawFile.arrayBuffer()),
-        mimetype: rawFile.type,
-        size: rawFile.size,
-      };
-
-      const { docs } = await req.payload.update({
-        collection: collectionSlug as 'messages',
-        data: {},
-        file,
-        where: { locale: { equals: locale } },
-      });
-      if (docs.length === 0) {
-        await req.payload.create({
-          collection: collectionSlug as 'messages',
-          data: { locale },
-          file,
+        const { docs } = await req.payload.update({
+          collection,
+          data: updateData,
+          where: { locale: { equals: locale } },
         });
+        if (docs.length === 0) {
+          await req.payload.create({
+            collection,
+            data: createData,
+          });
+        }
+      } else {
+        const rawFile = new File(
+          [JSON.stringify(messages)],
+          `${locale}-${Date.now()}.json`,
+          {
+            type: 'application/json',
+          },
+        );
+
+        const file: File = {
+          name: rawFile.name,
+          data: Buffer.from(await rawFile.arrayBuffer()),
+          mimetype: rawFile.type,
+          size: rawFile.size,
+        };
+
+        const { docs } = await req.payload.update({
+          collection: collectionSlug as 'messages',
+          data: {},
+          file,
+          where: { locale: { equals: locale } },
+        });
+        if (docs.length === 0) {
+          await req.payload.create({
+            collection: collectionSlug as 'messages',
+            data: { locale },
+            file,
+          });
+        }
       }
     }
 
