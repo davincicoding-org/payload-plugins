@@ -1,4 +1,5 @@
 import type { Field, GlobalConfig, TabsField } from 'payload';
+import { createAfterReadHook, createBeforeChangeHook } from './global-hooks';
 import type { MessagesSchema, NormalizedScope } from './types';
 
 /**
@@ -14,6 +15,21 @@ export function injectScopeIntoGlobal(
 ): GlobalConfig {
   const subSchema = schema[scopeKey];
   if (!subSchema || typeof subSchema === 'string') return global;
+
+  const withHooks: GlobalConfig = {
+    ...global,
+    hooks: {
+      ...global.hooks,
+      afterRead: [
+        ...(global.hooks?.afterRead ?? []),
+        createAfterReadHook(scopeKey),
+      ],
+      beforeChange: [
+        ...(global.hooks?.beforeChange ?? []),
+        createBeforeChangeHook(scopeKey),
+      ],
+    },
+  };
 
   const virtualField: Field = {
     name: '_intlMessages',
@@ -44,13 +60,13 @@ export function injectScopeIntoGlobal(
     };
 
     return {
-      ...global,
-      fields: [...(global.fields || []), sidebarGroup],
+      ...withHooks,
+      fields: [...(withHooks.fields || []), sidebarGroup],
     };
   }
 
   // position === 'tab'
-  const firstField = global.fields?.[0];
+  const firstField = withHooks.fields?.[0];
   const hasExistingTabs =
     firstField &&
     'type' in firstField &&
@@ -70,19 +86,19 @@ export function injectScopeIntoGlobal(
     };
 
     return {
-      ...global,
-      fields: [updatedTabsField, ...global.fields.slice(1)],
+      ...withHooks,
+      fields: [updatedTabsField, ...withHooks.fields.slice(1)],
     };
   }
 
   const contentTabLabel =
-    scopeConfig.existingFieldsTabLabel ?? global.label ?? 'Content';
+    scopeConfig.existingFieldsTabLabel ?? withHooks.label ?? 'Content';
 
   const tabsField: TabsField = {
     type: 'tabs',
     tabs: [
       {
-        fields: [...(global.fields || [])],
+        fields: [...(withHooks.fields || [])],
         label: contentTabLabel,
       },
       messagesTab,
@@ -90,7 +106,7 @@ export function injectScopeIntoGlobal(
   };
 
   return {
-    ...global,
+    ...withHooks,
     fields: [tabsField],
   };
 }
