@@ -15,7 +15,7 @@ Define your message keys as a typed schema using ICU MessageFormat syntax, then 
 - **Schema-driven** — define message keys and templates in a typed schema with automatic validation.
 - **Rich editor UI** — message editor with variable chips, autocompletion, and inline ICU element editors.
 - **JSON import** — bulk-import translations from JSON files directly in the admin UI.
-- **Flexible fetching** — works with a Payload instance (server-side) or a config object (client-side API fetch).
+- **Flexible storage** — store translations as JSON in the database (default) or as uploaded files for CDN hosting.
 
 ## Installation
 
@@ -59,14 +59,7 @@ Fetch messages in your application:
 ```ts
 import { fetchMessages } from "payload-intl";
 
-// Server-side — pass the Payload instance directly
 const messages = await fetchMessages(payload, "en");
-
-// Client-side — pass a config object to fetch from the REST API
-const messages = await fetchMessages(
-  { serverUrl: "http://localhost:3000" },
-  "en",
-);
 ```
 
 ### Options
@@ -77,6 +70,9 @@ const messages = await fetchMessages(
 | `collectionSlug` | `string`                                               | `'messages'`                 | Slug of the collection used to store translation files.                                                                                                 |
 | `editorAccess`   | `(req: PayloadRequest) => boolean \| Promise<boolean>` | `(req) => req.user !== null` | Access control function that determines who can edit messages.                                                                                          |
 | `hooks`          | `MessagesHooks`                                        | `{}`                         | Collection hooks. Extends Payload's collection hooks with an additional `afterUpdate` callback fired when translations are saved.                       |
+| `storage`        | `'db' \| 'upload'`                                     | `'db'`                       | `'db'` stores translations as JSON in the database. `'upload'` stores them as uploaded `.json` files for CDN/static hosting.                            |
+
+> **Note:** Switching between storage strategies on an existing deployment is not yet supported automatically. When the database schema changes (e.g. dropping upload columns), the migration data is lost before the app can read it. A safe migration path will be provided in a future release. For now, export your translations before switching strategies.
 | `tabs`           | `boolean`                                              | `false`                      | When enabled, top-level keys in the schema are rendered as tabs in the admin UI.                                                                        |
 
 ## Contributing

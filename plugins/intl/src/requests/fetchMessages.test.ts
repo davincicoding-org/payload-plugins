@@ -10,7 +10,7 @@ vi.mock('@/utils/error-handling', () => ({
   getErrorMessage: vi.fn(),
 }));
 
-import { pluginContext } from '@/const';
+import { PLUGIN_CONTEXT } from '@/const';
 
 describe('fetchMessagesFromPayload', () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('fetchMessagesFromPayload', () => {
       config: {},
     };
 
-    vi.mocked(pluginContext.get).mockReturnValue({
+    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });
@@ -44,7 +44,7 @@ describe('fetchMessagesFromPayload', () => {
       config: {},
     };
 
-    vi.mocked(pluginContext.get).mockReturnValue({
+    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
     });

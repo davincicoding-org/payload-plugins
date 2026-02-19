@@ -1,6 +1,6 @@
 import type { Plugin } from 'payload';
 import type { MessagesViewProps } from './components/MessagesView';
-import { pluginContext } from './const';
+import { PLUGIN_CONTEXT } from './const';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
 import type {
@@ -81,7 +81,7 @@ export const intlPlugin =
       },
     };
 
-    pluginContext.set(config, {
+    PLUGIN_CONTEXT.set(config, {
       collectionSlug,
       storage,
     });
@@ -90,13 +90,6 @@ export const intlPlugin =
 
     config.endpoints ??= [];
     config.endpoints.push(setMessagesEndpoint);
-
-    const existingOnInit = config.onInit;
-    config.onInit = async (payload) => {
-      if (existingOnInit) await existingOnInit(payload);
-      const { migrateStorageStrategy } = await import('./migration');
-      await migrateStorageStrategy(payload);
-    };
 
     return config;
   };

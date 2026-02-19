@@ -1,9 +1,9 @@
 import type { BasePayload } from 'payload';
-import { pluginContext } from '@/const';
+import { PLUGIN_CONTEXT } from '@/const';
 import { getErrorMessage } from '@/utils/error-handling';
 
 export async function fetchMessages(payload: BasePayload, locale: string) {
-  const ctx = pluginContext.get(payload.config);
+  const ctx = PLUGIN_CONTEXT.get(payload.config);
   if (!ctx) {
     throw new Error(
       '[payload-intl] Plugin context not found. Is the plugin registered?',

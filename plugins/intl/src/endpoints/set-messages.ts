@@ -1,6 +1,6 @@
 import { uncaughtSwitchCase } from '@davincicoding/payload-plugin-kit';
 import type { Endpoint, File, PayloadRequest } from 'payload';
-import { ENDPOINTS, pluginContext } from '@/const';
+import { ENDPOINTS, PLUGIN_CONTEXT } from '@/const';
 import type { Messages, Translations } from '@/types';
 import { getSupportedLocales } from '@/utils/config';
 
@@ -19,7 +19,7 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
     const supportedLocales = getSupportedLocales(
       req.payload.config.localization,
     );
-    const ctx = pluginContext.get(req.payload.config);
+    const ctx = PLUGIN_CONTEXT.get(req.payload.config);
     if (!ctx) {
       return Response.json({ error: 'Plugin not configured' }, { status: 500 });
     }
