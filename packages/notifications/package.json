@@ -2,6 +2,11 @@
   "name": "payload-notifications",
   "version": "0.1.1",
   "description": "Generic notification infrastructure for Payload CMS with email, in-app, and external callback channels.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davincicoding-org/payload-plugins.git",
+    "directory": "packages/notifications"
+  },
   "type": "module",
   "exports": {
     ".": {
