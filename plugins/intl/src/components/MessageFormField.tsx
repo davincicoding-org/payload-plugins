@@ -6,7 +6,6 @@ import type { MessageValidator } from '@/utils/validate';
 import { MessageInput } from './inputs/MessageInput';
 
 interface MessageFormFieldProps {
-  label?: string;
   locale: Locale;
   name: string;
   className?: string;
@@ -19,7 +18,6 @@ interface MessageFormFieldProps {
 export function MessageFormField({
   name,
   variables,
-  label,
   locale,
   validate,
   className,
@@ -36,7 +34,6 @@ export function MessageFormField({
         <MessageInput
           className={className}
           error={fieldState.error}
-          label={label}
           lang={locale}
           multiline={multiline}
           onBlur={field.onBlur}
