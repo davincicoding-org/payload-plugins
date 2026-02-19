@@ -5,7 +5,7 @@ This monorepo uses [Changesets](https://github.com/changesets/changesets) for ve
 ## How releases work
 
 1. A contributor runs `pnpm release` to create a changeset file, commits it, and opens a PR.
-2. Once the PR is merged to `main`, the [Changesets GitHub Action](../.github/workflows/release.yaml) detects pending changesets and opens a **"Version Packages"** PR that bumps versions and updates changelogs.
+2. Once the PR is merged to `main`, the [Changesets GitHub Action](../.github/workflows/publish.yaml) detects pending changesets and opens a **"Version Packages"** PR that bumps versions and updates changelogs.
 3. When the version PR is merged, the action builds all packages and publishes them to npm via `pnpm -r publish`.
 
 ## Adding a new package
@@ -24,7 +24,7 @@ OIDC trusted publishing requires the package to already exist on the registry. F
    - Select **GitHub Actions** and fill in:
      - **Repository owner**: `davincicoding-org`
      - **Repository**: `payload-plugins`
-     - **Workflow filename**: `release.yaml`
+     - **Workflow filename**: `publish.yaml`
    - Click **Set up connection**
 
 After this, all future publishes are handled automatically by CI.

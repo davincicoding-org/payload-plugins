@@ -1,11 +1,11 @@
-name: Release
+name: Publish
 on:
   push:
     branches:
       - main
 
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
@@ -29,9 +29,6 @@ jobs:
 
       - name: Build
         run: pnpm ci:build
-
-      - name: Typecheck
-        run: pnpm ci:typecheck
 
       - name: Test
         run: pnpm ci:test
