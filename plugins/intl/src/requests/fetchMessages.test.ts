@@ -29,6 +29,7 @@ describe('fetchMessagesFromPayload', () => {
     vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
+      scopes: new Map(),
     });
 
     const { fetchMessages: fetchMessagesFromPayload } = await import(
@@ -47,6 +48,7 @@ describe('fetchMessagesFromPayload', () => {
     vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
       collectionSlug: 'messages',
       storage: 'db',
+      scopes: new Map(),
     });
 
     const { fetchMessages: fetchMessagesFromPayload } = await import(
