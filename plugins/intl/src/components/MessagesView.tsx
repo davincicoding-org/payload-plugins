@@ -8,6 +8,7 @@ import type {
   Locale,
   Messages,
   MessagesGuard,
+  NormalizedScope,
   Translations,
 } from '@/types';
 import { sanitizeMessages } from '@/utils/sanitize';
@@ -17,8 +18,10 @@ import { MessagesForm } from './MessagesForm';
 export interface MessagesViewProps {
   locales: Locale[];
   schema: Messages;
+  fullSchema?: Messages;
   tabs: boolean | undefined;
   access: MessagesGuard;
+  scopes?: Map<string, NormalizedScope>;
 }
 
 export async function MessagesView({
