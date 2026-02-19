@@ -1,11 +1,11 @@
 {
-  "name": "@davincicoding/payload-plugin-kit",
+  "name": "@davincicoding/payload-utils",
   "version": "0.0.1",
-  "description": "Developer toolkit for building Payload CMS plugins — procedures, field utilities, build scripts, and base configuration.",
+  "description": "Shared utilities for Payload CMS plugins and applications.",
   "repository": {
     "type": "git",
     "url": "https://github.com/davincicoding-org/payload-plugins.git",
-    "directory": "packages/payload-plugin-kit"
+    "directory": "packages/utils"
   },
   "type": "module",
   "exports": {
@@ -14,19 +14,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./base.tsconfig.json": "./tsconfig.base.json"
+    "./urls": {
+      "types": "./dist/urls.d.ts",
+      "import": "./dist/urls.js",
+      "default": "./dist/urls.js"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "generate-types": "./scripts/generate-types.js",
-    "plugin-build": "./scripts/build.js"
-  },
   "files": [
-    "dist",
-    "scripts",
-    "tsconfig.base.json",
-    ".swcrc"
+    "dist"
   ],
   "scripts": {
     "build": "swc src -d dist --config-file .swcrc --strip-leading-paths --ignore '**/*.test.ts' && tsc -p tsconfig.build.json --emitDeclarationOnly",
@@ -36,17 +33,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@commander-js/extra-typings": "^14.0.0",
-    "@davincicoding/payload-utils": "workspace:*",
-    "@swc/cli": "^0.6.0",
-    "@swc/core": "^1.11.0",
-    "commander": "^14.0.2",
-    "tsc-alias": "^1.8.0",
-    "tsx": "^4.0.0",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@payloadcms/ui": "catalog:payload-stack",
+    "@swc/cli": "^0.6.0",
+    "@swc/core": "^1.11.0",
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",

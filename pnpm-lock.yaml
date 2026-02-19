@@ -77,14 +77,14 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
 
-  packages/payload-plugin-kit:
+  packages/plugin-kit:
     dependencies:
       '@commander-js/extra-typings':
         specifier: ^14.0.0
         version: 14.0.0(commander@14.0.2)
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../payload-utils
+        version: link:../utils
       '@swc/cli':
         specifier: ^0.6.0
         version: 0.6.0(@swc/core@1.15.10)
@@ -120,7 +120,7 @@ importers:
         specifier: ^3.1.2
         version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
 
-  packages/payload-utils:
+  packages/utils:
     dependencies:
       zod:
         specifier: 'catalog:'
@@ -149,7 +149,7 @@ importers:
     dependencies:
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -165,7 +165,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -210,7 +210,7 @@ importers:
     dependencies:
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -223,7 +223,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -265,7 +265,7 @@ importers:
         version: 1.1.0(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@formatjs/icu-messageformat-parser':
         specifier: ^2.11.2
         version: 2.11.4
@@ -293,7 +293,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/richtext-lexical':
         specifier: catalog:payload-stack
         version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
@@ -338,7 +338,7 @@ importers:
     dependencies:
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -348,7 +348,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -390,7 +390,7 @@ importers:
         version: 1.1.0(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -403,7 +403,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -448,7 +448,7 @@ importers:
     dependencies:
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
       '@payloadcms/next':
         specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -464,7 +464,7 @@ importers:
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -506,11 +506,11 @@ importers:
     dependencies:
       '@davincicoding/payload-utils':
         specifier: workspace:*
-        version: link:../../packages/payload-utils
+        version: link:../../packages/utils
     devDependencies:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/payload-plugin-kit
+        version: link:../../packages/plugin-kit
       '@types/node':
         specifier: ^22.5.4
         version: 22.19.7
