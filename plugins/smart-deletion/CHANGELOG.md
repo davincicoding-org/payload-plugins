@@ -1,5 +1,12 @@
 # payload-smart-deletion
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`eedd9c4`](https://github.com/davincicoding-org/payload-plugins/commit/eedd9c4085676c2c7c0dc9832feafadb7055caee)]:
+  - @davincicoding/payload-utils@0.0.2
+
 ## 1.0.3
 
 ### Patch Changes
