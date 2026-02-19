@@ -13,7 +13,6 @@ export interface LexicalInputProps extends FieldWrapperProps {
 
 export function LexicalInput({
   error,
-  label,
   value,
   onChange,
   className,
@@ -24,7 +23,7 @@ export function LexicalInput({
   });
 
   return (
-    <FieldWrapper className={className} error={error} label={label}>
+    <FieldWrapper className={className} error={error}>
       <RenderLexical
         field={{
           name: 'myCustomEditor',

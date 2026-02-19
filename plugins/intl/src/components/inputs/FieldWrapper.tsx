@@ -1,4 +1,3 @@
-import { FieldLabel } from '@payloadcms/ui';
 import clsx from 'clsx';
 import type { FieldError } from 'react-hook-form';
 
@@ -6,14 +5,12 @@ import styles from './FieldWrapper.module.css';
 import { ReferencePopover } from './ReferencePopover';
 
 export interface FieldWrapperProps {
-  label?: string;
   error: FieldError | undefined;
   className?: string;
   reference?: string;
 }
 
 export function FieldWrapper({
-  label,
   error,
   reference,
   className,

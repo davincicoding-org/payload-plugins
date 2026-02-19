@@ -63,7 +63,6 @@ export interface MessageInputProps extends FieldWrapperProps {
 }
 
 export function MessageInput({
-  label,
   value,
   lang,
   error,
@@ -122,12 +121,7 @@ export function MessageInput({
   );
 
   return (
-    <FieldWrapper
-      className={className}
-      error={error}
-      label={label}
-      reference={reference}
-    >
+    <FieldWrapper className={className} error={error} reference={reference}>
       <LexicalComposer initialConfig={initialConfig}>
         <div
           className={clsx(styles.editor, multiline && styles.multiline)}

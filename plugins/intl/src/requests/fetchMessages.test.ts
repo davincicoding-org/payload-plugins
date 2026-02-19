@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('@/const', () => ({
-  pluginContext: {
+  PLUGIN_CONTEXT: {
     get: vi.fn(),
   },
 }));
