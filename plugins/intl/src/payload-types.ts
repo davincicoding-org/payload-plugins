@@ -147,6 +147,15 @@ export interface User {
 export interface Message {
   id: string;
   locale: string;
+  data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -261,6 +270,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MessagesSelect<T extends boolean = true> {
   locale?: T;
+  data?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

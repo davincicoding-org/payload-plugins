@@ -1,23 +1,10 @@
 import { createCollectionConfigFactory } from '@davincicoding/payload-plugin-kit';
-import type { Field } from 'payload';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { createHooks } from './hooks';
-import type { ResolvedPluginOptions, StorageStrategy } from './types';
-
-const localeField: Field = {
-  name: 'locale',
-  type: 'text',
-  required: true,
-};
-
-const dataField: Field = {
-  name: 'data',
-  type: 'json',
-  required: true,
-};
+import type { ResolvedPluginOptions } from './types';
 
 export const Messages = createCollectionConfigFactory<
-  ResolvedPluginOptions<'hooks'> & { storage: StorageStrategy }
+  ResolvedPluginOptions<'hooks' | 'storage'>
 >(({ hooks, storage }) => ({
   admin: {
     hidden: true,
@@ -26,7 +13,17 @@ export const Messages = createCollectionConfigFactory<
     read: () => true,
   },
   endpoints: [setMessagesEndpoint],
-  fields: storage === 'db' ? [localeField, dataField] : [localeField],
+  fields: [
+    {
+      name: 'locale',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'data',
+      type: 'json',
+    },
+  ],
   hooks: createHooks(hooks),
   indexes: [
     {

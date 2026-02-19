@@ -45,16 +45,16 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "pnpm typecheck",
+    "prebuild": "pnpm run check:types",
     "build": "plugin-build",
+    "check:types": "tsc --noEmit",
     "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "plugin-build --watch",
-    "generate:types": "generate-types",
+    "generate:types": "generate-types --opt storage=upload",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

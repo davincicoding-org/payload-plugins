@@ -36,7 +36,3 @@ export {
   isTimeElement,
   isTagElement,
 };
-
-export const uncaughtSwitchCase = (value: never) => {
-  throw new Error(`Unhandled switch case: ${value}`);
-};

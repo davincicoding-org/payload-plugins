@@ -1,3 +1,4 @@
+import { uncaughtSwitchCase } from '@davincicoding/payload-plugin-kit';
 import type { Endpoint, File, PayloadRequest } from 'payload';
 import { ENDPOINTS, pluginContext } from '@/const';
 import type { Messages, Translations } from '@/types';
@@ -28,55 +29,54 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
       const messages = data[locale];
       if (!messages) continue;
 
-      if (storage === 'db') {
-        // Generated types reflect the upload collection shape and lack the
-        // json `data` field added by the db strategy at runtime.
-        const collection = collectionSlug as 'messages';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateData = { data: messages } as any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const createData = { locale, data: messages } as any;
-
-        const { docs } = await req.payload.update({
-          collection,
-          data: updateData,
-          where: { locale: { equals: locale } },
-        });
-        if (docs.length === 0) {
-          await req.payload.create({
-            collection,
-            data: createData,
+      switch (storage) {
+        case 'db': {
+          const { docs } = await req.payload.update({
+            collection: ctx.collectionSlug as 'messages',
+            data: { data: messages },
+            where: { locale: { equals: locale } },
           });
+          if (docs.length === 0) {
+            await req.payload.create({
+              collection: ctx.collectionSlug as 'messages',
+              data: { locale, data: messages },
+            });
+          }
+          break;
         }
-      } else {
-        const rawFile = new File(
-          [JSON.stringify(messages)],
-          `${locale}-${Date.now()}.json`,
-          {
-            type: 'application/json',
-          },
-        );
+        case 'upload': {
+          const rawFile = new File(
+            [JSON.stringify(messages)],
+            `${locale}-${Date.now()}.json`,
+            {
+              type: 'application/json',
+            },
+          );
 
-        const file: File = {
-          name: rawFile.name,
-          data: Buffer.from(await rawFile.arrayBuffer()),
-          mimetype: rawFile.type,
-          size: rawFile.size,
-        };
+          const file: File = {
+            name: rawFile.name,
+            data: Buffer.from(await rawFile.arrayBuffer()),
+            mimetype: rawFile.type,
+            size: rawFile.size,
+          };
 
-        const { docs } = await req.payload.update({
-          collection: collectionSlug as 'messages',
-          data: {},
-          file,
-          where: { locale: { equals: locale } },
-        });
-        if (docs.length === 0) {
-          await req.payload.create({
+          const { docs } = await req.payload.update({
             collection: collectionSlug as 'messages',
-            data: { locale },
+            data: {},
             file,
+            where: { locale: { equals: locale } },
           });
+          if (docs.length === 0) {
+            await req.payload.create({
+              collection: collectionSlug as 'messages',
+              data: { locale, data: null },
+              file,
+            });
+          }
+          break;
         }
+        default:
+          return uncaughtSwitchCase(storage);
       }
     }
 

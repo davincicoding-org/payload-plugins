@@ -1,3 +1,4 @@
+import { uncaughtSwitchCase } from '@davincicoding/payload-plugin-kit';
 import type { MessageFormatElement } from '@formatjs/icu-messageformat-parser';
 import { parse, TYPE } from '@formatjs/icu-messageformat-parser';
 import type {
@@ -7,7 +8,6 @@ import type {
 } from '@payloadcms/richtext-lexical/lexical';
 import type { SerializedBeautifulMentionNode } from 'lexical-beautiful-mentions';
 import { formatVariableLabel } from './format';
-import { uncaughtSwitchCase } from './guards';
 
 /**
  * Parse an ICU message string into a AST array

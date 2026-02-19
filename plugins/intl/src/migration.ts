@@ -20,46 +20,38 @@ export async function migrateStorageStrategy(
   if (docs.length === 0) return;
 
   for (const doc of docs) {
-    const record = doc as unknown as {
-      id: string;
-      locale: string;
-      data?: Record<string, unknown>;
-      url?: string;
-    };
-
-    if (storage === 'db' && !record.data && record.url) {
+    if (storage === 'db' && !doc.data && doc.url) {
       try {
         console.debug(
-          `PAYLOAD_INTL: Migrating locale "${record.locale}" from upload to db`,
+          `[payload-intl] Migrating locale "${doc.locale}" from upload to db`,
         );
-        const response = await fetch(record.url);
+        const response = await fetch(doc.url);
         if (!response.ok) {
           console.error(
-            `PAYLOAD_INTL: Failed to fetch ${record.url} during migration`,
+            `[payload-intl] Failed to fetch ${doc.url} during migration`,
           );
           continue;
         }
         const data = await response.json();
         await payload.update({
           collection: collectionSlug as 'messages',
-          id: record.id,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: { data } as any,
+          id: doc.id,
+          data: { data },
         });
       } catch (error) {
         console.error(
-          `PAYLOAD_INTL: Migration failed for locale "${record.locale}":`,
+          `[payload-intl] Migration failed for locale "${doc.locale}":`,
           error,
         );
       }
-    } else if (storage === 'upload' && record.data && !record.url) {
+    } else if (storage === 'upload' && doc.data && !doc.url) {
       try {
         console.debug(
-          `PAYLOAD_INTL: Migrating locale "${record.locale}" from db to upload`,
+          `[payload-intl] Migrating locale "${doc.locale}" from db to upload`,
         );
         const rawFile = new File(
-          [JSON.stringify(record.data)],
-          `${record.locale}-${Date.now()}.json`,
+          [JSON.stringify(doc.data)],
+          `${doc.locale}-${Date.now()}.json`,
           { type: 'application/json' },
         );
         const file = {
@@ -70,13 +62,13 @@ export async function migrateStorageStrategy(
         };
         await payload.update({
           collection: collectionSlug as 'messages',
-          id: record.id,
+          id: doc.id,
           data: {},
           file,
         });
       } catch (error) {
         console.error(
-          `PAYLOAD_INTL: Migration failed for locale "${record.locale}":`,
+          `[payload-intl] Migration failed for locale "${doc.locale}":`,
           error,
         );
       }

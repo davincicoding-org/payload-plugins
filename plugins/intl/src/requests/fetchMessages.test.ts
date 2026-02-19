@@ -31,8 +31,8 @@ describe('fetchMessagesFromPayload', () => {
       storage: 'db',
     });
 
-    const { fetchMessagesFromPayload } = await import(
-      './fetchMessageFromPayload'
+    const { fetchMessages: fetchMessagesFromPayload } = await import(
+      './fetchMessages'
     );
     const result = await fetchMessagesFromPayload(mockPayload as any, 'en');
     expect(result).toEqual(mockMessages);
@@ -49,8 +49,8 @@ describe('fetchMessagesFromPayload', () => {
       storage: 'db',
     });
 
-    const { fetchMessagesFromPayload } = await import(
-      './fetchMessageFromPayload'
+    const { fetchMessages: fetchMessagesFromPayload } = await import(
+      './fetchMessages'
     );
     const result = await fetchMessagesFromPayload(mockPayload as any, 'en');
     expect(result).toEqual({});

@@ -53,7 +53,6 @@ export const intlPlugin =
       console.warn(
         '[payload-intl] You have not set the localization option in your Payload config, so this plugin will have no effect.',
       );
-      return config;
     }
 
     const locales = getSupportedLocales(config.localization);
