@@ -31,8 +31,8 @@
         2,
         "always",
         [
-          "payload-utils",
-          "payload-plugin-kit",
+          "utils",
+          "plugin-kit",
           "payload-clienthub",
           "payload-discussions",
           "payload-intl",
