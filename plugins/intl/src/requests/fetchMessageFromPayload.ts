@@ -6,10 +6,12 @@ export async function fetchMessagesFromPayload(
   payload: BasePayload,
   locale: string,
 ) {
+  const { collectionSlug, storage } = getPluginContext(payload.config);
+
   const {
     docs: [doc],
   } = await payload.find({
-    collection: getPluginContext(payload.config).collectionSlug as 'messages',
+    collection: collectionSlug as 'messages',
     where: { locale: { equals: locale } },
   });
 
@@ -18,9 +20,13 @@ export async function fetchMessagesFromPayload(
     return {};
   }
 
+  if (storage === 'db') {
+    return (doc as unknown as { data: Record<string, unknown> }).data;
+  }
+
   const { url } = doc as unknown as { url: string };
 
-  console.debug(`PAYLOAD_INTL: Fetching messages from stroage: ${url}`);
+  console.debug(`PAYLOAD_INTL: Fetching messages from storage: ${url}`);
 
   const response = await fetch(url);
 
