@@ -7,6 +7,7 @@ import type {
   MessagesGuard,
   MessagesHooks,
   MessagesSchema,
+  Scopes,
   StorageStrategy,
 } from './types.ts';
 import { getSupportedLocales } from './utils/config';
@@ -37,6 +38,7 @@ export interface MessagesPluginConfig {
    */
   storage?: StorageStrategy;
   tabs?: boolean;
+  scopes?: Scopes;
 }
 
 export const intlPlugin =
@@ -99,5 +101,9 @@ export { fetchMessages } from './requests/fetchMessages';
 export type {
   Messages,
   MessagesSchema,
+  NormalizedScope,
+  ScopeConfig,
+  ScopePosition,
+  Scopes,
   StorageStrategy,
 } from './types.ts';
