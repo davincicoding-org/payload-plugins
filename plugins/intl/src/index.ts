@@ -1,9 +1,13 @@
 import type { Plugin } from 'payload';
 import type { MessagesViewProps } from './components/MessagesView';
-import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
-import type { MessagesGuard, MessagesHooks, MessagesSchema } from './types.ts';
+import type {
+  MessagesGuard,
+  MessagesHooks,
+  MessagesSchema,
+  StorageStrategy,
+} from './types.ts';
 import { attachPluginContext, getSupportedLocales } from './utils/config';
 
 export interface MessagesPluginConfig {
@@ -21,6 +25,16 @@ export interface MessagesPluginConfig {
    */
   editorAccess?: MessagesGuard;
   hooks?: MessagesHooks;
+  /**
+   * Where translated messages are persisted.
+   *
+   * - `'db'` — stores translations as JSON in a `data` field (default).
+   * - `'upload'` — stores translations as uploaded `.json` files, enabling
+   *   static hosting via a CDN or object storage.
+   *
+   * @default 'db'
+   */
+  storage?: StorageStrategy;
   tabs?: boolean;
 }
 
@@ -31,6 +45,7 @@ export const intlPlugin =
     collectionSlug = 'messages',
     hooks = {},
     editorAccess = (req) => req.user !== null,
+    storage = 'db',
   }: MessagesPluginConfig): Plugin =>
   (config) => {
     if (!config.localization) {
@@ -68,30 +83,12 @@ export const intlPlugin =
 
     attachPluginContext(config, {
       collectionSlug,
+      storage,
     });
-    // config.globals ??= [];
-    // config.globals.push({
-    //   slug: 'intl-plugin',
-    //   fields: [
-    //     {
-    //       name: 'editorTemplate',
-    //       type: 'richText',
-    //       editor: lexicalEditor({
-    //         features: ({ defaultFeatures }) =>
-    //           defaultFeatures.filter(
-    //             ({ key }) => !['relationship', 'upload'].includes(key),
-    //           ),
-    //       }),
-    //       admin: { hidden: true },
-    //     },
-    //   ],
-    // });
-
     config.collections ??= [];
-    config.collections.push(Messages({ slug: collectionSlug, hooks }));
+    config.collections.push(Messages({ slug: collectionSlug, hooks, storage }));
 
     config.endpoints ??= [];
-    config.endpoints.push(getMessagesEndpoint);
     config.endpoints.push(setMessagesEndpoint);
 
     return config;
@@ -102,4 +99,5 @@ export { fetchMessages } from './requests/fetchMessages';
 export type {
   Messages,
   MessagesSchema,
+  StorageStrategy,
 } from './types.ts';
