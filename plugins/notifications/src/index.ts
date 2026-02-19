@@ -1,6 +1,6 @@
 import type { CollectionSlug, Plugin } from 'payload';
 import type { NotificationBellProps } from './components/NotificationBell';
-import { attachPluginContext } from './context';
+import { PLUGIN_CONTEXT } from './const';
 import {
   defaultGenerateHTML,
   defaultGenerateSubject,
@@ -60,7 +60,7 @@ export const notificationsPlugin = ({
       : undefined;
 
   return (config) => {
-    attachPluginContext(config, {
+    PLUGIN_CONTEXT.set(config, {
       collectionSlugs: {
         notifications: notifSlug,
         subscriptions: subsSlug,

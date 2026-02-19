@@ -4,7 +4,7 @@ import {
   fetchDocumentByReference,
 } from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
-import { getPluginContext } from './context';
+import { PLUGIN_CONTEXT } from './const';
 import { sendNotificationEmail } from './email';
 import { resolveUser, toStoredReference } from './helpers';
 import { resolveMessageAtReadTime, toMessage } from './message';
@@ -19,7 +19,13 @@ export async function notify<Actor extends DocumentID | null>(
   req: PayloadRequest,
   input: NotifyInput<Actor>,
 ): Promise<void> {
-  const ctx = getPluginContext(req.payload.config);
+  const ctx = PLUGIN_CONTEXT.get(req.payload.config);
+  if (!ctx) {
+    throw new Error(
+      '[payload-notifications] Plugin context not found. Did you forget to initialize the plugin?',
+    );
+  }
+
   if (!req.payload.config.admin?.user) return;
 
   // Resolve actor display name if provided
@@ -103,7 +109,13 @@ export async function subscribe(
     documentReference: DocumentReference;
   },
 ): Promise<void> {
-  const ctx = getPluginContext(req.payload.config);
+  const ctx = PLUGIN_CONTEXT.get(req.payload.config);
+  if (!ctx) {
+    throw new Error(
+      '[payload-notifications] Plugin context not found. Did you forget to initialize the plugin?',
+    );
+  }
+
   const ref = toStoredReference(documentReference);
 
   const existing = await req.payload.find({
@@ -131,7 +143,13 @@ export async function unsubscribe(
   userId: string | number,
   documentReference: DocumentReference,
 ): Promise<void> {
-  const ctx = getPluginContext(req.payload.config);
+  const ctx = PLUGIN_CONTEXT.get(req.payload.config);
+  if (!ctx) {
+    throw new Error(
+      '[payload-notifications] Plugin context not found. Did you forget to initialize the plugin?',
+    );
+  }
+
   const ref = toStoredReference(documentReference);
 
   await req.payload.delete({
@@ -147,7 +165,13 @@ export async function getSubscribers(
   req: PayloadRequest,
   documentReference: DocumentReference,
 ): Promise<TypeWithID['id'][]> {
-  const ctx = getPluginContext(req.payload.config);
+  const ctx = PLUGIN_CONTEXT.get(req.payload.config);
+  if (!ctx) {
+    throw new Error(
+      '[payload-notifications] Plugin context not found. Did you forget to initialize the plugin?',
+    );
+  }
+
   const ref = toStoredReference(documentReference);
 
   const results = await req.payload.find({

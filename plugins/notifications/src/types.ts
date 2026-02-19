@@ -4,7 +4,7 @@ import {
   documentIdSchema,
   documentReferenceSchema,
 } from '@davincicoding/payload-plugin-kit';
-import type { PayloadRequest } from 'payload';
+import type { CollectionSlug, PayloadRequest } from 'payload';
 import { z } from 'zod';
 import type { NotificationsPluginConfig } from '.';
 import type { User } from './payload-types';
@@ -18,6 +18,13 @@ export interface ResolvedUser extends User {
 }
 
 // ── Notification types ─────────────────────────────────────────────────
+
+export interface NotificationPluginContext {
+  collectionSlugs: Record<'notifications' | 'subscriptions', CollectionSlug>;
+  pollInterval: number;
+  email: NotificationEmailConfig | undefined;
+  onNotify: NotificationCallback | undefined;
+}
 
 export interface NotificationEmailConfig {
   generateSubject: (args: {
