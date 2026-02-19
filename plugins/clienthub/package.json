@@ -1,6 +1,6 @@
 {
   "name": "payload-clienthub",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Payload CMS plugin for client management, service tracking, and invoicing.",
   "keywords": [
     "payload"
