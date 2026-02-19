@@ -31,22 +31,63 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
 
       switch (storage) {
         case 'db': {
-          const { docs } = await req.payload.update({
+          const { docs } = await req.payload.find({
             collection: ctx.collectionSlug as 'messages',
-            data: { data: messages },
             where: { locale: { equals: locale } },
+            limit: 1,
+            req,
           });
-          if (docs.length === 0) {
+
+          const existingDoc = docs[0];
+          const existingData =
+            (existingDoc?.data as Record<string, unknown>) ?? {};
+          const mergedData = { ...existingData, ...messages };
+
+          if (existingDoc) {
+            await req.payload.update({
+              collection: ctx.collectionSlug as 'messages',
+              id: existingDoc.id,
+              data: { data: mergedData },
+              req,
+            });
+          } else {
             await req.payload.create({
               collection: ctx.collectionSlug as 'messages',
-              data: { locale, data: messages },
+              data: { locale, data: mergedData },
+              req,
             });
           }
           break;
         }
         case 'upload': {
+          const { docs } = await req.payload.find({
+            collection: collectionSlug as 'messages',
+            where: { locale: { equals: locale } },
+            limit: 1,
+            req,
+          });
+
+          const existingDoc = docs[0];
+          let existingData: Record<string, unknown> = {};
+
+          if (existingDoc?.url) {
+            try {
+              const response = await fetch(existingDoc.url as string);
+              if (response.ok) {
+                existingData = (await response.json()) as Record<
+                  string,
+                  unknown
+                >;
+              }
+            } catch {
+              // If fetching existing data fails, proceed with empty object
+            }
+          }
+
+          const mergedData = { ...existingData, ...messages };
+
           const rawFile = new File(
-            [JSON.stringify(messages)],
+            [JSON.stringify(mergedData)],
             `${locale}-${Date.now()}.json`,
             {
               type: 'application/json',
@@ -60,17 +101,20 @@ export const setMessagesEndpoint: Endpoint = ENDPOINTS.setMessages.endpoint(
             size: rawFile.size,
           };
 
-          const { docs } = await req.payload.update({
-            collection: collectionSlug as 'messages',
-            data: {},
-            file,
-            where: { locale: { equals: locale } },
-          });
-          if (docs.length === 0) {
+          if (existingDoc) {
+            await req.payload.update({
+              collection: collectionSlug as 'messages',
+              id: existingDoc.id,
+              data: {},
+              file,
+              req,
+            });
+          } else {
             await req.payload.create({
               collection: collectionSlug as 'messages',
               data: { locale, data: null },
               file,
+              req,
             });
           }
           break;
