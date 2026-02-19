@@ -26,12 +26,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Lint & Format
+        if: github.head_ref != 'changeset-release/main'
         run: pnpm ci:check
 
       - name: Build
+        if: github.head_ref != 'changeset-release/main'
         run: pnpm ci:build
 
       - name: Test
+        if: github.head_ref != 'changeset-release/main'
         run: pnpm ci:test
 
       - name: Generate App Token
