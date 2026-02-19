@@ -16,7 +16,7 @@ npm trusted publishing requires the package to already exist on the registry. Fo
 npm login
 cd packages/<directory>
 pnpm build
-npm publish --access public
+pnpm publish --no-git-checks --access public
 ```
 
 Then configure trusted publishing on npmjs.com:
