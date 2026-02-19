@@ -1,5 +1,15 @@
 # payload-intl
 
+## 1.3.0
+
+### Minor Changes
+
+- [`4965bef`](https://github.com/davincicoding-org/payload-plugins/commit/4965bef485dd7a8f2b18c50cd35b295da82eb47a) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add dual storage strategy (`db` and `upload`) for message persistence. Default is `db` which stores translations as JSON in the database, avoiding HTTP fetches during `next build`. Auto-migrates existing documents when switching strategies.
+
+### Patch Changes
+
+- [`d9c65b4`](https://github.com/davincicoding-org/payload-plugins/commit/d9c65b4790095247384d233522945d16418792bc) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Internall changes
+
 ## 1.2.5
 
 ### Patch Changes

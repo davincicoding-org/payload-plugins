@@ -1,6 +1,6 @@
 {
   "name": "payload-smart-deletion",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Payload CMS plugin that adds PostgreSQL-style referential actions (cascade, set_null, restrict) to relationship fields.",
   "keywords": [
     "payload"
