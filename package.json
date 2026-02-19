@@ -9,7 +9,6 @@
     "ci": "pnpm ci:check && pnpm ci:build && pnpm ci:typecheck && pnpm ci:test",
     "ci:build": "pnpm --filter='./packages/**' --filter='./plugins/**' build",
     "ci:check": "biome ci . && pnpm format:pkg --check",
-    "ci:publish": "pnpm ci:build && node .github/scripts/publish.mjs",
     "ci:test": "pnpm --filter='./plugins/**' test",
     "ci:typecheck": "pnpm --filter sandbox typecheck",
     "clean": "pnpm -r clean && rm -rf node_modules && pnpm install && pnpm build",

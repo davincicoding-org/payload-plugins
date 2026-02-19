@@ -1,32 +1,30 @@
 # Publishing
 
-This monorepo uses [Changesets](https://github.com/changesets/changesets) for versioning and [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC) for tokenless CI publishing via GitHub Actions.
+This monorepo uses [Changesets](https://github.com/changesets/changesets) for versioning and [npm trusted publishing](https://docs.npmjs.com/generating-provenance-statements#publishing-packages-with-provenance-via-github-actions) (OIDC) for CI publishing via GitHub Actions. No tokens or secrets are needed.
 
 ## How releases work
 
 1. A contributor runs `pnpm release` to create a changeset file, commits it, and opens a PR.
 2. Once the PR is merged to `main`, the [Changesets GitHub Action](../.github/workflows/release.yaml) detects pending changesets and opens a **"Version Packages"** PR that bumps versions and updates changelogs.
-3. When the version PR is merged, the action builds all packages and publishes them to npm using OIDC — no tokens required.
+3. When the version PR is merged, the action builds all packages and publishes them to npm via `pnpm -r publish`.
 
-## First-time setup for a new package
+## Adding a new package
 
-npm trusted publishing requires the package to already exist on the registry. For a brand new package, you must do a **one-time manual publish** from your local machine:
+OIDC trusted publishing requires the package to already exist on the registry. For a brand new package:
 
-```sh
-npm login
-cd packages/<directory>
-pnpm build
-pnpm publish --no-git-checks --access public
-```
+1. Publish once from your local machine:
+   ```sh
+   npm login
+   cd packages/<directory>
+   pnpm build
+   pnpm publish --access public
+   ```
+2. Configure trusted publishing on [npmjs.com](https://npmjs.com):
+   - Go to the package > **Settings** > **Trusted Publisher**
+   - Select **GitHub Actions** and fill in:
+     - **Repository owner**: `davincicoding-org`
+     - **Repository**: `payload-plugins`
+     - **Workflow filename**: `release.yaml`
+   - Click **Set up connection**
 
-Then configure trusted publishing on npmjs.com:
-
-1. Go to **npmjs.com** > your package > **Settings** > **Trusted Publisher**
-2. Select **GitHub Actions** and fill in:
-   - **Organization or user**: `davincicoding-org`
-   - **Repository**: `payload-plugins`
-   - **Workflow filename**: `release.yaml`
-3. Click **Set up connection**
-
-After this, all future publishes are handled automatically by CI via OIDC.
-
+After this, all future publishes are handled automatically by CI.

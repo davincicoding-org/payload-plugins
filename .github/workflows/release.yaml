@@ -9,47 +9,37 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
-    # OIDC permissions for npm trusted publishing (tokenless)
     permissions:
-      id-token: write      # Required for npm OIDC trusted publishing
-      contents: write      # Required for Changesets to push version updates
-      pull-requests: write # Required for Changesets to open the PR
+      id-token: write
+      contents: write
+      pull-requests: write
 
     steps:
-      # Generate a GitHub App token so that PRs created by changesets/action
-      # trigger CI workflows (GITHUB_TOKEN events don't trigger other workflows).
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.RELEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-
       - uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: 'pnpm'
-          # Do NOT set registry-url — it creates .npmrc with _authToken
-          # that blocks OIDC authentication (actions/setup-node#1445)
 
       - run: pnpm install --frozen-lockfile
 
-      # Publish packages that have new versions via npm OIDC trusted publishing.
-      # This runs BEFORE changesets/action because the action creates an .npmrc
-      # with _authToken=${NODE_AUTH_TOKEN} that blocks OIDC.
-      - name: Publish packages to npm
-        run: pnpm ci:publish
+      - name: Lint & Format
+        run: pnpm ci:check
 
-      # Handle version PRs (changesets without publish — publishing is done above).
-      # Uses the App token so the PR triggers CI workflows.
-      - name: Create Release PR
+      - name: Build
+        run: pnpm ci:build
+
+      - name: Typecheck
+        run: pnpm ci:typecheck
+
+      - name: Test
+        run: pnpm ci:test
+
+      - name: Create Release PR or Publish
         uses: changesets/action@v1
         with:
+          publish: pnpm -r publish --access public
           commit: "chore(release): version packages"
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
