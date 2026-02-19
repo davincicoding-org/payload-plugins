@@ -31,7 +31,6 @@ export interface ScopedMessagesFieldProps {
  */
 export function ScopedMessagesField({
   path,
-  scopeKey,
   schema,
 }: {
   readonly field: JSONFieldClient;
