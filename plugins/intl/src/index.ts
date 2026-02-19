@@ -91,6 +91,13 @@ export const intlPlugin =
     config.endpoints ??= [];
     config.endpoints.push(setMessagesEndpoint);
 
+    const existingOnInit = config.onInit;
+    config.onInit = async (payload) => {
+      if (existingOnInit) await existingOnInit(payload);
+      const { migrateStorageStrategy } = await import('./migration');
+      await migrateStorageStrategy(payload);
+    };
+
     return config;
   };
 
