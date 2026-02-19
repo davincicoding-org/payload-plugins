@@ -1,0 +1,52 @@
+{
+  "name": "@davincicoding/payload-utils",
+  "version": "0.0.1",
+  "description": "Shared utilities for Payload CMS plugins and applications.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davincicoding-org/payload-plugins.git",
+    "directory": "packages/payload-utils"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./urls": {
+      "types": "./dist/urls.d.ts",
+      "import": "./dist/urls.js",
+      "default": "./dist/urls.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swc src -d dist --config-file .swcrc --strip-leading-paths --ignore '**/*.test.ts' && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "check:types": "tsc --noEmit",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.6.0",
+    "@swc/core": "^1.11.0",
+    "@types/node": "^22.5.4",
+    "payload": "catalog:payload-stack",
+    "typescript": "catalog:payload-stack",
+    "vitest": "^3.1.2"
+  },
+  "peerDependencies": {
+    "payload": ">=3.72.0"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0"
+  }
+}
