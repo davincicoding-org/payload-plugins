@@ -1,11 +1,20 @@
 name: CI
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -27,3 +36,12 @@ jobs:
 
       - name: Test
         run: pnpm ci:test
+
+      - name: Publish
+        if: github.event_name == 'push'
+        uses: changesets/action@v1
+        with:
+          publish: pnpm -r publish --access public
+          commit: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
