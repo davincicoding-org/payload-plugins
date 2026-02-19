@@ -22,6 +22,7 @@ export const getSupportedLocales = (
 const PLUGIN_KEY = 'intl-plugin';
 const pluginContextSchema = z.object({
   collectionSlug: z.string(),
+  storage: z.enum(['db', 'upload']),
 });
 type PluginContext = z.infer<typeof pluginContextSchema>;
 
