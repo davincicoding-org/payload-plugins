@@ -1,5 +1,11 @@
 # payload-discussions
 
+## 1.1.2
+
+### Patch Changes
+
+- [`d9c65b4`](https://github.com/davincicoding-org/payload-plugins/commit/d9c65b4790095247384d233522945d16418792bc) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Internall changes
+
 ## 1.1.1
 
 ### Patch Changes
