@@ -1,5 +1,4 @@
 packages:
-  - common
   - packages/*
   - plugins/*
   - sandbox

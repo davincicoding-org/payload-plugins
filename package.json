@@ -31,7 +31,6 @@
         2,
         "always",
         [
-          "common",
           "payload-utils",
           "payload-plugin-kit",
           "payload-clienthub",
