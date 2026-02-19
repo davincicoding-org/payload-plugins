@@ -34,6 +34,14 @@ jobs:
       - name: Test
         run: pnpm ci:test
 
+      - name: Generate App Token
+        if: github.event_name == 'push'
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Publish
         if: github.event_name == 'push'
         uses: changesets/action@v1
@@ -41,4 +49,4 @@ jobs:
           publish: pnpm -r publish --access public
           commit: "chore(release): version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
