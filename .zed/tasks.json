@@ -8,42 +8,42 @@
   },
   {
     "label": "dev:discussions",
-    "command": "pnpm --filter ./packages/discussions dev",
+    "command": "pnpm --filter ./plugins/discussions dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
   },
   {
     "label": "dev:intl",
-    "command": "pnpm --filter ./packages/intl dev",
+    "command": "pnpm --filter ./plugins/intl dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
   },
   {
     "label": "dev:invitations",
-    "command": "pnpm --filter ./packages/invitations dev",
+    "command": "pnpm --filter ./plugins/invitations dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
   },
   {
     "label": "dev:notifications",
-    "command": "pnpm --filter ./packages/notifications dev",
+    "command": "pnpm --filter ./plugins/notifications dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
   },
   {
     "label": "dev:smart-cache",
-    "command": "pnpm --filter ./packages/smart-cache dev",
+    "command": "pnpm --filter ./plugins/smart-cache dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"
   },
   {
     "label": "dev:smart-deletion",
-    "command": "pnpm --filter ./packages/smart-deletion dev",
+    "command": "pnpm --filter ./plugins/smart-deletion dev",
     "use_new_terminal": true,
     "allow_concurrent_runs": false,
     "hide": "always"

@@ -1,14 +1,23 @@
 {
-  "name": "payload-discussions",
-  "version": "1.1.1",
-  "description": "Payload CMS plugin that adds threaded comment discussions with nested replies, and author tracking to collections and globals.",
+  "name": "payload-intl",
+  "version": "1.2.5",
+  "description": "Payload Plugin for I18N using ICU Messages",
   "keywords": [
-    "payload"
+    "payload",
+    "intl",
+    "i18n",
+    "internationalization",
+    "localization",
+    "react",
+    "next.js",
+    "translation",
+    "translations",
+    "icu"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/davincicoding-org/payload-plugins.git",
-    "directory": "packages/discussions"
+    "directory": "plugins/intl"
   },
   "license": "MIT",
   "author": "DAVINCI CODING GmbH",
@@ -28,8 +37,7 @@
       "types": "./dist/exports/client.d.ts",
       "import": "./dist/exports/client.js",
       "default": "./dist/exports/client.js"
-    },
-    "./styles.css": "./dist/styles.css"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -37,24 +45,32 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rm -f src/internals 2>/dev/null; pnpm check:types",
+    "prebuild": "rm -f src/internals 2>/dev/null; pnpm typecheck",
     "build": "plugin-build",
-    "check:types": "tsc --noEmit",
     "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "plugin-build --watch",
     "generate:types": "generate-types",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "react-textarea-autosize": "^8.5.9",
+    "@base-ui/react": "^1.1.0",
+    "@formatjs/icu-messageformat-parser": "^2.11.2",
+    "@tabler/icons-react": "^3.36.1",
+    "clsx": "^2.1.1",
+    "lexical-beautiful-mentions": "^0.1.48",
+    "lodash-es": "^4.17.21",
+    "react-hook-form": "^7.58.1",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": "catalog:payload-stack",
     "@repo/common": "workspace:*",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",
@@ -68,6 +84,7 @@
   },
   "peerDependencies": {
     "@payloadcms/next": ">=3.72.0",
+    "@payloadcms/richtext-lexical": ">=3.72.0",
     "@payloadcms/ui": ">=3.72.0",
     "next": ">=15.2.3",
     "payload": ">=3.72.0"

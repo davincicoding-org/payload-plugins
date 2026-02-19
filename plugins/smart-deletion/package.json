@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/davincicoding-org/payload-plugins.git",
-    "directory": "packages/smart-deletion"
+    "directory": "plugins/smart-deletion"
   },
   "license": "MIT",
   "author": "DAVINCI CODING GmbH",

@@ -5,7 +5,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/davincicoding-org/payload-plugins.git",
-    "directory": "packages/notifications"
+    "directory": "plugins/notifications"
   },
   "type": "module",
   "exports": {

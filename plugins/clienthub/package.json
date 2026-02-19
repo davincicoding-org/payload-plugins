@@ -1,23 +1,14 @@
 {
-  "name": "payload-intl",
-  "version": "1.2.5",
-  "description": "Payload Plugin for I18N using ICU Messages",
+  "name": "payload-clienthub",
+  "version": "0.0.3",
+  "description": "Payload CMS plugin for client management, service tracking, and invoicing.",
   "keywords": [
-    "payload",
-    "intl",
-    "i18n",
-    "internationalization",
-    "localization",
-    "react",
-    "next.js",
-    "translation",
-    "translations",
-    "icu"
+    "payload"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/davincicoding-org/payload-plugins.git",
-    "directory": "packages/intl"
+    "directory": "plugins/clienthub"
   },
   "license": "MIT",
   "author": "DAVINCI CODING GmbH",
@@ -37,7 +28,8 @@
       "types": "./dist/exports/client.d.ts",
       "import": "./dist/exports/client.js",
       "default": "./dist/exports/client.js"
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -52,26 +44,20 @@
     "generate:types": "generate-types",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@base-ui/react": "^1.1.0",
-    "@formatjs/icu-messageformat-parser": "^2.11.2",
-    "@tabler/icons-react": "^3.36.1",
-    "clsx": "^2.1.1",
-    "lexical-beautiful-mentions": "^0.1.48",
-    "lodash-es": "^4.17.21",
-    "react-hook-form": "^7.58.1",
-    "zod": "catalog:"
+    "@react-pdf/renderer": "^4.3.2",
+    "dayjs": "^1.11.19",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": "catalog:payload-stack",
     "@repo/common": "workspace:*",
-    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.5.4",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",
     "next": "catalog:payload-stack",
@@ -80,11 +66,11 @@
     "react-dom": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",
-    "vitest": "^3.1.2"
+    "vitest": "^3.1.2",
+    "zod": "catalog:"
   },
   "peerDependencies": {
     "@payloadcms/next": ">=3.72.0",
-    "@payloadcms/richtext-lexical": ">=3.72.0",
     "@payloadcms/ui": ">=3.72.0",
     "next": ">=15.2.3",
     "payload": ">=3.72.0"

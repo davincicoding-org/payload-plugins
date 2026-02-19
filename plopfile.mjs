@@ -24,7 +24,7 @@ export default function plopConfig(plop) {
       // Generate the plugin files
       {
         type: 'addMany',
-        destination: 'packages/{{name}}/',
+        destination: 'plugins/{{name}}/',
         base: 'plop-templates/plugin/',
         templateFiles: 'plop-templates/plugin/**/*.hbs',
         stripExtensions: ['hbs'],
