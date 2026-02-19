@@ -23,7 +23,6 @@ describe('createCollectionConfigFactory', () => {
       }),
     );
 
-    // biome-ignore lint/suspicious/noExplicitAny: test mock
     const config = factory({ slug: 'items' as any, prefix: 'Custom' });
     expect(config.slug).toBe('items');
     expect(config.labels).toEqual({
