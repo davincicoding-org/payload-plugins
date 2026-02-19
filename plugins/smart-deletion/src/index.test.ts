@@ -37,10 +37,10 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config);
-    const posts = result.collections!.find((c) => c.slug === 'posts')!;
+    const posts = result.collections?.find((c) => c.slug === 'posts');
 
-    expect(posts.hooks?.afterDelete).toHaveLength(1);
-    expect(posts.hooks?.afterChange).toHaveLength(0);
+    expect(posts?.hooks?.afterDelete).toHaveLength(1);
+    expect(posts?.hooks?.afterChange).toHaveLength(0);
   });
 
   test('does not attach hooks to collections without cascade fields', () => {
@@ -62,10 +62,10 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config);
-    const posts = result.collections!.find((c) => c.slug === 'posts')!;
+    const posts = result.collections?.find((c) => c.slug === 'posts');
 
-    expect(posts.hooks?.afterDelete ?? []).toHaveLength(0);
-    expect(posts.hooks?.afterChange ?? []).toHaveLength(0);
+    expect(posts?.hooks?.afterDelete ?? []).toHaveLength(0);
+    expect(posts?.hooks?.afterChange ?? []).toHaveLength(0);
   });
 
   test('auto-enables trash on target when source has trash', () => {
@@ -90,9 +90,9 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config, { autoEnableTrash: true });
-    const replies = result.collections!.find((c) => c.slug === 'replies')!;
+    const replies = result.collections?.find((c) => c.slug === 'replies');
 
-    expect(replies.trash).toBe(true);
+    expect(replies?.trash).toBe(true);
   });
 
   test('does not auto-enable trash when source does not have trash', () => {
@@ -116,9 +116,9 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config);
-    const replies = result.collections!.find((c) => c.slug === 'replies')!;
+    const replies = result.collections?.find((c) => c.slug === 'replies');
 
-    expect(replies.trash).toBeUndefined();
+    expect(replies?.trash).toBeUndefined();
   });
 
   test('warns when autoEnableTrash is false and target lacks trash', () => {
@@ -200,10 +200,10 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config);
-    const articles = result.collections!.find((c) => c.slug === 'articles')!;
+    const articles = result.collections?.find((c) => c.slug === 'articles');
 
-    expect(articles.hooks?.afterDelete).toHaveLength(2);
-    expect(articles.hooks?.afterChange).toHaveLength(0);
+    expect(articles?.hooks?.afterDelete).toHaveLength(2);
+    expect(articles?.hooks?.afterChange).toHaveLength(0);
   });
 
   test('handles multiple cascade fields on one collection', () => {
@@ -247,10 +247,10 @@ describe('smartDeletionPlugin', () => {
     ]);
 
     const result = applyPlugin(config);
-    const threads = result.collections!.find((c) => c.slug === 'threads')!;
+    const threads = result.collections?.find((c) => c.slug === 'threads');
 
-    expect(threads.hooks?.afterDelete).toHaveLength(2);
-    expect(threads.hooks?.afterChange).toHaveLength(0);
+    expect(threads?.hooks?.afterDelete).toHaveLength(2);
+    expect(threads?.hooks?.afterChange).toHaveLength(0);
   });
 
   test('does not throw when autoEnableTrash is false but target already has trash', () => {
@@ -278,7 +278,7 @@ describe('smartDeletionPlugin', () => {
     expect(() => applyPlugin(config, { autoEnableTrash: false })).not.toThrow();
 
     const result = applyPlugin(config, { autoEnableTrash: false });
-    const replies = result.collections!.find((c) => c.slug === 'replies')!;
-    expect(replies.trash).toBe(true);
+    const replies = result.collections?.find((c) => c.slug === 'replies');
+    expect(replies?.trash).toBe(true);
   });
 });

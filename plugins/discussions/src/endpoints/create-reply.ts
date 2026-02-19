@@ -1,5 +1,5 @@
 import { documentIdSchema } from '@davincicoding/payload-plugin-kit';
-import type { CollectionSlug, Endpoint } from 'payload';
+import type { Endpoint } from 'payload';
 import { z } from 'zod';
 import { ENDPOINTS } from '@/procedures';
 import type { CreateCommentCallback, ResolvedPluginOptions } from '@/types';

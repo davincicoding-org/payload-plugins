@@ -110,6 +110,7 @@ export async function updateDocumentByReference(
     case 'global':
       return payload.updateGlobal({
         slug: ref.slug as GlobalSlug,
+        // biome-ignore lint/suspicious/noExplicitAny: this is fine
         data: data as any,
       });
     default:

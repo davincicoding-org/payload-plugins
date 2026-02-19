@@ -2,14 +2,8 @@ import type {
   DocumentID,
   DocumentReference,
 } from '@davincicoding/payload-plugin-kit';
-import { getApiURL } from '@davincicoding/payload-plugin-kit';
-import type { BasePayload, PayloadRequest } from 'payload';
-import { signUnsubscribeToken } from './email/email-token';
-import type {
-  NotificationEmailLinks,
-  ResolvedUser,
-  StoredDocumentReference,
-} from './types';
+import type { BasePayload } from 'payload';
+import type { ResolvedUser, StoredDocumentReference } from './types';
 
 /**
  * Resolve a user ID into a display-name pair using the user collection's

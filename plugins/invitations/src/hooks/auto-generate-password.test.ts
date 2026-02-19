@@ -11,8 +11,8 @@ describe('autoGeneratePassword', () => {
     } as any);
 
     expect(result).toBeDefined();
-    expect(result!.password).toMatch(/^[0-9a-f]{64}$/);
-    expect(result!['confirm-password']).toBe(result!.password);
+    expect(result?.password).toMatch(/^[0-9a-f]{64}$/);
+    expect(result?.['confirm-password']).toBe(result?.password);
   });
 
   test('sets email from _email', () => {
@@ -22,7 +22,7 @@ describe('autoGeneratePassword', () => {
       data,
     } as any);
 
-    expect(result!.email).toBe('test@example.com');
+    expect(result?.email).toBe('test@example.com');
   });
 
   test('returns new object (immutability)', () => {
