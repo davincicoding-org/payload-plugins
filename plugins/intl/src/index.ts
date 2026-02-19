@@ -3,6 +3,7 @@ import type { MessagesViewProps } from './components/MessagesView';
 import { PLUGIN_CONTEXT } from './const';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { Messages } from './entities';
+import { injectScopeIntoGlobal } from './globals';
 import type {
   MessagesGuard,
   MessagesHooks,
@@ -11,6 +12,7 @@ import type {
   StorageStrategy,
 } from './types.ts';
 import { getSupportedLocales } from './utils/config';
+import { normalizeScopes } from './utils/scopes';
 
 export interface MessagesPluginConfig {
   schema: MessagesSchema;
@@ -45,6 +47,7 @@ export const intlPlugin =
   ({
     schema,
     tabs,
+    scopes: rawScopes,
     collectionSlug = 'messages',
     hooks = {},
     editorAccess = (req) => req.user !== null,
@@ -58,6 +61,12 @@ export const intlPlugin =
     }
 
     const locales = getSupportedLocales(config.localization);
+    const scopes = normalizeScopes(rawScopes);
+
+    const scopeKeys = new Set(scopes.keys());
+    const viewSchema = Object.fromEntries(
+      Object.entries(schema).filter(([key]) => !scopeKeys.has(key)),
+    );
 
     config.admin ??= {};
     config.admin.components ??= {};
@@ -74,18 +83,29 @@ export const intlPlugin =
           path: 'payload-intl/rsc#MessagesView',
           serverProps: {
             access: editorAccess,
+            fullSchema: schema,
             locales,
-            schema,
+            schema: viewSchema,
+            scopes,
             tabs,
-          } satisfies MessagesViewProps,
+          } as MessagesViewProps,
         },
         path: '/intl',
       },
     };
 
+    if (scopes.size > 0) {
+      config.globals = (config.globals ?? []).map((global) => {
+        const scopeConfig = scopes.get(global.slug);
+        if (!scopeConfig) return global;
+        return injectScopeIntoGlobal(global, global.slug, scopeConfig, schema);
+      });
+    }
+
     PLUGIN_CONTEXT.set(config, {
       collectionSlug,
       storage,
+      scopes,
     });
     config.collections ??= [];
     config.collections.push(Messages({ slug: collectionSlug, hooks, storage }));
