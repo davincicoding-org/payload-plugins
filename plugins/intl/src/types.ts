@@ -15,6 +15,8 @@ export type MessagesHooks = {
   afterUpdate?: () => Promise<void> | void;
 } & CollectionConfig['hooks'];
 
+export type StorageStrategy = 'db' | 'upload';
+
 export type MessagesGuard = (req: PayloadRequest) => boolean | Promise<boolean>;
 
 /* MARK: Messages */
