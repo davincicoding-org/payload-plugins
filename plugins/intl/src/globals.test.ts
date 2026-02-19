@@ -129,10 +129,10 @@ describe('injectScopeIntoGlobal', () => {
       const tabsField = result.fields[0] as TabsField;
       expect(tabsField.type).toBe('tabs');
       expect(tabsField.tabs).toHaveLength(2);
-      expect(tabsField.tabs[0]!.label).toBe('Content');
-      expect(tabsField.tabs[0]!.fields).toHaveLength(2);
-      expect(tabsField.tabs[1]!.label).toBe('Messages');
-      expect(tabsField.tabs[1]!.fields).toHaveLength(1);
+      expect(tabsField.tabs[0]?.label).toBe('Content');
+      expect(tabsField.tabs[0]?.fields).toHaveLength(2);
+      expect(tabsField.tabs[1]?.label).toBe('Messages');
+      expect(tabsField.tabs[1]?.fields).toHaveLength(1);
     });
 
     it('should use global.label as content tab label when available', () => {
@@ -145,7 +145,7 @@ describe('injectScopeIntoGlobal', () => {
       );
 
       const tabsField = result.fields[0] as TabsField;
-      expect(tabsField.tabs[0]!.label).toBe('Site Header');
+      expect(tabsField.tabs[0]?.label).toBe('Site Header');
     });
 
     it('should use existingFieldsTabLabel when provided', () => {
@@ -157,7 +157,7 @@ describe('injectScopeIntoGlobal', () => {
       const result = injectScopeIntoGlobal(global, 'header', config, schema);
 
       const tabsField = result.fields[0] as TabsField;
-      expect(tabsField.tabs[0]!.label).toBe('Header Fields');
+      expect(tabsField.tabs[0]?.label).toBe('Header Fields');
     });
 
     it('should append to existing tabs when first field is a tabs field', () => {
@@ -181,9 +181,9 @@ describe('injectScopeIntoGlobal', () => {
       const tabsField = result.fields[0] as TabsField;
       expect(tabsField.type).toBe('tabs');
       expect(tabsField.tabs).toHaveLength(3);
-      expect(tabsField.tabs[0]!.label).toBe('General');
-      expect(tabsField.tabs[1]!.label).toBe('Advanced');
-      expect(tabsField.tabs[2]!.label).toBe('Messages');
+      expect(tabsField.tabs[0]?.label).toBe('General');
+      expect(tabsField.tabs[1]?.label).toBe('Advanced');
+      expect(tabsField.tabs[2]?.label).toBe('Messages');
 
       // Extra fields after the tabs field should be preserved
       expect(result.fields).toHaveLength(2);
@@ -200,7 +200,7 @@ describe('injectScopeIntoGlobal', () => {
       );
 
       const tabsField = result.fields[0] as TabsField;
-      const messagesTab = tabsField.tabs[1]!;
+      const messagesTab = tabsField.tabs[1] as (typeof tabsField.tabs)[number];
       const virtualField = messagesTab.fields[0] as Record<string, unknown>;
 
       expect(virtualField.name).toBe('_intlMessages');
