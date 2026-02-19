@@ -1,5 +1,5 @@
+import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import { Button } from '@payloadcms/ui';
-import { getAdminURL } from '@repo/common';
 import { IconWorld } from '@tabler/icons-react';
 import type { PayloadRequest } from 'payload';
 import type { MessagesGuard } from '@/types';

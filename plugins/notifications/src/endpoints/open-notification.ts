@@ -1,4 +1,7 @@
-import { getAdminURL, resolveDocumentID } from '@repo/common';
+import {
+  getAdminURL,
+  resolveDocumentID,
+} from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug } from 'payload';
 import { ENDPOINTS } from '@/procedures';
 

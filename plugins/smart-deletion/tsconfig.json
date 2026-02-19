@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/common/base.tsconfig.json",
+  "extends": "@davincicoding/payload-plugin-kit/base.tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": "src",
@@ -9,5 +9,5 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "src/internals/**/*.test.ts"]
+  "exclude": ["node_modules", "dist"]
 }

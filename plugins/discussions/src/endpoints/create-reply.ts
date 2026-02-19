@@ -1,4 +1,4 @@
-import { documentIdSchema } from '@repo/common';
+import { documentIdSchema } from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug, Endpoint } from 'payload';
 import { z } from 'zod';
 import { ENDPOINTS } from '@/procedures';

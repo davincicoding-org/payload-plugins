@@ -1,7 +1,7 @@
 import {
   fetchDocumentByReference,
   updateDocumentByReference,
-} from '@repo/common';
+} from '@davincicoding/payload-plugin-kit';
 import type { Endpoint } from 'payload';
 import { ENDPOINTS } from '@/procedures';
 import { type CreateCommentCallback, discussionsDocumentSchema } from '@/types';

@@ -1,4 +1,4 @@
-import { createCollectionConfigFactory } from '@repo/common';
+import { createCollectionConfigFactory } from '@davincicoding/payload-plugin-kit';
 import type { JSONSchema4 } from 'json-schema';
 import { z } from 'zod';
 import { messageSchema } from './types';

@@ -3,7 +3,7 @@ import {
   type DocumentReference,
   documentIdSchema,
   documentReferenceSchema,
-} from '@repo/common';
+} from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest } from 'payload';
 import { z } from 'zod';
 import type { NotificationsPluginConfig } from '.';

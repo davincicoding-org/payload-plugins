@@ -2,8 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
-      "@repo/common": ["./src/internals/index.ts"]
+      "@/*": ["./src/*"]
     }
   },
   "exclude": [

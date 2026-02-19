@@ -2,7 +2,7 @@ import {
   type DocumentID,
   type DocumentReference,
   getApiURL,
-} from '@repo/common';
+} from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest } from 'payload';
 import type {
   MinimalNotification,

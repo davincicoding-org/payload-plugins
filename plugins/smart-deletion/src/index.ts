@@ -1,4 +1,4 @@
-import { findFields } from '@repo/common';
+import { findFields } from '@davincicoding/payload-plugin-kit';
 import type { Field, Plugin, RelationshipField } from 'payload';
 import { CUSTOM_KEY } from './const';
 import {

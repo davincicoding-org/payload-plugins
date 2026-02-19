@@ -37,7 +37,7 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rm -f src/internals 2>/dev/null; pnpm check:types",
+    "prebuild": "pnpm check:types",
     "build": "plugin-build",
     "check:types": "tsc --noEmit",
     "clean": "rm -rf dist && rm -rf node_modules",
@@ -49,12 +49,13 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@davincicoding/payload-utils": "workspace:*",
     "react-textarea-autosize": "^8.5.9",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/ui": "catalog:payload-stack",
-    "@repo/common": "workspace:*",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",

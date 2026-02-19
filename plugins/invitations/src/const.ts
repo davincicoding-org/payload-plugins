@@ -1,4 +1,4 @@
-import { defineProcedure } from '@repo/common';
+import { defineProcedure } from '@davincicoding/payload-plugin-kit';
 import { acceptInviteSchema, reinviteSchema } from './types';
 
 export const ENDPOINTS = {

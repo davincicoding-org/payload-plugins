@@ -1,6 +1,6 @@
 'use client';
 
-import type { DocumentReference } from '@repo/common';
+import type { DocumentReference } from '@davincicoding/payload-plugin-kit';
 import type { PopulatedComment } from '../types';
 import { CommentProvider } from './CommentProvider';
 import { CommentsPanel } from './CommentsPanel';

@@ -1,5 +1,5 @@
-import { resolveDocumentID } from '@repo/common';
-import type { FieldWithPath } from '@repo/common/utils';
+import type { FieldWithPath } from '@davincicoding/payload-plugin-kit';
+import { resolveDocumentID } from '@davincicoding/payload-plugin-kit';
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,

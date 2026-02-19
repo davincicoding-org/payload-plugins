@@ -1,5 +1,8 @@
-import type { DocumentID, DocumentReference } from '@repo/common';
-import { getApiURL } from '@repo/common';
+import type {
+  DocumentID,
+  DocumentReference,
+} from '@davincicoding/payload-plugin-kit';
+import { getApiURL } from '@davincicoding/payload-plugin-kit';
 import type { BasePayload, PayloadRequest } from 'payload';
 import { signUnsubscribeToken } from './email/email-token';
 import type {

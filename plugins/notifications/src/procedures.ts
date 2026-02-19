@@ -1,4 +1,4 @@
-import { defineProcedure } from '@repo/common';
+import { defineProcedure } from '@davincicoding/payload-plugin-kit';
 import { z } from 'zod';
 import type { NotificationData } from './types';
 import { markReadSchema, subscriptionSchema } from './types';

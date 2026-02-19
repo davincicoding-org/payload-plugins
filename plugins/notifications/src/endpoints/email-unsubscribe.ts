@@ -1,4 +1,4 @@
-import { documentReferenceSchema } from '@repo/common';
+import { documentReferenceSchema } from '@davincicoding/payload-plugin-kit';
 import { unsubscribe } from '@/api';
 import { verifyUnsubscribeToken } from '@/email/email-token';
 import { ENDPOINTS } from '@/procedures';

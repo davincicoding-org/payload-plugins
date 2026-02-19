@@ -1,4 +1,4 @@
-import { createCollectionConfigFactory } from '@repo/common';
+import { createCollectionConfigFactory } from '@davincicoding/payload-plugin-kit';
 import { getMessagesEndpoint } from './endpoints/get-messages';
 import { setMessagesEndpoint } from './endpoints/set-messages';
 import { createHooks } from './hooks';

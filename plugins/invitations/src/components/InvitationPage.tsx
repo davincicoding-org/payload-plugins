@@ -1,7 +1,6 @@
+import { getAdminURL, getApiURL } from '@davincicoding/payload-plugin-kit';
 import { Logo } from '@payloadcms/next/rsc';
-
 import { MinimalTemplate } from '@payloadcms/next/templates';
-import { getAdminURL, getApiURL } from '@repo/common';
 import { RedirectType, redirect } from 'next/navigation';
 import type { AdminViewServerProps } from 'payload';
 import { ENDPOINTS } from '@/const';

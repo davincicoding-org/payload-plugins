@@ -1,4 +1,7 @@
-import { type DocumentReference, uncaughtSwitchCase } from '@repo/common';
+import {
+  type DocumentReference,
+  uncaughtSwitchCase,
+} from '@davincicoding/payload-plugin-kit';
 import type { ServerComponentProps } from 'payload';
 import { populateComment } from '@/utils';
 import type { DiscussionsFieldConfig, PopulatedComment } from '../types';

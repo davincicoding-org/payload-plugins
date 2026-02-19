@@ -2,7 +2,7 @@ import {
   type DocumentID,
   type DocumentReference,
   fetchDocumentByReference,
-} from '@repo/common';
+} from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, TypeWithID, Where } from 'payload';
 import { getPluginContext } from './context';
 import { sendNotificationEmail } from './email';

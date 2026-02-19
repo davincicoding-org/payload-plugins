@@ -1,4 +1,7 @@
-import { createCollectionConfigFactory, resolveDocumentID } from '@repo/common';
+import {
+  createCollectionConfigFactory,
+  resolveDocumentID,
+} from '@davincicoding/payload-plugin-kit';
 import type { GlobalConfig } from 'payload';
 import { SETTINGS_SLUG } from './const';
 import type { ResolvedPluginOptions } from './types';

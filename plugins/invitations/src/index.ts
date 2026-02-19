@@ -1,4 +1,4 @@
-import { getAdminURL } from '@repo/common';
+import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, Plugin } from 'payload';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';

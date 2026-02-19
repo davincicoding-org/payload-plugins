@@ -1,6 +1,6 @@
+import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
-import { getAdminURL } from '@repo/common';
 import { RedirectType, redirect } from 'next/navigation';
 import type { AdminViewServerProps } from 'payload';
 import type {

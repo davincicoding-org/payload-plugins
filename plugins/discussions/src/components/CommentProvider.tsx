@@ -1,7 +1,10 @@
 'use client';
 
+import type {
+  DocumentID,
+  DocumentReference,
+} from '@davincicoding/payload-plugin-kit';
 import { useConfig } from '@payloadcms/ui';
-import type { DocumentID, DocumentReference } from '@repo/common';
 import { useCallback, useMemo, useState } from 'react';
 import { ENDPOINTS } from '@/procedures';
 import type { PopulatedComment } from '../types';

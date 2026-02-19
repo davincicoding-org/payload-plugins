@@ -1,4 +1,4 @@
-import { findFields } from '@repo/common';
+import { findFields } from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug, Config, Field, GlobalSlug } from 'payload';
 import type { ResolvedPluginOptions } from '@/types';
 

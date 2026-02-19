@@ -1,4 +1,4 @@
-import { defineProcedure } from '@repo/common';
+import { defineProcedure } from '@davincicoding/payload-plugin-kit';
 import type { PopulatedComment } from './types';
 import { createCommentSchema, createReplySchema } from './types';
 

@@ -1,4 +1,4 @@
-import { createCollectionConfigFactory } from '@repo/common';
+import { createCollectionConfigFactory } from '@davincicoding/payload-plugin-kit';
 
 export const Comments = createCollectionConfigFactory(({ slug }) => ({
   admin: {
