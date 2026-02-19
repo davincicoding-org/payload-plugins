@@ -1,7 +1,13 @@
 import type { Field, GlobalConfig, TabsField } from 'payload';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { createAfterReadHook, createBeforeChangeHook } from './global-hooks';
 import { injectScopeIntoGlobal } from './globals';
 import type { MessagesSchema, NormalizedScope } from './types';
+
+vi.mock('./global-hooks', () => ({
+  createAfterReadHook: vi.fn(() => vi.fn()),
+  createBeforeChangeHook: vi.fn(() => vi.fn()),
+}));
 
 function makeGlobal(overrides: Partial<GlobalConfig> = {}): GlobalConfig {
   return {
@@ -206,6 +212,63 @@ describe('injectScopeIntoGlobal', () => {
       const fieldConfig = components.Field as Record<string, unknown>;
       expect(fieldConfig.exportName).toBe('ScopedMessagesField');
       expect(fieldConfig.path).toBe('payload-intl/client#ScopedMessagesField');
+    });
+  });
+
+  describe('hooks', () => {
+    it('should attach afterRead and beforeChange hooks', () => {
+      const global = makeGlobal();
+      const result = injectScopeIntoGlobal(
+        global,
+        'header',
+        { position: 'tab' },
+        schema,
+      );
+
+      expect(createAfterReadHook).toHaveBeenCalledWith('header');
+      expect(createBeforeChangeHook).toHaveBeenCalledWith('header');
+      expect(result.hooks?.afterRead).toHaveLength(1);
+      expect(result.hooks?.beforeChange).toHaveLength(1);
+    });
+
+    it('should preserve existing hooks when attaching new ones', () => {
+      const existingAfterRead = vi.fn();
+      const existingBeforeChange = vi.fn();
+      const global = makeGlobal({
+        hooks: {
+          afterRead: [existingAfterRead],
+          beforeChange: [existingBeforeChange],
+        },
+      });
+
+      const result = injectScopeIntoGlobal(
+        global,
+        'header',
+        { position: 'sidebar' },
+        schema,
+      );
+
+      expect(result.hooks?.afterRead).toHaveLength(2);
+      expect(result.hooks?.afterRead?.[0]).toBe(existingAfterRead);
+      expect(result.hooks?.beforeChange).toHaveLength(2);
+      expect(result.hooks?.beforeChange?.[0]).toBe(existingBeforeChange);
+    });
+
+    it('should not attach hooks when scope key is not in schema', () => {
+      vi.mocked(createAfterReadHook).mockClear();
+      vi.mocked(createBeforeChangeHook).mockClear();
+
+      const global = makeGlobal({ slug: 'missing' });
+      const result = injectScopeIntoGlobal(
+        global,
+        'missing',
+        { position: 'tab' },
+        schema,
+      );
+
+      expect(createAfterReadHook).not.toHaveBeenCalled();
+      expect(createBeforeChangeHook).not.toHaveBeenCalled();
+      expect(result.hooks).toBeUndefined();
     });
   });
 });
