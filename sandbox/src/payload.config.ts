@@ -117,6 +117,19 @@ export default buildConfig({
       ],
     },
   ],
+  globals: [
+    {
+      slug: 'navigation',
+      label: 'Navigation',
+      fields: [
+        {
+          name: 'logoText',
+          type: 'text',
+          defaultValue: 'Swiss Influence',
+        },
+      ],
+    },
+  ],
   email: resendAdapter({
     defaultFromAddress: 'noreply@davincicoding.ch',
     defaultFromName: 'Davinci Coding',
@@ -179,6 +192,7 @@ export default buildConfig({
       schema: messages,
       tabs: true,
       storage: 'upload',
+      scopes: ['navigation'],
     }),
     smartCachePlugin({ collections: ['media', 'messages'] }),
     localFileStoragePlugin(),
