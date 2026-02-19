@@ -10,7 +10,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
     : routing.defaultLocale;
 
   const messages = await fetchCachedMessages(locale);
-  console.log(messages);
   return {
     locale,
     messages,

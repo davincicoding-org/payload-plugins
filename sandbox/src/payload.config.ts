@@ -178,6 +178,7 @@ export default buildConfig({
     intlPlugin({
       schema: messages,
       tabs: true,
+      storage: 'upload',
     }),
     smartCachePlugin({ collections: ['media', 'messages'] }),
     localFileStoragePlugin(),

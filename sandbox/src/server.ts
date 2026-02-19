@@ -1,8 +1,12 @@
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 import { fetchMessages } from 'payload-intl';
 import { createRequestHandler } from 'payload-smart-cache';
-import { env } from '@/env';
 
 export const fetchCachedMessages = createRequestHandler(
-  (locale: string) => fetchMessages({ serverUrl: env.BASE_URL }, locale),
+  async (locale: string) => {
+    const payload = await getPayload({ config: configPromise });
+    return fetchMessages(payload, locale);
+  },
   ['messages'],
 );
