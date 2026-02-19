@@ -14,6 +14,7 @@ import type {
   Translations,
 } from '@/types';
 import { JsonImport } from './actions/JsonImport';
+import { ScopesButton } from './actions/ScopesButton';
 import { useMessagesFormSubmit } from './hooks/useMessagesFormSubmit';
 import { MessageField } from './layout/MessageField';
 import { MessagesTabs } from './layout/MessagesTabs';
@@ -80,6 +81,7 @@ export function MessagesForm({
           <header className={styles.header}>
             <h1 className={styles.title}>Messages</h1>
             <div className={styles.actions}>
+              <ScopesButton scopes={scopes} />
               <JsonImport activeLocale={activeLocale} />
               <Button
                 className={styles.saveButton}
