@@ -1,9 +1,5 @@
 import { isEqual } from 'lodash-es';
-import type {
-  FieldHook,
-  GlobalAfterReadHook,
-  GlobalBeforeChangeHook,
-} from 'payload';
+import type { FieldHook } from 'payload';
 import type { Messages } from './types';
 
 /**

@@ -61,7 +61,6 @@ describe('fetchMessages', () => {
 
     vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
       globalSlug: 'messages',
-      uploadCollection: 'media',
     });
 
     const { fetchMessages } = await import('./fetchMessages');
