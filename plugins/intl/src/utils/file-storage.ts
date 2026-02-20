@@ -72,11 +72,11 @@ export async function readDataFromFile({
 }: ReadOptions): Promise<Messages> {
   if (!fileId) return {};
 
-  const uploadDoc = await payload.findByID({
+  const uploadDoc = (await payload.findByID({
     collection: collection as CollectionSlug,
     id: fileId,
     depth: 0,
-  });
+  })) as { filename: string };
 
   const filePath = resolveUploadPath(payload, collection, uploadDoc.filename);
 
@@ -98,12 +98,13 @@ function resolveUploadPath(
     (c) => c.slug === collectionSlug,
   );
 
-  const uploadConfig =
-    typeof collectionConfig?.upload === 'object' ? collectionConfig.upload : {};
-  const staticDir =
-    'staticDir' in uploadConfig
-      ? (uploadConfig.staticDir ?? collectionSlug)
-      : collectionSlug;
+  let staticDir = collectionSlug;
+  if (
+    typeof collectionConfig?.upload === 'object' &&
+    collectionConfig.upload.staticDir
+  ) {
+    staticDir = collectionConfig.upload.staticDir;
+  }
 
   const resolvedDir = path.isAbsolute(staticDir)
     ? staticDir
