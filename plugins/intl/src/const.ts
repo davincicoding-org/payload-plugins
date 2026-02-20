@@ -16,6 +16,6 @@ export const PLUGIN_CONTEXT = createPluginContext(
   'payload-intl',
   z.object({
     globalSlug: z.string(),
-    // scopes: z.map(z.string(), normalizedScopeSchema),
+    uploadCollection: z.optional(z.string()),
   }),
 );
