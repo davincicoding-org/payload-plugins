@@ -72,13 +72,16 @@ export async function readDataFromFile({
 }: ReadOptions): Promise<Messages> {
   if (!fileId) return {};
 
-  const uploadDoc = (await payload.findByID({
+  const uploadDoc = await payload.findByID({
     collection: collection as CollectionSlug,
     id: fileId,
     depth: 0,
-  })) as { filename: string };
+  });
 
-  const filePath = resolveUploadPath(payload, collection, uploadDoc.filename);
+  const filename = (uploadDoc as unknown as Record<string, unknown>).filename;
+  if (typeof filename !== 'string') return {};
+
+  const filePath = resolveUploadPath(payload, collection, filename);
 
   try {
     const content = await readFile(filePath, 'utf-8');

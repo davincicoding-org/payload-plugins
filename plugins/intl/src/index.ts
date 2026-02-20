@@ -83,7 +83,6 @@ export const intlPlugin =
 
     PLUGIN_CONTEXT.set(config, {
       globalSlug,
-      uploadCollection,
     });
 
     const scopes = normalizeScopes(scopesConfig);
@@ -113,13 +112,19 @@ export const intlPlugin =
         update: ({ req }) => editorAccess(req),
       },
       hooks: {
+        ...hooks,
         ...(uploadCollection
           ? {
-              afterRead: [createPopulateDataFromFileHook({ uploadCollection })],
-              beforeChange: [createPersistDataToFileHook({ uploadCollection })],
+              afterRead: [
+                createPopulateDataFromFileHook({ uploadCollection }),
+                ...(hooks.afterRead ?? []),
+              ],
+              beforeChange: [
+                createPersistDataToFileHook({ uploadCollection }),
+                ...(hooks.beforeChange ?? []),
+              ],
             }
           : {}),
-        ...hooks,
       },
       admin: {
         hidden: (req) => !editorAccess(req),
@@ -167,6 +172,7 @@ export const intlPlugin =
                 type: 'upload' as const,
                 localized: true,
                 relationTo: uploadCollection,
+                admin: { hidden: true },
               },
             ]
           : []),

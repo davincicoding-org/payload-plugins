@@ -58,13 +58,7 @@ export default buildConfig({
       access: {
         read: () => true,
       },
-      fields: [
-        {
-          name: 'alt',
-          type: 'text',
-          required: true,
-        },
-      ],
+      fields: [],
       upload: true,
     },
     {

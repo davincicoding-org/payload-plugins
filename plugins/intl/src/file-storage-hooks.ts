@@ -13,6 +13,7 @@ interface FileHookOptions {
 export const createPopulateDataFromFileHook =
   ({ uploadCollection }: FileHookOptions): GlobalAfterReadHook =>
   async ({ doc, req: { payload } }) => {
+    console.log(doc);
     const data = await readDataFromFile({
       payload,
       collection: uploadCollection,
