@@ -79,6 +79,7 @@ export const intlPlugin =
 
     PLUGIN_CONTEXT.set(config, {
       globalSlug,
+      uploadCollection,
     });
 
     const scopes = normalizeScopes(scopesConfig);
