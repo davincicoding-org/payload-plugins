@@ -125,6 +125,7 @@ export default buildConfig({
         {
           name: 'logoText',
           type: 'text',
+          localized: true,
           defaultValue: 'Swiss Influence',
         },
       ],
@@ -190,11 +191,10 @@ export default buildConfig({
     smartDeletionPlugin(),
     intlPlugin({
       schema: messages,
-      tabs: true,
-      storage: 'upload',
-      scopes: ['navigation'],
+      uploadCollection: 'media',
+      scopes: { navigation: 'tab' },
     }),
-    smartCachePlugin({ collections: ['media', 'messages'] }),
+    smartCachePlugin({ collections: ['media'] }),
     localFileStoragePlugin(),
   ],
 });

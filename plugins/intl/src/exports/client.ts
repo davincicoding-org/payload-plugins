@@ -1,2 +1,6 @@
-export type { ScopedMessagesFieldProps } from '../components/ScopedMessagesField';
-export { ScopedMessagesField } from '../components/ScopedMessagesField';
+export { DefaultEditView as MessagesRootView } from '@payloadcms/ui';
+export {
+  MessagesField,
+  type MessagesFieldProps,
+} from '../components/MessagesField';
+export { MessagesImport } from '../components/MessagesImport';

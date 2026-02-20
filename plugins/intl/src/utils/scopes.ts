@@ -1,11 +1,9 @@
-import type { NormalizedScope, Scopes } from '../types';
-
-export type { NormalizedScope };
+import type { MessagesScopesConfig, ScopeConfig } from '../types';
 
 export function normalizeScopes(
-  scopes: Scopes | undefined,
-): Map<string, NormalizedScope> {
-  const result = new Map<string, NormalizedScope>();
+  scopes: MessagesScopesConfig | undefined,
+): Map<string, ScopeConfig> {
+  const result = new Map<string, ScopeConfig>();
   if (!scopes) return result;
 
   if (Array.isArray(scopes)) {

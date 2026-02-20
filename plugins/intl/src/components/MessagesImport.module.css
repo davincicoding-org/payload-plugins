@@ -1,0 +1,8 @@
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.action {
+  margin-block: 0;
+}

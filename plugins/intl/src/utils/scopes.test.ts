@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { NormalizedScope } from './scopes';
+import type { ScopeConfig } from '@/types';
 import { normalizeScopes } from './scopes';
 
 describe('normalizeScopes', () => {
@@ -10,7 +10,7 @@ describe('normalizeScopes', () => {
   it('should normalize string array to tab defaults', () => {
     const result = normalizeScopes(['header', 'footer']);
     expect(result).toEqual(
-      new Map<string, NormalizedScope>([
+      new Map<string, ScopeConfig>([
         ['header', { position: 'tab' }],
         ['footer', { position: 'tab' }],
       ]),
@@ -20,7 +20,7 @@ describe('normalizeScopes', () => {
   it('should normalize string shorthand in record', () => {
     const result = normalizeScopes({ header: 'sidebar', footer: 'tab' });
     expect(result).toEqual(
-      new Map<string, NormalizedScope>([
+      new Map<string, ScopeConfig>([
         ['header', { position: 'sidebar' }],
         ['footer', { position: 'tab' }],
       ]),
@@ -32,7 +32,7 @@ describe('normalizeScopes', () => {
       header: { position: 'tab', existingFieldsTabLabel: 'Header Fields' },
     });
     expect(result).toEqual(
-      new Map<string, NormalizedScope>([
+      new Map<string, ScopeConfig>([
         [
           'header',
           { position: 'tab', existingFieldsTabLabel: 'Header Fields' },

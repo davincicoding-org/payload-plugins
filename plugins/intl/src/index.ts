@@ -1,33 +1,33 @@
-import type { Plugin } from 'payload';
-import type { MessagesViewProps } from './components/MessagesView';
-import { PLUGIN_CONTEXT } from './const';
-import { setMessagesEndpoint } from './endpoints/set-messages';
-import { Messages } from './entities';
-import { injectScopeIntoGlobal } from './globals';
+import type {
+  CollectionSlug,
+  Field,
+  GlobalAdminOptions,
+  GlobalConfig,
+  Plugin,
+} from 'payload';
+import { PLUGIN_CONTEXT, VIRTUAL_MESSAGES_FIELD_NAME } from './const';
+import type { MessagesFieldProps } from './exports/client';
+import {
+  createExtractScopedMessagesHook,
+  createPopulateScopedMessagesHook,
+} from './hooks';
 import type {
   EditorAccessGuard,
   MessagesHooks,
   MessagesSchema,
   MessagesScopesConfig,
+  Messages as MessagesType,
+  TypedMessagesScopesConfig,
 } from './types.ts';
-import { getSupportedLocales } from './utils/config';
 import { normalizeScopes } from './utils/scopes';
 
-export { fetchMessages } from './requests/fetchMessages';
-
-export interface MessagesPluginConfig {
+export interface MessagesPluginConfig<Schema extends MessagesSchema> {
   /** Nested object defining message keys and ICU templates. */
-  schema: MessagesSchema;
-  /**
-   * Where translated messages are persisted.
-   *
-   * - `'db'` — stores translations as JSON in a `data` field (default).
-   * - `'upload'` — stores translations as uploaded `.json` files, enabling
-   *   static hosting via a CDN or object storage.
-   *
-   * @default 'db'
-   */
-  storage?: 'db' | 'upload';
+  schema: Schema;
+  globalSlug?: string;
+  globalGroup?: GlobalAdminOptions['group'];
+  globalLabel?: string;
+  uploadCollection?: CollectionSlug;
   /**
    * Colocate translation editing with Payload globals. Each entry maps a
    * top-level schema key to a global with the same slug, adding a Messages
@@ -36,31 +36,18 @@ export interface MessagesPluginConfig {
    * Accepts an array of slugs (defaults to `'tab'` position) or a record
    * mapping slugs to `'tab' | 'sidebar' | { position, existingFieldsTabLabel? }`.
    */
-  scopes?: MessagesScopesConfig;
-  /**
-   * When enabled, top-level schema keys are rendered as tabs in the
-   * admin UI instead of a flat list.
-   *
-   * @default false
-   */
-  tabs?: boolean;
-  /**
-   * The slug of the collection used to store translation documents.
-   *
-   * @default 'messages'
-   */
-  collectionSlug?: string;
+  scopes?: TypedMessagesScopesConfig<Schema>;
   /**
    * Access control for allowing to edit the messages.
    *
-   * @default `(req) => req.user !== null`
+   * @default `({ user }) => user !== null`
    */
   editorAccess?: EditorAccessGuard;
   /**
    * Collection hooks for the messages collection. Extends Payload's
    * collection hooks with an additional `afterUpdate` callback.
    */
-  hooks?: MessagesHooks;
+  hooks?: GlobalConfig['hooks'];
 }
 
 export type {
@@ -70,16 +57,19 @@ export type {
   EditorAccessGuard,
 };
 
+export { fetchMessages } from './exports/fetchMessages';
+
 export const intlPlugin =
-  ({
+  <Schema extends MessagesSchema>({
     schema,
-    tabs,
-    scopes: rawScopes,
-    collectionSlug = 'messages',
+    globalSlug = 'messages',
+    globalGroup,
+    globalLabel,
+    scopes: scopesConfig,
+    uploadCollection,
     hooks = {},
-    editorAccess = (req) => req.user !== null,
-    storage = 'db',
-  }: MessagesPluginConfig): Plugin =>
+    editorAccess = ({ user }) => user !== null,
+  }: MessagesPluginConfig<Schema>): Plugin =>
   (config) => {
     if (!config.localization) {
       console.warn(
@@ -87,62 +77,168 @@ export const intlPlugin =
       );
     }
 
-    const locales = getSupportedLocales(config.localization);
-    const scopes = normalizeScopes(rawScopes);
-
-    const scopeKeys = new Set(scopes.keys());
-    const viewSchema = Object.fromEntries(
-      Object.entries(schema).filter(([key]) => !scopeKeys.has(key)),
-    );
-
-    /* Add admin components */
-
-    config.admin ??= {};
-    config.admin.components ??= {};
-    config.admin.components.actions ??= [];
-    config.admin.components.actions.push({
-      exportName: 'MessagesLink',
-      path: 'payload-intl/rsc#MessagesLink',
+    PLUGIN_CONTEXT.set(config, {
+      globalSlug,
     });
 
-    config.admin.components.views = {
-      ...config.admin.components.views,
-      intl: {
-        Component: {
-          path: 'payload-intl/rsc#MessagesView',
-          serverProps: {
-            access: editorAccess,
-            fullSchema: schema,
-            locales,
-            schema: viewSchema,
-            scopes,
-            tabs,
-          } satisfies MessagesViewProps,
+    const scopes = normalizeScopes(scopesConfig);
+
+    config.typescript ??= {};
+    config.typescript.schema ??= [];
+    config.typescript.schema.push(({ jsonSchema }) => ({
+      ...jsonSchema,
+      definitions: {
+        ...jsonSchema.definitions,
+        MessagesData: {
+          type: 'object',
+          additionalProperties: {
+            anyOf: [{ $ref: '#/definitions/MessagesData' }, { type: 'string' }],
+          },
         },
-        path: '/intl',
       },
-    };
+    }));
+
+    config.globals ??= [];
+
+    config.globals.push({
+      slug: globalSlug,
+      label: globalLabel,
+      access: {
+        read: () => true,
+        update: ({ req }) => editorAccess(req),
+      },
+      admin: {
+        hidden: (req) => !editorAccess(req),
+        group: globalGroup,
+        components: {
+          elements: {
+            beforeDocumentControls: [
+              {
+                path: 'payload-intl/client#MessagesImport',
+              },
+            ],
+          },
+        },
+      },
+      fields: [
+        {
+          name: 'data',
+          type: 'json',
+          label: false,
+          required: true,
+          localized: true,
+          virtual: uploadCollection !== undefined,
+          defaultValue: {},
+          typescriptSchema: [
+            () => ({
+              $ref: '#/definitions/MessagesData',
+            }),
+          ],
+          admin: {
+            components: {
+              Field: {
+                path: 'payload-intl/client#MessagesField',
+                clientProps: {
+                  schema: schema,
+                } satisfies MessagesFieldProps,
+              },
+            },
+          },
+        },
+
+        ...(uploadCollection
+          ? [
+              {
+                name: 'file',
+                type: 'upload' as const,
+                localized: true,
+                relationTo: uploadCollection,
+              },
+            ]
+          : []),
+      ],
+    });
+
+    if (scopes.size === 0) return config;
 
     /* Configure Scopes */
 
-    if (scopes.size > 0) {
-      config.globals = (config.globals ?? []).map((global) => {
-        const scopeConfig = scopes.get(global.slug);
-        if (!scopeConfig) return global;
-        return injectScopeIntoGlobal(global, global.slug, scopeConfig, schema);
-      });
+    for (const global of config.globals) {
+      const scopeConfig = scopes.get(global.slug);
+      if (!scopeConfig) continue;
+
+      /* Inject Messages Field */
+
+      const messagesField: Field = {
+        name: VIRTUAL_MESSAGES_FIELD_NAME,
+        label: false,
+        type: 'json',
+        virtual: true,
+        access: {
+          read: ({ req }) => editorAccess(req),
+          update: ({ req }) => editorAccess(req),
+          create: ({ req }) => editorAccess(req),
+        },
+        admin: {
+          components: {
+            Field: {
+              path: 'payload-intl/client#MessagesField',
+              clientProps: {
+                schema: schema[global.slug] as MessagesType,
+              } satisfies MessagesFieldProps,
+            },
+          },
+        },
+        hooks: {
+          afterRead: [
+            createPopulateScopedMessagesHook({
+              globalSlug: globalSlug as 'messages',
+              scope: global.slug,
+            }),
+          ],
+          beforeChange: [
+            createExtractScopedMessagesHook({
+              globalSlug: globalSlug as 'messages',
+              scope: global.slug,
+            }),
+          ],
+        },
+      };
+
+      global.fields ??= [];
+
+      if (scopeConfig.position === 'sidebar') {
+        global.fields.push({
+          type: 'group',
+          label: 'Messages',
+          admin: {
+            position: 'sidebar',
+          },
+          fields: [messagesField],
+        });
+      } else if (global.fields[0]?.type === 'tabs') {
+        global.fields[0].tabs.push({
+          label: 'Messages',
+          fields: [messagesField],
+        });
+      } else {
+        global.fields = [
+          {
+            type: 'tabs',
+            tabs: [
+              {
+                label: scopeConfig.existingFieldsTabLabel ?? 'Fields',
+                fields: global.fields,
+              },
+              {
+                label: 'Messages',
+                fields: [messagesField],
+              },
+            ],
+          },
+        ];
+      }
     }
-
-    PLUGIN_CONTEXT.set(config, {
-      collectionSlug,
-      storage,
-      scopes,
-    });
-    config.collections ??= [];
-    config.collections.push(Messages({ slug: collectionSlug, hooks, storage }));
-
-    config.endpoints ??= [];
-    config.endpoints.push(setMessagesEndpoint);
 
     return config;
   };

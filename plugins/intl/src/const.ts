@@ -4,6 +4,9 @@ import {
 } from '@davincicoding/payload-plugin-kit';
 import { z } from 'zod/v4-mini';
 
+export const VIRTUAL_MESSAGES_FIELD_NAME = '_inlt_scoped_messages';
+
+// TODO move to types
 const normalizedScopeSchema = z.object({
   position: z.enum(['tab', 'sidebar']),
   existingFieldsTabLabel: z.optional(z.string()),
@@ -12,15 +15,7 @@ const normalizedScopeSchema = z.object({
 export const PLUGIN_CONTEXT = createPluginContext(
   'payload-intl',
   z.object({
-    collectionSlug: z.string(),
-    storage: z.enum(['db', 'upload']),
-    scopes: z.map(z.string(), normalizedScopeSchema),
+    globalSlug: z.string(),
+    // scopes: z.map(z.string(), normalizedScopeSchema),
   }),
 );
-
-export const ENDPOINTS = {
-  setMessages: defineProcedure({
-    path: '/intl-plugin',
-    method: 'put',
-  }).returns<{ success: boolean }>(),
-};
