@@ -8,6 +8,10 @@ import type {
 import { PLUGIN_CONTEXT, VIRTUAL_MESSAGES_FIELD_NAME } from './const';
 import type { MessagesFieldProps } from './exports/client';
 import {
+  createPersistDataToFileHook,
+  createPopulateDataFromFileHook,
+} from './file-storage-hooks';
+import {
   createExtractScopedMessagesHook,
   createPopulateScopedMessagesHook,
 } from './hooks';
@@ -107,6 +111,15 @@ export const intlPlugin =
       access: {
         read: () => true,
         update: ({ req }) => editorAccess(req),
+      },
+      hooks: {
+        ...(uploadCollection
+          ? {
+              afterRead: [createPopulateDataFromFileHook({ uploadCollection })],
+              beforeChange: [createPersistDataToFileHook({ uploadCollection })],
+            }
+          : {}),
+        ...hooks,
       },
       admin: {
         hidden: (req) => !editorAccess(req),
