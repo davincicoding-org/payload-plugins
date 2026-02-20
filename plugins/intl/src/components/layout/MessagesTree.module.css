@@ -1,4 +1,4 @@
-.grid {
+.root {
   display: grid;
   gap: 1rem;
 }
@@ -21,9 +21,13 @@
 .collapsible > :global(.collapsible__toggle-wrap) {
   position: sticky;
   border-bottom: 1px solid var(--theme-border-color);
-  top: calc(var(--nesting-level) * 36px - 26px);
-  z-index: calc(9 - var(--nesting-level));
+  top: calc(var(--nesting-level) * 36px + 55px);
+  z-index: calc(4 - var(--nesting-level));
   padding-block: 0.5rem;
+}
+
+.collapsible > :global(.collapsible__toggle) {
+  position: relative;
 }
 
 .collapsible :global(.collapsible__content) {

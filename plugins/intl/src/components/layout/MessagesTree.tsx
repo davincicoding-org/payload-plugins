@@ -1,49 +1,46 @@
 import { Collapsible } from '@payloadcms/ui';
-import clsx from 'clsx';
 import { memo } from 'react';
-import { useMessagesForm } from '@/components/MessagesFormProvider';
-import type { Messages } from '@/types';
-import { toWords } from '@/utils/format';
-
-import { GroupStatusDot } from './GroupStatusDot';
+import type { Control } from 'react-hook-form';
+import { toWords } from '@/components/input/utils';
+import type { Messages, MessagesSchema } from '@/types';
 import { MessageField } from './MessageField';
 import styles from './MessagesTree.module.css';
 
 interface MessagesTreeProps {
   path: string;
-  nestingLevel: number;
-  schema: Messages;
-  className?: string;
-  hidden?: boolean;
+  nestingLevel?: number;
+  schema: MessagesSchema;
+  control: Control<Messages>;
+  defaultValues?: Messages | undefined;
+  hiddenGroups?: string[];
 }
-
-// TODO fix sticky position on single locale form
 
 export const MessagesTree = memo(function MessagesTree({
   path,
   schema,
   nestingLevel = 0,
-  className,
-  hidden,
+  control,
+  defaultValues,
+  hiddenGroups = [],
 }: MessagesTreeProps): React.ReactNode {
-  const { activeLocale, defaultLocale } = useMessagesForm();
-  const showStatus = activeLocale !== defaultLocale;
-
   return (
-    <div
-      className={clsx(styles.grid, className)}
-      style={{ display: hidden ? 'none' : undefined }}
-    >
+    <div className={styles.root}>
       {Object.entries(schema).map(([key, value]) => {
+        if (hiddenGroups.includes(key)) return null;
         const fullPath = path ? [path, key].join('.') : key;
 
         return typeof value === 'string' ? (
           <MessageField
+            control={control}
             key={key}
             messageKey={key}
             path={path}
+            reference={
+              typeof defaultValues?.[key] === 'string'
+                ? defaultValues[key]
+                : undefined
+            }
             schema={value}
-            showStatus={showStatus}
           />
         ) : (
           <div
@@ -57,14 +54,15 @@ export const MessagesTree = memo(function MessagesTree({
           >
             <Collapsible
               className={styles.collapsible}
-              header={
-                <span className={styles.header}>
-                  {toWords(key)}
-                  {showStatus && <GroupStatusDot path={fullPath} />}
-                </span>
-              }
+              header={<span className={styles.header}>{toWords(key)}</span>}
             >
               <MessagesTree
+                control={control}
+                defaultValues={
+                  typeof defaultValues?.[key] === 'object'
+                    ? defaultValues[key]
+                    : undefined
+                }
                 nestingLevel={nestingLevel + 1}
                 path={fullPath}
                 schema={value}

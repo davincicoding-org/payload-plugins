@@ -1,0 +1,39 @@
+.editor {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 2rem;
+  font-size: var(--font-size-large);
+
+  &[data-multiline="true"] {
+    min-height: 4rem;
+  }
+}
+
+.menuAnchor {
+  z-index: 50;
+}
+
+.contentEditable {
+  outline: none;
+  border-radius: var(--style-radius-m);
+  background-color: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-300);
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  height: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-elevation-600);
+  }
+
+  &[data-error="true"] {
+    border-color: var(--theme-error-400);
+    background-color: var(--theme-error-100);
+  }
+
+  p {
+    margin: 0;
+  }
+}

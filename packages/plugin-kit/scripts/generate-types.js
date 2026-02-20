@@ -144,7 +144,10 @@ export default buildConfig({
   admin: {
     user: 'users',
   },
-  collections: [{ slug: 'users', auth: true, fields: [] }],
+  collections: [
+    { slug: 'users', auth: true, fields: [] },
+    { slug: 'uploads', upload: true, fields: [] },
+  ],
   plugins: [${plugin.call}],
 });
 `,

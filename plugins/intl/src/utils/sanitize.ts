@@ -12,11 +12,15 @@ import type { DeepPartial, Messages } from '@/types';
  * - Leaf missing/non-string + !useSchemaDefaults -> omitted
  * - Empty nested groups -> omitted (unless filled by defaults)
  */
-export function sanitizeMessages(
-  config: Messages,
-  data: unknown,
-  { useSchemaDefaults = false }: { useSchemaDefaults?: boolean } = {},
-): DeepPartial<Messages> {
+export function sanitizeMessages({
+  config,
+  data,
+  useSchemaDefaults = false,
+}: {
+  config: Messages;
+  data: unknown;
+  useSchemaDefaults?: boolean;
+}): Messages {
   const out: Record<string, unknown> = {};
   const src = isObj(data) ? data : {};
 
@@ -25,7 +29,9 @@ export function sanitizeMessages(
     const srcVal = src[key];
 
     if (isObj(shapeVal)) {
-      const child = sanitizeMessages(shapeVal as Messages, srcVal, {
+      const child = sanitizeMessages({
+        config: shapeVal as Messages,
+        data: srcVal,
         useSchemaDefaults,
       });
       if (isObj(child) && Object.keys(child).length > 0) {
@@ -42,7 +48,7 @@ export function sanitizeMessages(
     }
   }
 
-  return out as DeepPartial<Messages>;
+  return out as Messages;
 }
 
 function isObj(x: unknown): x is Record<string, unknown> {

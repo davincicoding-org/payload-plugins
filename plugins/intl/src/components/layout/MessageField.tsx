@@ -1,34 +1,28 @@
-import clsx from 'clsx';
 import { get } from 'lodash-es';
 import { memo, useMemo } from 'react';
-import { useFormState, useWatch } from 'react-hook-form';
-import { useMessagesForm } from '@/components/MessagesFormProvider';
-import type { MessageSchema } from '@/types';
-import { toWords } from '@/utils/format';
-import { parseMessageSchema } from '@/utils/schema';
-import { createValidator } from '@/utils/validate';
-
-import { MessageFormField } from '../MessageFormField';
-import { GroupStatusDot } from './GroupStatusDot';
+import { type Control, Controller, useFormState } from 'react-hook-form';
+import { toWords } from '@/components/input/utils';
+import { createValidator, parseMessageSchema } from '@/icu';
+import type { Messages } from '@/types';
+import { MessageInput } from '../input/MessageInput';
+import { ReferencePopover } from '../input/ReferencePopover';
 import styles from './MessageField.module.css';
 
 interface MessageFieldProps {
-  schema: MessageSchema;
+  schema: string;
   messageKey: string;
   path: string;
-  hidden?: boolean;
-  showStatus?: boolean;
+  control: Control<Messages>;
+  reference: string | undefined;
 }
 
 export const MessageField = memo(function MessageField({
   schema,
   messageKey,
   path,
-  hidden,
-  showStatus,
+  control,
+  reference,
 }: MessageFieldProps): React.ReactNode {
-  const { defaultLocale, activeLocale, control } = useMessagesForm();
-
   const config = useMemo(() => parseMessageSchema(schema), [schema]);
 
   const validator = useMemo(
@@ -37,43 +31,45 @@ export const MessageField = memo(function MessageField({
   );
 
   const multiline = schema.includes('\n');
-  const isDefaultLocale = activeLocale === defaultLocale;
   const fieldPath = [path, messageKey].filter(Boolean).join('.');
-  const fullName = `${activeLocale}.${fieldPath}`;
-
-  const defaultValue = useWatch({ name: `${defaultLocale}.${fieldPath}` }) as
-    | string
-    | undefined;
 
   const { errors } = useFormState({ control });
-  const hasError = get(errors, fullName) !== undefined;
+  const hasError = get(errors, fieldPath) !== undefined;
 
-  const content = (
-    <div style={{ display: hidden ? 'none' : undefined }}>
-      {config.description && <p>{config.description}</p>}
+  return (
+    <div className={styles.root} data-error={hasError}>
+      <span className={styles.label}>{toWords(messageKey)}</span>
 
-      <MessageFormField
-        locale={activeLocale}
-        multiline={multiline}
-        name={fullName}
-        reference={!isDefaultLocale ? defaultValue : undefined}
-        validate={validator}
-        variables={config.variables}
+      <Controller
+        control={control}
+        name={fieldPath}
+        render={({ field, fieldState }) => (
+          <>
+            <ReferencePopover reference={reference}>
+              <fieldset
+                className={styles.fieldset}
+                data-error={fieldState.error !== undefined}
+              >
+                <MessageInput
+                  error={fieldState.error !== undefined}
+                  multiline={multiline}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  value={(field.value as unknown as string) || ''}
+                  variables={config.variables}
+                />
+              </fieldset>
+            </ReferencePopover>
+            {fieldState.error?.message && (
+              <p className={styles.errorMessage}>{fieldState.error.message}</p>
+            )}
+          </>
+        )}
+        rules={{
+          required: true,
+          validate: validator,
+        }}
       />
     </div>
   );
-
-  if (showStatus !== undefined) {
-    return (
-      <div className={clsx(styles.row, hasError && styles.rowError)}>
-        <span className={styles.label}>
-          {toWords(messageKey)}
-          {showStatus && <GroupStatusDot path={fieldPath} />}
-        </span>
-        <div className={styles.input}>{content}</div>
-      </div>
-    );
-  }
-
-  return content;
 });

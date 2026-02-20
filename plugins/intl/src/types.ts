@@ -3,37 +3,48 @@ import type {
   MessageFormatElement,
   PoundElement,
 } from '@formatjs/icu-messageformat-parser';
-import type { CollectionConfig, PayloadRequest } from 'payload';
+import type { CollectionConfig, GlobalSlug, PayloadRequest } from 'payload';
 import type { DeepPartial } from 'react-hook-form';
 import type { MessagesPluginConfig } from '.';
+import type { User } from './payload-types';
 
 export type ResolvedPluginOptions<
-  K extends keyof MessagesPluginConfig = keyof MessagesPluginConfig,
-> = Pick<Required<MessagesPluginConfig>, K>;
+  K extends
+    keyof MessagesPluginConfig<MessagesSchema> = keyof MessagesPluginConfig<MessagesSchema>,
+> = Pick<Required<MessagesPluginConfig<MessagesSchema>>, K>;
 
 export type MessagesHooks = {
   afterUpdate?: () => Promise<void> | void;
 } & CollectionConfig['hooks'];
 
-export type StorageStrategy = 'db' | 'upload';
+/* MARK: Scope */
 
-export type ScopePosition = 'tab' | 'sidebar';
-
-export type ScopeConfig =
-  | ScopePosition
-  | {
-      position: ScopePosition;
-      existingFieldsTabLabel?: string;
-    };
-
-export type Scopes = string[] | Record<string, ScopeConfig>;
-
-export interface NormalizedScope {
-  readonly position: ScopePosition;
-  readonly existingFieldsTabLabel?: string;
+export interface TabScopeConfig {
+  position: 'tab';
+  existingFieldsTabLabel?: string;
 }
 
-export type MessagesGuard = (req: PayloadRequest) => boolean | Promise<boolean>;
+export interface SidebarScopeConfig {
+  position: 'sidebar';
+}
+
+export type ScopeConfig = TabScopeConfig | SidebarScopeConfig;
+
+export type ScopePosition = ScopeConfig['position'];
+
+export type ScopeKey<Schema extends MessagesSchema> = {
+  [K in keyof Schema & GlobalSlug]: Schema[K] extends object ? K : never;
+}[keyof Schema & GlobalSlug];
+
+export type MessagesScopesConfig<Scope extends string = string> =
+  | Scope[]
+  | Record<Scope, ScopeConfig | ScopePosition>;
+
+export type TypedMessagesScopesConfig<
+  Schema extends MessagesSchema = MessagesSchema,
+> = MessagesScopesConfig<ScopeKey<Schema>>;
+
+export type EditorAccessGuard = (req: Pick<PayloadRequest, 'user'>) => boolean;
 
 /* MARK: Messages */
 
@@ -41,12 +52,16 @@ export type Locale = string;
 
 export type Translations<T> = Record<Locale, T>;
 
-export type Messages<T = string> = {
-  [key: string]: Messages<T> | T;
+export type Messages = {
+  [key: string]: Messages | string;
 };
 
-export type MessageSchema = string;
-export type MessagesSchema = Messages<MessageSchema>;
+export type MessagesSchema = Messages;
+
+export type MessageConfig = {
+  description: string | undefined;
+  variables: TemplateVariable[];
+};
 
 export interface VariableMentionNodeAttrs {
   name: string;
