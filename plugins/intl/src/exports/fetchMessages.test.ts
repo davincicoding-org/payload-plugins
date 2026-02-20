@@ -12,49 +12,61 @@ vi.mock('@/utils/error-handling', () => ({
 
 import { PLUGIN_CONTEXT } from '@/const';
 
-describe('fetchMessagesFromPayload', () => {
+describe('fetchMessages', () => {
   beforeEach(() => {
     vi.resetModules();
   });
 
-  test('returns data field directly for db strategy', async () => {
+  test('returns data from findGlobal', async () => {
     const mockMessages = { common: { hello: 'Hello' } };
     const mockPayload = {
-      find: vi.fn().mockResolvedValue({
-        docs: [{ locale: 'en', data: mockMessages }],
-      }),
+      findGlobal: vi.fn().mockResolvedValue({ data: mockMessages }),
       config: {},
     };
 
     vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
-      collectionSlug: 'messages',
-      storage: 'db',
-      scopes: new Map(),
+      globalSlug: 'messages',
     });
 
-    const { fetchMessages: fetchMessagesFromPayload } = await import(
-      './fetchMessages'
-    );
-    const result = await fetchMessagesFromPayload(mockPayload as any, 'en');
+    const { fetchMessages } = await import('./fetchMessages');
+    const result = await fetchMessages(mockPayload as any, 'en');
+
     expect(result).toEqual(mockMessages);
+    expect(mockPayload.findGlobal).toHaveBeenCalledWith({
+      slug: 'messages',
+      locale: 'en',
+      select: { data: true },
+    });
   });
 
-  test('returns empty object when no doc found', async () => {
+  test('throws when plugin context is missing', async () => {
+    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue(undefined as any);
+
+    const { fetchMessages } = await import('./fetchMessages');
+
+    await expect(fetchMessages({ config: {} } as any, 'en')).rejects.toThrow(
+      '[payload-intl] Plugin context not found',
+    );
+  });
+
+  test('works transparently with file storage (afterRead populates data)', async () => {
+    // When uploadCollection is set, findGlobal triggers the afterRead hook
+    // which populates doc.data from the file. fetchMessages sees the
+    // populated data without needing any code changes.
+    const mockMessages = { nav: { home: 'Home' } };
     const mockPayload = {
-      find: vi.fn().mockResolvedValue({ docs: [] }),
+      findGlobal: vi.fn().mockResolvedValue({ data: mockMessages }),
       config: {},
     };
 
     vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
-      collectionSlug: 'messages',
-      storage: 'db',
-      scopes: new Map(),
+      globalSlug: 'messages',
+      uploadCollection: 'media',
     });
 
-    const { fetchMessages: fetchMessagesFromPayload } = await import(
-      './fetchMessages'
-    );
-    const result = await fetchMessagesFromPayload(mockPayload as any, 'en');
-    expect(result).toEqual({});
+    const { fetchMessages } = await import('./fetchMessages');
+    const result = await fetchMessages(mockPayload as any, 'en');
+
+    expect(result).toEqual(mockMessages);
   });
 });
