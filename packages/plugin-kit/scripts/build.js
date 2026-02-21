@@ -75,6 +75,7 @@ function resolveBuildTsConfig() {
 
   writeFileSync(
     tmpPath,
+    // biome-ignore lint/style/useTemplate: this is more readable
     JSON.stringify(
       {
         extends: './tsconfig.json',

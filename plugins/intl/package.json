@@ -86,11 +86,11 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@payloadcms/next": ">=3.72.0",
-    "@payloadcms/richtext-lexical": ">=3.72.0",
+    "@payloadcms/next": "catalog:payload-stack",
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": ">=3.72.0",
-    "next": ">=15.2.3",
-    "payload": ">=3.72.0"
+    "next": "catalog:payload-stack",
+    "payload": "catalog:payload-stack"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",

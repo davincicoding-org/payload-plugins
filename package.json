@@ -14,7 +14,7 @@
     "check:types": "turbo check:types",
     "clean": "rm -rf node_modules .turbo plugins/*/dist packages/*/dist plugins/*/dev/.next",
     "clean:install": "pnpm clean && pnpm install",
-    "fix": "biome check --write . && pnpm sort-package-json && syncpack fix-mismatches",
+    "fix": "biome check --write . && pnpm sort-package-json && syncpack fix",
     "prepare": "husky",
     "sort-package-json": "sort-package-json \"package.json\" \"{plugins,packages}/*/package.json\"",
     "test": "turbo test",

@@ -20,10 +20,10 @@ describe('invitations plugin', () => {
     );
     expect(usersConfig).toBeDefined();
 
-    const flatFields = usersConfig!.flattenedFields;
-    const joinedAt = flatFields.find((f) => f.name === 'joinedAt');
+    const flatFields = usersConfig?.flattenedFields;
+    const joinedAt = flatFields?.find((f) => f.name === 'joinedAt');
     expect(joinedAt).toBeDefined();
-    expect(joinedAt!.type).toBe('date');
+    expect(joinedAt?.type).toBe('date');
   });
 
   test('adds virtual _email field to the users collection', () => {
@@ -32,10 +32,10 @@ describe('invitations plugin', () => {
     );
     expect(usersConfig).toBeDefined();
 
-    const flatFields = usersConfig!.flattenedFields;
-    const emailField = flatFields.find((f) => f.name === '_email');
+    const flatFields = usersConfig?.flattenedFields;
+    const emailField = flatFields?.find((f) => f.name === '_email');
     expect(emailField).toBeDefined();
-    expect(emailField!.type).toBe('email');
+    expect(emailField?.type).toBe('email');
   });
 
   test('sets auth.verify on the users collection', () => {
@@ -43,10 +43,9 @@ describe('invitations plugin', () => {
       (c) => c.slug === 'users',
     );
     expect(usersConfig).toBeDefined();
-    expect(usersConfig!.auth).toBeDefined();
+    expect(usersConfig?.auth).toBeDefined();
 
-    const auth = typeof usersConfig!.auth === 'object' ? usersConfig!.auth : {};
-    expect(auth.verify).toBeTruthy();
+    expect(usersConfig?.auth?.verify).toBeTruthy();
   });
 
   test('creating a user with _email auto-generates a password', async () => {

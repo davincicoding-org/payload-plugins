@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import type { FieldHook } from 'payload';
+import type { FieldHook, TypeWithID } from 'payload';
 import type { Messages } from './types';
 
 /**
@@ -13,7 +13,7 @@ export const createPopulateScopedMessagesHook =
   }: {
     globalSlug: 'messages';
     scope: string;
-  }): FieldHook<any, Messages> =>
+  }): FieldHook<TypeWithID, Messages> =>
   async ({ req: { locale, payload } }) => {
     if (!locale) return {};
     const { data: messages = {} } = await payload.findGlobal({
@@ -37,7 +37,7 @@ export const createExtractScopedMessagesHook =
   }: {
     globalSlug: 'messages';
     scope: string;
-  }): FieldHook<any, Messages> =>
+  }): FieldHook<TypeWithID, Messages> =>
   async ({ value, previousValue, req: { payload, locale } }) => {
     if (!value) return {};
     // TODO check if this can be derived from the FieldHook args instead

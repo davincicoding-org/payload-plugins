@@ -15,7 +15,7 @@ afterAll(async () => {
 
 describe('discussions plugin', () => {
   test('comments collection is created', () => {
-    const comments = payload.collections['comments'];
+    const comments = payload.collections.comments;
     expect(comments).toBeDefined();
   });
 

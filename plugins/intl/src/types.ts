@@ -6,7 +6,6 @@ import type {
 import type { CollectionConfig, GlobalSlug, PayloadRequest } from 'payload';
 import type { DeepPartial } from 'react-hook-form';
 import type { MessagesPluginConfig } from '.';
-import type { User } from './payload-types';
 
 export type ResolvedPluginOptions<
   K extends

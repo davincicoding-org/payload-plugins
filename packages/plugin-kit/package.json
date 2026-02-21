@@ -76,7 +76,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "payload": ">=3.72.0"
+    "payload": "catalog:payload-stack"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

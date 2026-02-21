@@ -1,4 +1,4 @@
-import type { DeepPartial, Messages } from '@/types';
+import type { Messages } from '@/types';
 
 /**
  * Sanitize messages data to match the schema.

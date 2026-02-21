@@ -1,13 +1,7 @@
 import { Popover } from '@base-ui/react/popover';
 
 import { IconX } from '@tabler/icons-react';
-import {
-  cloneElement,
-  type ReactElement,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactElement, useRef } from 'react';
 
 import styles from './ReferencePopover.module.css';
 
@@ -36,22 +30,10 @@ function ControlledReferencePopover({
   reference: string;
   children: ReactElement;
 }) {
-  const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLElement>(null);
 
-  const handleFocus = useCallback(() => setOpen(true), []);
-  const handleBlur = useCallback((e: React.FocusEvent) => {
-    // Stay open if focus moves within the fieldset or into the popup
-    if (
-      anchorRef.current?.contains(e.relatedTarget) ||
-      e.relatedTarget?.closest('[data-popup-open]')
-    )
-      return;
-    setOpen(false);
-  }, []);
-
   return (
-    <Popover.Root onOpenChange={setOpen} open={open}>
+    <Popover.Root>
       <Popover.Portal>
         <Popover.Positioner
           align="start"
@@ -72,11 +54,6 @@ function ControlledReferencePopover({
         </Popover.Positioner>
       </Popover.Portal>
       {children}
-      {/*{cloneElement(children, {
-        ref: anchorRef,
-        onFocus: handleFocus,
-        onBlur: handleBlur,
-      })}*/}
     </Popover.Root>
   );
 }

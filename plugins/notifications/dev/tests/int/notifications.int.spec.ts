@@ -24,12 +24,12 @@ afterAll(async () => {
 
 describe('notifications plugin', () => {
   test('notifications collection is registered', () => {
-    const notifications = payload.collections['notifications'];
+    const notifications = payload.collections.notifications;
     expect(notifications).toBeDefined();
   });
 
   test('subscriptions collection is registered', () => {
-    const subscriptions = payload.collections['subscriptions'];
+    const subscriptions = payload.collections.subscriptions;
     expect(subscriptions).toBeDefined();
   });
 

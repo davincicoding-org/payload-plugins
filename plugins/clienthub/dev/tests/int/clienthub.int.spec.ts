@@ -15,15 +15,15 @@ afterAll(async () => {
 
 describe('clienthub plugin', () => {
   test('clients collection exists', () => {
-    expect(payload.collections['clients']).toBeDefined();
+    expect(payload.collections.clients).toBeDefined();
   });
 
   test('services collection exists', () => {
-    expect(payload.collections['services']).toBeDefined();
+    expect(payload.collections.services).toBeDefined();
   });
 
   test('invoices collection exists', () => {
-    expect(payload.collections['invoices']).toBeDefined();
+    expect(payload.collections.invoices).toBeDefined();
   });
 
   test('invoice-pdfs collection exists', () => {

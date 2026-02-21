@@ -15,7 +15,7 @@ afterAll(async () => {
 
 describe('smart-deletion plugin', () => {
   test('hooks are attached to collections with cascade fields', () => {
-    const parents = payload.collections['parents'];
+    const parents = payload.collections.parents;
     expect(parents).toBeDefined();
   });
 
