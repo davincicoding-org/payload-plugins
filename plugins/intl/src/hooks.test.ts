@@ -1,283 +1,211 @@
+import type { FieldHookArgs } from 'payload';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@/const', () => ({
-  PLUGIN_CONTEXT: {
-    get: vi.fn(),
-  },
-}));
-
-vi.mock('@/exports/fetchMessages', () => ({
-  fetchMessages: vi.fn(),
-}));
-
-vi.mock('@/config', () => ({
-  getSupportedLocales: vi.fn(),
-}));
-
-import { getSupportedLocales } from '@/config';
-import { PLUGIN_CONTEXT } from '@/const';
-import { fetchMessages } from '@/exports/fetchMessages';
 import {
   createExtractScopedMessagesHook,
-  populateMessagesField,
+  createPopulateScopedMessagesHook,
 } from './hooks';
+import type { Messages } from './types';
 
-describe('createAfterReadHook', () => {
+const mockFindGlobal = vi.fn();
+const mockUpdateGlobal = vi.fn();
+
+function fieldHookArgs(
+  overrides: Partial<FieldHookArgs<any, Messages, any>>,
+): FieldHookArgs<any, Messages, any> {
+  return {
+    context: {},
+    operation: 'read',
+    originalDoc: {},
+    overrideAccess: false,
+    previousValue: undefined,
+    req: {
+      locale: 'en',
+      payload: {
+        findGlobal: mockFindGlobal,
+        updateGlobal: mockUpdateGlobal,
+      },
+    },
+    value: undefined,
+    ...overrides,
+  } as unknown as FieldHookArgs<any, Messages, any>;
+}
+
+describe('createPopulateScopedMessagesHook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should populate _intlMessages with scoped translations for each locale', async () => {
-    vi.mocked(getSupportedLocales).mockReturnValue(['en', 'de']);
-    vi.mocked(fetchMessages)
-      .mockResolvedValueOnce({
+  it('should return scoped messages from the global for the current locale', async () => {
+    mockFindGlobal.mockResolvedValueOnce({
+      data: {
         header: { title: 'Hello' },
         footer: { copy: '2024' },
-      })
-      .mockResolvedValueOnce({
-        header: { title: 'Hallo' },
-        footer: { copy: '2024' },
-      });
-
-    const hook = populateMessagesField('header');
-    const doc = { slug: 'header', title: 'test' };
-    const req = {
-      payload: {
-        config: {
-          localization: { locales: ['en', 'de'], defaultLocale: 'en' },
-        },
-      },
-    };
-
-    const result = await hook({
-      doc,
-      req: req as any,
-      context: {},
-      global: {} as any,
-      findMany: false,
-      query: {},
-    });
-
-    expect(result).toEqual({
-      slug: 'header',
-      title: 'test',
-      _intlMessages: {
-        en: { title: 'Hello' },
-        de: { title: 'Hallo' },
       },
     });
+
+    const hook = createPopulateScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
+    });
+
+    const result = await hook(
+      fieldHookArgs({
+        req: { locale: 'en', payload: { findGlobal: mockFindGlobal } } as any,
+      }),
+    );
+
+    expect(mockFindGlobal).toHaveBeenCalledWith({
+      slug: 'messages',
+      locale: 'en',
+      select: { data: true },
+    });
+    expect(result).toEqual({ title: 'Hello' });
   });
 
-  it('should return empty objects for locales missing the scope key', async () => {
-    vi.mocked(getSupportedLocales).mockReturnValue(['en']);
-    vi.mocked(fetchMessages).mockResolvedValueOnce({
-      footer: { copy: '2024' },
+  it('should return empty object when no locale is set', async () => {
+    const hook = createPopulateScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
     });
 
-    const hook = populateMessagesField('header');
-    const result = await hook({
-      doc: {},
-      req: { payload: { config: { localization: {} } } } as any,
-      context: {},
-      global: {} as any,
-      findMany: false,
-      query: {},
-    });
+    const result = await hook(
+      fieldHookArgs({
+        req: {
+          locale: undefined,
+          payload: { findGlobal: mockFindGlobal },
+        } as any,
+      }),
+    );
 
-    expect(result._intlMessages).toEqual({ en: {} });
-  });
-
-  it('should return empty _intlMessages when no locales are configured', async () => {
-    vi.mocked(getSupportedLocales).mockReturnValue([]);
-
-    const hook = populateMessagesField('header');
-    const result = await hook({
-      doc: { existing: true },
-      req: { payload: { config: { localization: null } } } as any,
-      context: {},
-      global: {} as any,
-      findMany: false,
-      query: {},
-    });
-
-    expect(result).toEqual({ existing: true, _intlMessages: {} });
-    expect(fetchMessages).not.toHaveBeenCalled();
-  });
-});
-
-describe('createBeforeChangeHook', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should return data unchanged when _intlMessages is undefined', async () => {
-    const hook = createExtractScopedMessagesHook('header');
-    const data = { title: 'test' };
-
-    const result = await hook({
-      data,
-      req: {} as any,
-      context: {},
-      global: {} as any,
-      originalDoc: {},
-    });
-
-    expect(result).toBe(data);
-  });
-
-  it('should return data unchanged when plugin context is missing', async () => {
-    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue(undefined as any);
-
-    const hook = createExtractScopedMessagesHook('header');
-    const data = { title: 'test', _intlMessages: { en: { title: 'Hello' } } };
-
-    const result = await hook({
-      data,
-      req: { payload: { config: {} } } as any,
-      context: {},
-      global: {} as any,
-      originalDoc: {},
-    });
-
-    expect(result).toBe(data);
-  });
-
-  it('should merge scoped messages into existing doc and strip _intlMessages', async () => {
-    const mockUpdate = vi.fn();
-    const mockFind = vi.fn().mockResolvedValue({
-      docs: [{ id: 'doc-1', data: { footer: { copy: '2024' } } }],
-    });
-
-    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
-      collectionSlug: 'messages',
-      storage: 'db',
-      scopes: new Map(),
-    });
-
-    const hook = createExtractScopedMessagesHook('header');
-    const data = {
-      title: 'test',
-      _intlMessages: { en: { title: 'Hello' } },
-    };
-
-    const req = {
-      payload: {
-        config: {},
-        find: mockFind,
-        update: mockUpdate,
-        create: vi.fn(),
-      },
-    };
-
-    const result = await hook({
-      data,
-      req: req as any,
-      context: {},
-      global: {} as any,
-      originalDoc: {},
-    });
-
-    expect(mockFind).toHaveBeenCalledWith({
-      collection: 'messages',
-      where: { locale: { equals: 'en' } },
-      limit: 1,
-      req,
-    });
-
-    expect(mockUpdate).toHaveBeenCalledWith({
-      collection: 'messages',
-      id: 'doc-1',
-      data: { data: { footer: { copy: '2024' }, header: { title: 'Hello' } } },
-      req,
-    });
-
-    expect(result).toEqual({ title: 'test' });
-    expect(result).not.toHaveProperty('_intlMessages');
-  });
-
-  it('should create a new doc when no existing doc is found for a locale', async () => {
-    const mockCreate = vi.fn();
-    const mockFind = vi.fn().mockResolvedValue({ docs: [] });
-
-    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
-      collectionSlug: 'messages',
-      storage: 'db',
-      scopes: new Map(),
-    });
-
-    const hook = createExtractScopedMessagesHook('header');
-    const data = {
-      _intlMessages: { de: { title: 'Hallo' } },
-    };
-
-    const req = {
-      payload: {
-        config: {},
-        find: mockFind,
-        create: mockCreate,
-        update: vi.fn(),
-      },
-    };
-
-    const result = await hook({
-      data,
-      req: req as any,
-      context: {},
-      global: {} as any,
-      originalDoc: {},
-    });
-
-    expect(mockCreate).toHaveBeenCalledWith({
-      collection: 'messages',
-      data: { locale: 'de', data: { header: { title: 'Hallo' } } },
-      req,
-    });
-
+    expect(mockFindGlobal).not.toHaveBeenCalled();
     expect(result).toEqual({});
   });
 
-  it('should handle multiple locales in a single save', async () => {
-    const mockUpdate = vi.fn();
-    const mockCreate = vi.fn();
-    const mockFind = vi
-      .fn()
-      .mockResolvedValueOnce({
-        docs: [{ id: 'en-doc', data: { existing: 'data' } }],
-      })
-      .mockResolvedValueOnce({ docs: [] });
-
-    vi.mocked(PLUGIN_CONTEXT.get).mockReturnValue({
-      collectionSlug: 'messages',
-      storage: 'db',
-      scopes: new Map(),
+  it('should return undefined when the scope key is missing from messages', async () => {
+    mockFindGlobal.mockResolvedValueOnce({
+      data: { footer: { copy: '2024' } },
     });
 
-    const hook = createExtractScopedMessagesHook('nav');
-    const data = {
-      _intlMessages: {
-        en: { home: 'Home' },
-        fr: { home: 'Accueil' },
-      },
-    };
-
-    const req = {
-      payload: {
-        config: {},
-        find: mockFind,
-        update: mockUpdate,
-        create: mockCreate,
-      },
-    };
-
-    await hook({
-      data,
-      req: req as any,
-      context: {},
-      global: {} as any,
-      originalDoc: {},
+    const hook = createPopulateScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
     });
 
-    expect(mockUpdate).toHaveBeenCalledOnce();
-    expect(mockCreate).toHaveBeenCalledOnce();
+    const result = await hook(
+      fieldHookArgs({
+        req: { locale: 'en', payload: { findGlobal: mockFindGlobal } } as any,
+      }),
+    );
+
+    expect(result).toBeUndefined();
+  });
+});
+
+describe('createExtractScopedMessagesHook', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should return empty object when value is falsy', async () => {
+    const hook = createExtractScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
+    });
+
+    const result = await hook(fieldHookArgs({ value: undefined }));
+
+    expect(mockFindGlobal).not.toHaveBeenCalled();
+    expect(result).toEqual({});
+  });
+
+  it('should return value unchanged when it equals previousValue', async () => {
+    const value = { title: 'Hello' };
+
+    const hook = createExtractScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
+    });
+
+    const result = await hook(
+      fieldHookArgs({ value, previousValue: { title: 'Hello' } }),
+    );
+
+    expect(mockFindGlobal).not.toHaveBeenCalled();
+    expect(result).toBe(value);
+  });
+
+  it('should merge scoped messages into the global and return value', async () => {
+    mockFindGlobal.mockResolvedValueOnce({
+      data: { footer: { copy: '2024' } },
+    });
+
+    const hook = createExtractScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'header',
+    });
+
+    const value = { title: 'Hello' };
+    const result = await hook(
+      fieldHookArgs({
+        value,
+        previousValue: { title: 'Old' },
+        req: {
+          locale: 'en',
+          payload: {
+            findGlobal: mockFindGlobal,
+            updateGlobal: mockUpdateGlobal,
+          },
+        } as any,
+      }),
+    );
+
+    expect(mockFindGlobal).toHaveBeenCalledWith({
+      slug: 'messages',
+      locale: 'en',
+      select: { data: true },
+    });
+
+    expect(mockUpdateGlobal).toHaveBeenCalledWith({
+      slug: 'messages',
+      locale: 'en',
+      data: {
+        data: {
+          footer: { copy: '2024' },
+          header: { title: 'Hello' },
+        },
+      },
+    });
+
+    expect(result).toBe(value);
+  });
+
+  it('should write to the global even when no prior messages exist', async () => {
+    mockFindGlobal.mockResolvedValueOnce({ data: {} });
+
+    const hook = createExtractScopedMessagesHook({
+      globalSlug: 'messages',
+      scope: 'nav',
+    });
+
+    const value = { home: 'Home' };
+    await hook(
+      fieldHookArgs({
+        value,
+        previousValue: undefined,
+        req: {
+          locale: 'en',
+          payload: {
+            findGlobal: mockFindGlobal,
+            updateGlobal: mockUpdateGlobal,
+          },
+        } as any,
+      }),
+    );
+
+    expect(mockUpdateGlobal).toHaveBeenCalledWith({
+      slug: 'messages',
+      locale: 'en',
+      data: { data: { nav: { home: 'Home' } } },
+    });
   });
 });
