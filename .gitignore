@@ -7,3 +7,4 @@ dist
 .tsconfig.build.tmp.json
 .payload-gen.config.ts
 .claude/settings.local.json
+.turbo
