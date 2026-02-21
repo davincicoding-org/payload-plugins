@@ -14,7 +14,8 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./base.tsconfig.json": "./tsconfig.base.json"
+    "./base.tsconfig.json": "./tsconfig.base.json",
+    "./vitest.config": "./vitest.config.ts"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,6 +27,7 @@
     "dist",
     "scripts",
     "tsconfig.base.json",
+    "vitest.config.ts",
     ".swcrc"
   ],
   "scripts": {
@@ -50,6 +52,7 @@
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
+    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^3.1.2"
   },
   "peerDependencies": {

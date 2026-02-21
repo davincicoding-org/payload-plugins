@@ -116,6 +116,9 @@ importers:
       typescript:
         specifier: catalog:payload-stack
         version: 5.7.3
+      vite-tsconfig-paths:
+        specifier: ^6.1.1
+        version: 6.1.1(typescript@5.7.3)(vite@7.0.6(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2))
       vitest:
         specifier: ^3.1.2
         version: 3.2.3(@types/debug@4.1.12)(@types/node@22.19.7)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(sass@1.77.4)(tsx@4.20.6)(yaml@2.8.2)
