@@ -1,5 +1,15 @@
 # payload-smart-cache
 
+## 1.1.9
+
+### Patch Changes
+
+- [#22](https://github.com/davincicoding-org/payload-plugins/pull/22) [`def5c00`](https://github.com/davincicoding-org/payload-plugins/commit/def5c0011fa733718249ea4fbfb929d8e221b108) Thanks [@michaelcamper](https://github.com/michaelcamper)! - fix: move @davincicoding/payload-plugin-kit from devDependencies to dependencies
+
+  The plugin-kit package was listed as a devDependency but is imported at runtime.
+  This caused "Module not found" errors for consumers after installing from npm,
+  since devDependencies are not installed for published packages.
+
 ## 1.1.8
 
 ### Patch Changes

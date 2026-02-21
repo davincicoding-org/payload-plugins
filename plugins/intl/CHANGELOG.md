@@ -1,5 +1,17 @@
 # payload-intl
 
+## 1.4.0
+
+### Minor Changes
+
+- [#22](https://github.com/davincicoding-org/payload-plugins/pull/22) [`def5c00`](https://github.com/davincicoding-org/payload-plugins/commit/def5c0011fa733718249ea4fbfb929d8e221b108) Thanks [@michaelcamper](https://github.com/michaelcamper)! - feat: add scoped messages and file-based storage
+
+  - Replace messages collection with a global for simpler data model
+  - Add scope support for organizing translations by feature/section
+  - Add file storage utilities for upload-based persistence
+  - Restructure ICU utilities and component layout
+  - Move plugin-kit to runtime dependencies
+
 ## 1.3.2
 
 ### Patch Changes
