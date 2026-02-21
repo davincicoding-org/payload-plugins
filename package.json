@@ -4,23 +4,23 @@
   "license": "MIT",
   "author": "DAVINCI CODING GmbH",
   "scripts": {
-    "build": "turbo build --filter='!sandbox'",
+    "build": "turbo build",
     "check": "biome check --write .",
     "ci": "pnpm ci:check && pnpm ci:build && pnpm ci:test",
-    "ci:build": "turbo build --filter='!sandbox'",
+    "ci:build": "turbo build",
     "ci:check": "biome ci . && pnpm format:pkg --check && syncpack lint",
     "ci:test": "turbo test --filter='./plugins/**'",
     "clean": "pnpm -r clean && rm -rf node_modules && pnpm install && pnpm build",
     "dev": "pnpm --parallel -r dev",
     "format": "biome format --write . && pnpm format:pkg",
-    "format:pkg": "sort-package-json \"package.json\" \"plugins/*/package.json\" \"packages/*/package.json\" \"sandbox/package.json\"",
+    "format:pkg": "sort-package-json \"package.json\" \"plugins/*/package.json\" \"packages/*/package.json\"",
     "prepare": "husky",
     "release": "changeset",
     "test": "turbo test --filter='./plugins/**'",
     "test:all": "turbo test test:int test:e2e --filter='./plugins/**'",
     "test:e2e": "turbo test:e2e --filter='./plugins/**'",
     "test:int": "turbo test:int --filter='./plugins/**'",
-    "typecheck": "turbo check:types --filter='!sandbox'"
+    "typecheck": "turbo check:types"
   },
   "commitlint": {
     "extends": [
@@ -40,7 +40,6 @@
           "payload-invitations",
           "payload-smart-cache",
           "payload-smart-deletion",
-          "sandbox",
           "root"
         ]
       ]

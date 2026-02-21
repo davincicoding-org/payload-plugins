@@ -69,21 +69,6 @@
       ],
       "dependencyTypes": ["prod"],
       "isBanned": true
-    },
-    {
-      "label": "Sandbox must use catalog:payload-stack for Payload ecosystem",
-      "packages": ["sandbox"],
-      "dependencies": [
-        "@payloadcms/**",
-        "payload",
-        "next",
-        "react",
-        "react-dom",
-        "@types/react",
-        "@types/react-dom",
-        "typescript"
-      ],
-      "pinVersion": "catalog:payload-stack"
     }
   ],
   "semverGroups": [
