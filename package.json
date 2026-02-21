@@ -8,7 +8,7 @@
     "check": "biome check --write .",
     "ci": "pnpm ci:check && pnpm ci:build && pnpm ci:test",
     "ci:build": "pnpm --filter='./packages/**' --filter='./plugins/**' build",
-    "ci:check": "biome ci . && pnpm format:pkg --check",
+    "ci:check": "biome ci . && pnpm format:pkg --check && syncpack lint",
     "ci:test": "pnpm --filter='./plugins/**' test",
     "clean": "pnpm -r clean && rm -rf node_modules && pnpm install && pnpm build",
     "dev": "pnpm --parallel -r dev",
@@ -59,7 +59,8 @@
     "@commitlint/config-conventional": "^20.3.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "sort-package-json": "^3.6.0"
+    "sort-package-json": "^3.6.0",
+    "syncpack": "^14.0.0"
   },
   "packageManager": "pnpm@10.30.0"
 }

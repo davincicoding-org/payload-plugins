@@ -44,7 +44,7 @@
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",
-    "vitest": "^3.1.2",
+    "vitest": "catalog:",
     "zod": "catalog:"
   },
   "peerDependencies": {

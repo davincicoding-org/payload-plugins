@@ -41,7 +41,7 @@
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
-    "vitest": "^3.1.2"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "payload": ">=3.72.0"

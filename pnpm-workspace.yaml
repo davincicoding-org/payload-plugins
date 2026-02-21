@@ -5,11 +5,14 @@ packages:
 
 
 catalog:
+  vite-tsconfig-paths: 6.1.1
+  vitest: 3.2.3
   zod: 4.3.5
 
 catalogs:
   payload-stack:
     '@payloadcms/db-postgres': 3.72.0
+    '@payloadcms/email-resend': 3.72.0
     '@payloadcms/next': 3.72.0
     '@payloadcms/richtext-lexical': 3.72.0
     '@payloadcms/ui': 3.72.0

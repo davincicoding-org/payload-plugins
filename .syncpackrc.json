@@ -1,0 +1,96 @@
+{
+  "$schema": "https://unpkg.com/syncpack@14/dist/schema.json",
+  "sortFirst": [
+    "name",
+    "version",
+    "description",
+    "keywords",
+    "repository",
+    "license",
+    "author",
+    "type",
+    "exports",
+    "main",
+    "types",
+    "bin",
+    "files",
+    "scripts",
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "engines",
+    "publishConfig"
+  ],
+  "versionGroups": [
+    {
+      "label": "Workspace packages use workspace: protocol",
+      "dependencies": [
+        "@davincicoding/payload-plugin-kit",
+        "@davincicoding/payload-utils"
+      ],
+      "dependencyTypes": ["prod", "dev"],
+      "pinVersion": "workspace:*"
+    },
+    {
+      "label": "Payload ecosystem must use catalog:payload-stack in devDependencies",
+      "dependencies": [
+        "@payloadcms/**",
+        "payload",
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ],
+      "dependencyTypes": ["dev"],
+      "pinVersion": "catalog:payload-stack"
+    },
+    {
+      "label": "zod must use default catalog everywhere",
+      "dependencies": ["zod"],
+      "pinVersion": "catalog:"
+    },
+    {
+      "label": "vite must use catalog:vite in devDependencies",
+      "dependencies": ["vite"],
+      "dependencyTypes": ["dev"],
+      "pinVersion": "catalog:vite"
+    },
+    {
+      "label": "Plugins must not ship Payload ecosystem as regular dependencies",
+      "packages": ["plugins/**"],
+      "dependencies": [
+        "payload",
+        "@payloadcms/**",
+        "react",
+        "react-dom",
+        "next"
+      ],
+      "dependencyTypes": ["prod"],
+      "isBanned": true
+    },
+    {
+      "label": "Sandbox must use catalog:payload-stack for Payload ecosystem",
+      "packages": ["sandbox"],
+      "dependencies": [
+        "@payloadcms/**",
+        "payload",
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ],
+      "pinVersion": "catalog:payload-stack"
+    }
+  ],
+  "semverGroups": [
+    {
+      "label": "Peer dependencies use >= ranges",
+      "dependencyTypes": ["peer"],
+      "range": ">="
+    }
+  ]
+}
