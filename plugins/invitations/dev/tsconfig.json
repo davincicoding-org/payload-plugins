@@ -1,0 +1,11 @@
+{
+  "extends": "@davincicoding/payload-plugin-kit/tsconfig.dev.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@payload-config": ["./payload.config.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", ".next"]
+}
