@@ -147,6 +147,9 @@ importers:
 
   plugins/clienthub:
     dependencies:
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -163,9 +166,6 @@ importers:
         specifier: ^1.5.4
         version: 1.5.4
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -208,6 +208,9 @@ importers:
 
   plugins/discussions:
     dependencies:
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -221,9 +224,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -263,6 +263,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.1.0
         version: 1.1.0(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -291,9 +294,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/richtext-lexical':
         specifier: catalog:payload-stack
         version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
@@ -339,6 +339,9 @@ importers:
 
   plugins/invitations:
     dependencies:
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -349,9 +352,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -391,6 +391,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.1.0
         version: 1.1.0(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -404,9 +407,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -449,6 +449,9 @@ importers:
 
   plugins/smart-cache:
     dependencies:
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -465,9 +468,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@babel/core@7.28.6)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -507,13 +507,13 @@ importers:
 
   plugins/smart-deletion:
     dependencies:
+      '@davincicoding/payload-plugin-kit':
+        specifier: workspace:*
+        version: link:../../packages/plugin-kit
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../../packages/utils
     devDependencies:
-      '@davincicoding/payload-plugin-kit':
-        specifier: workspace:*
-        version: link:../../packages/plugin-kit
       '@types/node':
         specifier: ^22.5.4
         version: 22.19.7

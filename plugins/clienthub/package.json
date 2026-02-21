@@ -49,13 +49,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*",
     "@react-pdf/renderer": "^4.3.2",
     "dayjs": "^1.11.19",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/ui": "catalog:payload-stack",
     "@types/node": "^22.5.4",
     "@types/qrcode": "^1.5.6",

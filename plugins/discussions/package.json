@@ -49,12 +49,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*",
     "react-textarea-autosize": "^8.5.9",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/ui": "catalog:payload-stack",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",

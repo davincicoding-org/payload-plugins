@@ -48,11 +48,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/ui": "catalog:payload-stack",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
