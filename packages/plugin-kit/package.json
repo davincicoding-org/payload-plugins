@@ -15,7 +15,20 @@
       "default": "./dist/index.js"
     },
     "./base.tsconfig.json": "./tsconfig.base.json",
-    "./vitest.config": "./vitest.config.ts"
+    "./vitest.config": "./vitest.config.ts",
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "default": "./dist/testing/index.js"
+    },
+    "./testing/helpers": {
+      "types": "./dist/testing/helpers.d.ts",
+      "import": "./dist/testing/helpers.js",
+      "default": "./dist/testing/helpers.js"
+    },
+    "./vitest.integration.config": "./vitest.integration.config.ts",
+    "./playwright.base.config": "./playwright.base.config.ts",
+    "./tsconfig.dev.json": "./tsconfig.dev.json"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,6 +41,9 @@
     "scripts",
     "tsconfig.base.json",
     "vitest.config.ts",
+    "vitest.integration.config.ts",
+    "playwright.base.config.ts",
+    "tsconfig.dev.json",
     ".swcrc"
   ],
   "scripts": {
@@ -42,6 +58,8 @@
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
     "@davincicoding/payload-utils": "workspace:*",
+    "@payloadcms/db-sqlite": "catalog:payload-stack",
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.11.0",
     "commander": "^14.0.2",
@@ -51,6 +69,7 @@
   },
   "devDependencies": {
     "@payloadcms/ui": "catalog:payload-stack",
+    "@playwright/test": "1.56.1",
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",

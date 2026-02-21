@@ -12,6 +12,7 @@ catalog:
 catalogs:
   payload-stack:
     '@payloadcms/db-postgres': 3.72.0
+    '@payloadcms/db-sqlite': 3.72.0
     '@payloadcms/email-resend': 3.72.0
     '@payloadcms/next': 3.72.0
     '@payloadcms/richtext-lexical': 3.72.0
