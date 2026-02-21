@@ -1,1 +1,1 @@
-turbo build test --filter="...[origin/main]"
+pnpm test && pnpm test:int

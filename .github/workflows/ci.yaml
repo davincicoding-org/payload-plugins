@@ -29,15 +29,19 @@ jobs:
 
       - name: Lint & Format
         if: github.head_ref != 'changeset-release/main'
-        run: pnpm ci:check
+        run: pnpm check
 
       - name: Build
         if: github.head_ref != 'changeset-release/main'
-        run: pnpm ci:build
+        run: pnpm build
 
       - name: Test
         if: github.head_ref != 'changeset-release/main'
-        run: pnpm ci:test
+        run: pnpm test
+
+      - name: Integration Test
+        if: github.head_ref != 'changeset-release/main'
+        run: pnpm test:int
 
       - name: Generate App Token
         if: github.event_name == 'push'

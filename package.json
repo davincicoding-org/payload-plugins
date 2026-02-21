@@ -5,22 +5,16 @@
   "author": "DAVINCI CODING GmbH",
   "scripts": {
     "build": "turbo build",
-    "check": "biome check --write .",
-    "ci": "pnpm ci:check && pnpm ci:build && pnpm ci:test",
-    "ci:build": "turbo build",
-    "ci:check": "biome ci . && pnpm format:pkg --check && syncpack lint",
-    "ci:test": "turbo test --filter='./plugins/**'",
-    "clean": "pnpm -r clean && rm -rf node_modules && pnpm install && pnpm build",
-    "dev": "pnpm --parallel -r dev",
-    "format": "biome format --write . && pnpm format:pkg",
-    "format:pkg": "sort-package-json \"package.json\" \"plugins/*/package.json\" \"packages/*/package.json\"",
+    "check": "biome ci . && pnpm sort-package-json --check && syncpack lint",
+    "check:types": "turbo check:types",
+    "clean": "rm -rf node_modules .turbo {plugins,packages}/*/dist plugins/*/dev/.next && pnpm install",
+    "fix": "biome check --write . && pnpm sort-package-json",
     "prepare": "husky",
     "release": "changeset",
-    "test": "turbo test --filter='./plugins/**'",
-    "test:all": "turbo test test:int test:e2e --filter='./plugins/**'",
-    "test:e2e": "turbo test:e2e --filter='./plugins/**'",
-    "test:int": "turbo test:int --filter='./plugins/**'",
-    "typecheck": "turbo check:types"
+    "sort-package-json": "sort-package-json \"package.json\" \"{plugins,packages}/*/package.json\"",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
+    "test:int": "turbo test:int"
   },
   "commitlint": {
     "extends": [

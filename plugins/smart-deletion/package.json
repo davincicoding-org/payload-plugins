@@ -29,7 +29,6 @@
     "prebuild": "pnpm check:types",
     "build": "plugin-build",
     "check:types": "tsc --noEmit",
-    "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "next dev dev",
     "dev:build": "plugin-build --watch",
     "lint": "biome check .",
