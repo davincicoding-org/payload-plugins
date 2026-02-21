@@ -1,10 +1,36 @@
+# Dependencies
 node_modules
-.next
-.env
-.env.*
+
+# Build outputs
 dist
+.next
+.turbo
 *.tsbuildinfo
 .tsconfig.build.tmp.json
-.payload-gen.config.ts
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Logs
+pnpm-debug.log*
+
+# Editors
+.idea
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+.vscode/extensions.json
+.vscode/profiles
+.zed/settings.json
+
+# AI tooling
 .claude/settings.local.json
-.turbo
+.serena
+
+# Project
+docs/plans
