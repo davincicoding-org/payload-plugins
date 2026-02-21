@@ -1,0 +1,26 @@
+{
+  "name": "smart-deletion-dev",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
+    "@payloadcms/db-sqlite": "catalog:payload-stack",
+    "@payloadcms/next": "catalog:payload-stack",
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
+    "cross-env": "^7.0.3",
+    "next": "catalog:payload-stack",
+    "payload": "catalog:payload-stack",
+    "payload-smart-deletion": "workspace:*",
+    "react": "catalog:payload-stack",
+    "react-dom": "catalog:payload-stack",
+    "sharp": "0.34.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/react": "catalog:payload-stack",
+    "@types/react-dom": "catalog:payload-stack",
+    "typescript": "catalog:payload-stack",
+    "vite-tsconfig-paths": "catalog:",
+    "vitest": "catalog:"
+  }
+}
