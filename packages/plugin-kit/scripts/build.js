@@ -34,9 +34,7 @@ process.env.PATH = [localBin, commonBin, process.env.PATH].join(path.delimiter);
 const ASSET_RE = /\.(css|scss|html|json|ttf|woff|woff2|eot|svg|jpg|png)$/;
 const SWC_IGNORE =
   '**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/payload-types.ts';
-const tsconfig = existsSync(path.join(cwd, 'tsconfig.build.json'))
-  ? 'tsconfig.build.json'
-  : 'tsconfig.json';
+// tsconfig is resolved lazily via resolveBuildTsConfig() below
 
 // Note: execSync is used here with hardcoded build tool commands (swc, tsc, tsc-alias)
 // and no user-controlled input, so shell injection is not a concern.
@@ -60,6 +58,48 @@ function stripPayloadAugmentation() {
   if (stripped !== content) writeFileSync(dts, stripped);
 }
 
+/**
+ * Resolve the tsconfig used for declaration builds. If the project provides
+ * its own `tsconfig.build.json` we use it as-is. Otherwise we generate a
+ * temporary config that extends the base `tsconfig.json` while excluding
+ * test files.
+ */
+function resolveBuildTsConfig() {
+  if (existsSync(path.join(cwd, 'tsconfig.build.json'))) {
+    return { tsconfig: 'tsconfig.build.json', cleanup: () => {} };
+  }
+
+  const tmpName = '.tsconfig.build.tmp.json';
+  const tmpPath = path.join(cwd, tmpName);
+  const tmpBuildInfo = path.join(cwd, '.tsconfig.build.tmp.tsbuildinfo');
+
+  writeFileSync(
+    tmpPath,
+    JSON.stringify(
+      {
+        extends: './tsconfig.json',
+        exclude: [
+          'node_modules',
+          'dist',
+          'src/**/*.test.ts',
+          'src/**/*.test.tsx',
+          'src/**/*.spec.ts',
+          'src/**/*.spec.tsx',
+        ],
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+
+  const cleanup = () => {
+    if (existsSync(tmpPath)) rmSync(tmpPath);
+    if (existsSync(tmpBuildInfo)) rmSync(tmpBuildInfo);
+  };
+
+  return { tsconfig: tmpName, cleanup };
+}
+
 function copyAssets() {
   const srcDir = path.join(cwd, 'src');
   if (!existsSync(srcDir)) return;
@@ -73,14 +113,17 @@ function copyAssets() {
 }
 
 if (opts.watch) {
+  const { tsconfig, cleanup: cleanupTsConfig } = resolveBuildTsConfig();
+
   /** @type {import('node:child_process').ChildProcess[]} */
   const children = [];
-  const cleanup = () => {
+  const shutdown = () => {
     for (const c of children) c.kill();
+    cleanupTsConfig();
   };
-  process.on('SIGINT', cleanup);
-  process.on('SIGTERM', cleanup);
-  process.on('exit', cleanup);
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+  process.on('exit', shutdown);
 
   /** @param {string} cmd @param {string[]} args */
   const start = (cmd, args) => {
@@ -131,11 +174,16 @@ if (opts.watch) {
     if (existsSync(p)) rmSync(p);
   }
 
-  copyAssets();
-  exec(
-    `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${SWC_IGNORE}"`,
-  );
-  exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
-  exec(`tsc-alias -p ${tsconfig}`);
-  stripPayloadAugmentation();
+  const { tsconfig, cleanup } = resolveBuildTsConfig();
+  try {
+    copyAssets();
+    exec(
+      `swc src -d dist --config-file "${swcrc}" --strip-leading-paths --ignore "${SWC_IGNORE}"`,
+    );
+    exec(`tsc -p ${tsconfig} --emitDeclarationOnly`);
+    exec(`tsc-alias -p ${tsconfig}`);
+    stripPayloadAugmentation();
+  } finally {
+    cleanup();
+  }
 }

@@ -4,5 +4,6 @@ node_modules
 .env.*
 dist
 *.tsbuildinfo
+.tsconfig.build.tmp.json
 .payload-gen.config.ts
 .claude/settings.local.json
