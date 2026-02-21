@@ -32,5 +32,12 @@ pnpm-debug.log*
 .claude/settings.local.json
 .serena
 
+# Per-plugin dev app artifacts
+**/dev/payload.db
+**/dev/payload.db-journal
+**/dev/payload-types.ts
+**/dev/.next
+**/dev/importMap.js
+
 # Project
 docs/plans

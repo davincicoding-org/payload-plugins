@@ -17,6 +17,9 @@
     "prepare": "husky",
     "release": "changeset",
     "test": "turbo test --filter='./plugins/**'",
+    "test:all": "turbo test test:int test:e2e --filter='./plugins/**'",
+    "test:e2e": "turbo test:e2e --filter='./plugins/**'",
+    "test:int": "turbo test:int --filter='./plugins/**'",
     "typecheck": "turbo check:types --filter='!sandbox'"
   },
   "commitlint": {

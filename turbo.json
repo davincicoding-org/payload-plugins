@@ -20,6 +20,23 @@
       "dependsOn": ["^build"],
       "inputs": ["src/**", "tsconfig.json", "package.json"],
       "outputs": []
+    },
+    "test:int": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "src/**",
+        "dev/payload.config.ts",
+        "dev/seed.ts",
+        "dev/tests/int/**"
+      ],
+      "outputs": [],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "inputs": ["src/**", "dev/**"],
+      "outputs": [],
+      "cache": false
     }
   }
 }
