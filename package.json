@@ -1,16 +1,21 @@
 {
   "name": "payload-plugins",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davincicoding-org/payload-plugins.git"
+  },
   "license": "MIT",
   "author": "DAVINCI CODING GmbH",
   "scripts": {
     "build": "turbo build",
+    "changeset": "changeset",
     "check": "biome ci . && pnpm sort-package-json --check && syncpack lint",
     "check:types": "turbo check:types",
-    "clean": "rm -rf node_modules .turbo {plugins,packages}/*/dist plugins/*/dev/.next && pnpm install",
-    "fix": "biome check --write . && pnpm sort-package-json",
+    "clean": "rm -rf node_modules .turbo plugins/*/dist packages/*/dist plugins/*/dev/.next",
+    "clean:install": "pnpm clean && pnpm install",
+    "fix": "biome check --write . && pnpm sort-package-json && syncpack fix-mismatches",
     "prepare": "husky",
-    "release": "changeset",
     "sort-package-json": "sort-package-json \"package.json\" \"{plugins,packages}/*/package.json\"",
     "test": "turbo test",
     "test:e2e": "turbo test:e2e",
@@ -27,13 +32,13 @@
         [
           "utils",
           "plugin-kit",
-          "payload-clienthub",
-          "payload-discussions",
-          "payload-intl",
-          "payload-notifications",
-          "payload-invitations",
-          "payload-smart-cache",
-          "payload-smart-deletion",
+          "clienthub",
+          "discussions",
+          "intl",
+          "notifications",
+          "invitations",
+          "smart-cache",
+          "smart-deletion",
           "root"
         ]
       ]
@@ -59,5 +64,8 @@
     "syncpack": "^14.0.0",
     "turbo": "^2.8.10"
   },
-  "packageManager": "pnpm@10.30.0"
+  "packageManager": "pnpm@10.30.0",
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0"
+  }
 }
