@@ -44,12 +44,12 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*",
     "@tabler/icons-react": "^3.36.1",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/ui": "catalog:payload-stack",
     "@types/json-schema": "^7.0.15",
     "@types/node": "^22.5.4",

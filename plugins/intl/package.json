@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*",
     "@formatjs/icu-messageformat-parser": "^2.11.2",
     "@tabler/icons-react": "^3.36.1",
@@ -68,7 +69,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": "catalog:payload-stack",
     "@types/lodash-es": "^4.17.12",

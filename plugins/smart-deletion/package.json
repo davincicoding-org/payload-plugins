@@ -37,10 +37,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@davincicoding/payload-utils": "workspace:*"
   },
   "devDependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
     "@types/node": "^22.5.4",
     "payload": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
