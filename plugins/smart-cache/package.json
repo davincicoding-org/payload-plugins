@@ -54,7 +54,6 @@
   },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
-    "@davincicoding/payload-utils": "workspace:*",
     "graph-data-structure": "^4.5.0",
     "lodash-es": "^4.17.21",
     "zod": "catalog:"

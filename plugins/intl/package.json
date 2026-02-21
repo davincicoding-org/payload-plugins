@@ -59,7 +59,6 @@
   "dependencies": {
     "@base-ui/react": "^1.1.0",
     "@davincicoding/payload-plugin-kit": "workspace:*",
-    "@davincicoding/payload-utils": "workspace:*",
     "@formatjs/icu-messageformat-parser": "^2.11.2",
     "@tabler/icons-react": "^3.36.1",
     "clsx": "^2.1.1",

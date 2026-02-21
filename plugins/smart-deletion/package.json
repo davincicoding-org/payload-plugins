@@ -37,8 +37,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@davincicoding/payload-plugin-kit": "workspace:*",
-    "@davincicoding/payload-utils": "workspace:*"
+    "@davincicoding/payload-plugin-kit": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",

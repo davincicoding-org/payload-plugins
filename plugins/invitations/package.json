@@ -49,7 +49,6 @@
   },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
-    "@davincicoding/payload-utils": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
