@@ -1,12 +1,13 @@
-import type { DocumentID } from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug, GlobalSlug, Plugin } from 'payload';
 import {
   invalidateCollectionCache,
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
 } from '@/hooks';
+import type { OnInvalidate } from '@/types';
 import { getTrackedCollections } from '@/utils/tracked-collections';
 
+export type { InvalidationChange, OnInvalidate } from '@/types';
 export {
   createRequestHandler,
   type RequestHandlerCacheOptions,
@@ -37,18 +38,7 @@ export interface SmartCachePluginConfig<
    * Called when cache invalidation is triggered.
    * Only fires for collections/globals explicitly registered in the config.
    */
-  onInvalidate?: (
-    change:
-      | {
-          type: 'collection';
-          slug: C;
-          docID: DocumentID;
-        }
-      | {
-          type: 'global';
-          slug: G;
-        },
-  ) => void | Promise<void>;
+  onInvalidate?: OnInvalidate<C, G>;
 }
 
 export const smartCachePlugin =
