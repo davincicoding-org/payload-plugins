@@ -33,11 +33,11 @@ pnpm-debug.log*
 .serena
 
 # Per-plugin dev app artifacts
-**/dev/payload.db
-**/dev/payload.db-journal
-**/dev/payload-types.ts
+**/dev/**/payload.db
+**/dev/**/payload.db-journal
 **/dev/.next
-**/dev/importMap.js
+**/dev/next-env.d.ts
+**/dev/media
 
 # Project
 docs/plans
