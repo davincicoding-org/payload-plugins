@@ -4,8 +4,9 @@ import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
   GlobalAfterChangeHook,
+  TypeWithID,
 } from 'payload';
-import type { DocumentInvalidationCallback, DocumentWithStatus } from '@/types';
+import type { DocumentInvalidationCallback, DocumentWithStatus } from './types';
 import type { EntitiesGraph } from './utils/dependency-graph';
 
 async function invalidateWithDependents(
@@ -121,10 +122,15 @@ export function invalidateCollectionCache({
   graph: EntitiesGraph;
   invalidationCallback: DocumentInvalidationCallback | undefined;
 }): CollectionAfterChangeHook<DocumentWithStatus> {
-  return async ({ req: { payload }, doc, collection }) => {
-    if (collection.versions?.drafts && doc._status !== 'published') return;
+  return async ({ req, doc, collection, previousDoc }) => {
+    if (req.context.skipRevalidation) return;
 
-    await invalidateWithDependents(payload, {
+    if (collection.versions?.drafts) {
+      if (doc._status === 'draft' && previousDoc._status !== 'published')
+        return;
+    }
+
+    await invalidateWithDependents(req.payload, {
       graph,
       invalidationCallback,
       collection: collection.slug,
@@ -140,8 +146,10 @@ export function invalidateCollectionCacheOnDelete({
   graph: EntitiesGraph;
   invalidationCallback: DocumentInvalidationCallback;
 }): CollectionAfterDeleteHook<DocumentWithStatus> {
-  return async ({ req: { payload }, doc, collection }) => {
-    await invalidateWithDependents(payload, {
+  return async ({ req, doc, collection }) => {
+    if (req.context.skipRevalidation) return;
+
+    await invalidateWithDependents(req.payload, {
       graph,
       invalidationCallback,
       collection: collection.slug,
@@ -153,7 +161,13 @@ export function invalidateCollectionCacheOnDelete({
 export function invalidateGlobalCache(
   invalidationCallback: DocumentInvalidationCallback,
 ): GlobalAfterChangeHook {
-  return async ({ global }) => {
+  return async ({ req, global, doc, previousDoc }) => {
+    if (global.versions?.drafts) {
+      if (doc._status === 'draft' && previousDoc._status !== 'published')
+        return;
+    }
+    if (req.context.skipRevalidation) return;
+
     revalidateTag(global.slug);
     await invalidationCallback?.({ type: 'global', slug: global.slug });
   };

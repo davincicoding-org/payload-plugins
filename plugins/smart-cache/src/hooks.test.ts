@@ -12,8 +12,8 @@ import {
   invalidateCollectionCache,
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
-} from '@/hooks';
-import type { DocumentInvalidationCallback, DocumentWithStatus } from '@/types';
+} from './hooks';
+import type { DocumentInvalidationCallback, DocumentWithStatus } from './types';
 
 vi.mock('next/cache', () => ({
   revalidateTag: vi.fn(),
@@ -59,7 +59,7 @@ function makeCollectionAfterChangeArgs(
   } = overrides;
 
   return {
-    req: { payload: makePayload() },
+    req: { payload: makePayload(), context: {} },
     doc: { id: '1', ...(_status != null ? { _status } : {}) },
     previousDoc: {
       id: '1',
@@ -80,7 +80,7 @@ function makeCollectionAfterDeleteArgs(
 ): AfterDeleteArgs {
   const { slug = 'posts' } = overrides;
   return {
-    req: { payload: makePayload() },
+    req: { payload: makePayload(), context: {} },
     doc: { id: '42' },
     collection: { slug: slug as CollectionSlug },
     context: {},
@@ -96,7 +96,7 @@ function makeGlobalAfterChangeArgs(
     global: { slug: slug as GlobalSlug },
     doc: {},
     previousDoc: {},
-    req: { payload: makePayload() },
+    req: { payload: makePayload(), context: {} },
     context: {},
   } as unknown as GlobalAfterChangeArgs;
 }

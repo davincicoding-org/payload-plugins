@@ -1,6 +1,6 @@
 import { findFields } from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug, Config, Field, GlobalSlug } from 'payload';
-import type { ResolvedPluginOptions } from '@/types';
+import type { ResolvedPluginOptions } from '../types';
 
 export function getTrackedCollections(
   options: ResolvedPluginOptions<'collections' | 'globals'>,
