@@ -4,7 +4,11 @@ import {
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
 } from '@/hooks';
-import type { OnInvalidate } from '@/types';
+import type { GraphResolver, OnInvalidate } from '@/types';
+import {
+  createDependencyGraph,
+  type EntitiesGraph,
+} from '@/utils/dependency-graph';
 import { getTrackedCollections } from '@/utils/tracked-collections';
 
 export type { InvalidationChange, OnInvalidate } from '@/types';
@@ -41,6 +45,17 @@ export interface SmartCachePluginConfig<
   onInvalidate?: OnInvalidate<C, G>;
 }
 
+function createGraphResolver(
+  registeredCollections: Set<CollectionSlug>,
+  registeredGlobals: Set<GlobalSlug>,
+): GraphResolver {
+  let graph: EntitiesGraph | undefined;
+  return (payload) => {
+    graph ??= createDependencyGraph(payload);
+    return { graph, registeredCollections, registeredGlobals };
+  };
+}
+
 export const smartCachePlugin =
   ({
     collections = [],
@@ -56,18 +71,18 @@ export const smartCachePlugin =
       return config;
     }
 
-    const hookConfig = { collections, globals, onInvalidate };
-
-    const afterChange = invalidateCollectionCache(hookConfig);
-    const afterDelete = invalidateCollectionCacheOnDelete(hookConfig);
-    const afterGlobalChange = invalidateGlobalCache(hookConfig);
+    const resolve = createGraphResolver(
+      new Set(collections),
+      new Set(globals),
+    );
+    const hookConfig = { resolve, onInvalidate };
 
     config.globals ??= [];
     for (const global of config.globals) {
       if (!globals.includes(global.slug as GlobalSlug)) continue;
       global.hooks ??= {};
       global.hooks.afterChange ??= [];
-      global.hooks.afterChange.push(afterGlobalChange);
+      global.hooks.afterChange.push(invalidateGlobalCache(hookConfig));
     }
 
     config.collections ??= [];
@@ -81,9 +96,9 @@ export const smartCachePlugin =
       if (!collectionsToTrack.has(collection.slug as CollectionSlug)) continue;
       collection.hooks ??= {};
       collection.hooks.afterChange ??= [];
-      collection.hooks.afterChange.push(afterChange);
+      collection.hooks.afterChange.push(invalidateCollectionCache(hookConfig));
       collection.hooks.afterDelete ??= [];
-      collection.hooks.afterDelete.push(afterDelete);
+      collection.hooks.afterDelete.push(invalidateCollectionCacheOnDelete(hookConfig));
     }
 
     return config;
