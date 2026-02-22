@@ -54,7 +54,7 @@ const getPosts = createRequestHandler(
     const payload = await getPayload({ config });
     return payload.find({ collection: "posts" });
   },
-  ["posts"], // cache tags — revalidated when posts change
+  ["posts"], // collection/global slugs — revalidated when posts are published
 );
 ```
 
