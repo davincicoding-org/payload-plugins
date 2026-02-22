@@ -7,13 +7,13 @@ Intelligent, dependency-aware cache invalidation for Next.js + Payload CMS appli
 
 ## Overview
 
-payload-smart-cache hooks into Payload's save and publish flow to provide automatic, dependency-aware cache invalidation. It builds a dependency graph from your collection relationships and walks it on every change, revalidating all affected Next.js cache tags — including indirectly related documents. There is no queue and no button; invalidation is invisible to editors.
+payload-smart-cache hooks into Payload's save and publish flow to provide automatic, dependency-aware cache invalidation. It builds a dependency graph from your collection relationships and walks it on every change, revalidating all affected Next.js cache tags — including indirectly related collections and globals.
 
 **Features**
 
 - **Dependency graph** — automatically discovers relationships between collections, so changing a referenced document revalidates its dependents.
 - **Tag-based revalidation** — precise, granular cache invalidation via Next.js `revalidateTag()`.
-- **Draft-aware** — for collections with drafts enabled, cache invalidation only fires on publish, not on draft saves.
+- **Versions-aware** — for collections with versions and drafts enabled, cache invalidation only fires on publish, not on draft saves.
 - **Request caching utility** — `createRequestHandler` wraps data-fetching functions with collection/global-level cache tags for automatic revalidation.
 
 ## Installation
@@ -44,7 +44,7 @@ export default buildConfig({
 });
 ```
 
-Wrap your data-fetching functions with `createRequestHandler` so they are cached by collection/global tags and automatically revalidated when documents change:
+Wrap your data-fetching functions with `createRequestHandler` so they are cached by collection/global tags and automatically revalidated when those collections or globals change:
 
 ```ts
 import { createRequestHandler } from "payload-smart-cache";
@@ -58,6 +58,24 @@ const getPosts = createRequestHandler(
 );
 ```
 
+You can pass additional cache options as a third argument:
+
+```ts
+const getPosts = createRequestHandler(
+  async () => {
+    const payload = await getPayload({ config });
+    return payload.find({ collection: "posts" });
+  },
+  ["posts"],
+  { revalidate: 60 }, // also revalidate every 60 seconds
+);
+```
+
+| Cache Option  | Type               | Default | Description                                                          |
+| ------------- | ------------------ | ------- | -------------------------------------------------------------------- |
+| `tags`        | `string[]`         | `[]`    | Additional cache tags beyond the collection/global slugs.            |
+| `revalidate`  | `number \| false`  | `false` | Time-based revalidation in seconds, or `false` for tag-based only.   |
+
 ### Options
 
 | Option                | Type                                                                          | Default | Description                                                                                                          |
@@ -65,7 +83,7 @@ const getPosts = createRequestHandler(
 | `collections`         | `CollectionSlug[]`                                                            | `[]`    | Collections to track changes for. Referenced collections are auto-tracked.                                            |
 | `globals`             | `GlobalSlug[]`                                                                | `[]`    | Globals to track changes for. Referenced collections are auto-tracked.                                                |
 | `disableAutoTracking` | `boolean`                                                                     | `false` | Disable automatic tracking of collections referenced via relationship/upload fields.                                  |
-| `onInvalidate`        | `(change: { collection: EntitySlug; docID: string }) => void \| Promise<void>` | —       | Called per document when cache invalidation is triggered. Only fires for explicitly registered collections/globals. |
+| `onInvalidate`        | `(change) => void \| Promise<void>` | —       | Called when cache invalidation fires for a registered collection (`{ type: 'collection', slug, docID }`) or global (`{ type: 'global', slug }`). |
 
 ## Contributing
 

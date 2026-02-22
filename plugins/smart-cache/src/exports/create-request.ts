@@ -11,7 +11,7 @@ export interface RequestHandlerCacheOptions {
 
 /**
  * Wraps a data-fetching function with Next.js `unstable_cache`, tagging it with
- * collection/global slugs so it is automatically revalidated when those are published.
+ * collection/global slugs so it is automatically revalidated when those collections or globals change.
  *
  * @param handler - The async function to cache.
  * @param slugs - Collection or global slugs used as cache tags (e.g. `['posts', 'media']`).
