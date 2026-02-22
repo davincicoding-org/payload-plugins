@@ -32,17 +32,16 @@ pnpm install
 
 ### Development
 
-The `sandbox/` directory is a Next.js + Payload app that imports all plugins via `workspace:*`. Use it to test changes locally:
+Each plugin has a `dev/` directory with a standalone Next.js + Payload app for isolated testing:
 
 ```sh
-# watch a plugin for changes
 pnpm --filter payload-intl dev
-
-# run the dev app (in a second terminal)
-cd sandbox
-bash start-database.sh
-pnpm dev
 ```
+
+A default admin user is seeded automatically:
+
+- **Email:** `dev@test.com`
+- **Password:** `test1234`
 
 ### Code quality
 

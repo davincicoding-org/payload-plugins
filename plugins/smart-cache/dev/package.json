@@ -2,11 +2,19 @@
   "name": "smart-cache-dev",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "next build --turbo",
+    "predev": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts",
+    "dev": "next dev --turbo",
+    "generate:importmap": "payload generate:importmap",
+    "generate:types": "payload generate:types"
+  },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/db-sqlite": "catalog:payload-stack",
     "@payloadcms/next": "catalog:payload-stack",
     "@payloadcms/richtext-lexical": "catalog:payload-stack",
+    "@payloadcms/ui": "catalog:payload-stack",
     "cross-env": "^7.0.3",
     "next": "catalog:payload-stack",
     "payload": "catalog:payload-stack",
@@ -21,6 +29,7 @@
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",
     "playwright": "1.56.1",
+    "tsx": "^4.20.6",
     "typescript": "catalog:payload-stack",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"

@@ -32,7 +32,7 @@
     "prebuild": "pnpm check:types",
     "build": "plugin-build",
     "check:types": "tsc --noEmit",
-    "dev": "next dev dev",
+    "dev": "cd dev && pnpm dev",
     "dev:build": "plugin-build --watch",
     "generate:types": "generate-types",
     "lint": "biome check .",

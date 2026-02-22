@@ -3,23 +3,23 @@ import {
   invalidateCollectionCache,
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
-} from '@/hooks';
+} from './hooks';
 import type {
   DocumentInvalidation,
   DocumentInvalidationCallback,
   ResolvedPluginOptions,
-} from '@/types';
-import { createDependencyGraph } from '@/utils/dependency-graph';
-import { getTrackedCollections } from '@/utils/tracked-collections';
+} from './types';
+import { createDependencyGraph } from './utils/dependency-graph';
+import { getTrackedCollections } from './utils/tracked-collections';
 
-export type {
-  DocumentInvalidation as InvalidationChange,
-  DocumentInvalidationCallback as OnInvalidate,
-} from '@/types';
 export {
   createRequestHandler,
   type RequestHandlerCacheOptions,
 } from './exports/create-request';
+export type {
+  DocumentInvalidation as InvalidationChange,
+  DocumentInvalidationCallback as OnInvalidate,
+} from './types';
 
 export interface SmartCachePluginConfig<
   C extends CollectionSlug = CollectionSlug,
@@ -50,12 +50,15 @@ export interface SmartCachePluginConfig<
 }
 
 export const smartCachePlugin =
-  ({
+  <
+    C extends CollectionSlug = CollectionSlug,
+    G extends GlobalSlug = GlobalSlug,
+  >({
     collections = [],
     globals = [],
     onInvalidate,
     disableAutoTracking,
-  }: SmartCachePluginConfig): Plugin =>
+  }: SmartCachePluginConfig<C, G>): Plugin =>
   (config) => {
     if (collections.length + globals.length === 0) {
       console.warn(
@@ -69,12 +72,12 @@ export const smartCachePlugin =
     const invalidationCallback = wrapInvalidationCallback({
       collections,
       globals,
-      onInvalidate,
+      onInvalidate: onInvalidate as DocumentInvalidationCallback,
     });
 
     config.globals ??= [];
     for (const global of config.globals) {
-      if (!globals.includes(global.slug as GlobalSlug)) continue;
+      if (!globals.includes(global.slug as G)) continue;
       global.hooks ??= {};
       global.hooks.afterChange ??= [];
       global.hooks.afterChange.push(

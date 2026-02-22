@@ -1,7 +1,7 @@
 import type { CollectionConfig, GlobalConfig } from 'payload';
 import { describe, expect, test, vi } from 'vitest';
 
-import type { ResolvedPluginOptions } from '@/types';
+import type { ResolvedPluginOptions } from '../types';
 
 import { getTrackedCollections } from './tracked-collections';
 
