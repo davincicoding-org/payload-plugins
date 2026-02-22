@@ -33,7 +33,6 @@ export function SelectVariableEditor({
     name: 'options',
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: useEffectEvent
   useEffect(() => {
     return () => {
       const values = getValues();

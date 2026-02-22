@@ -31,7 +31,6 @@ export function NumericVariableEditor({
   });
   const getValueRef = useRef<{ getValue: () => string }>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: useEffectEvent
   useEffect(() => {
     return () => {
       if (!getValueRef.current) return;

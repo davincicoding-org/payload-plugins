@@ -23,7 +23,6 @@ export function TagVariableEditor({
     defaultValues: { content },
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: useEffectEvent
   useEffect(() => {
     return () => {
       const { content } = getValues();

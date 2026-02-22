@@ -88,7 +88,6 @@ export function MessageInput({
     };
   }, [variables]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: LexicalComposer only reads initialConfig on mount
   const initialConfig = useMemo(
     () => ({
       namespace: 'ICUMessageEditor',
