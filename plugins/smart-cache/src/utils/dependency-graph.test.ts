@@ -1,4 +1,4 @@
-import type { CollectionSlug, FlattenedField, GlobalSlug } from 'payload';
+import type { CollectionSlug, Field, GlobalSlug } from 'payload';
 import { describe, expect, test } from 'vitest';
 
 import { EntitiesGraph } from './dependency-graph';
@@ -53,152 +53,189 @@ describe('EntitiesGraph roundtrip', () => {
   });
 });
 
-describe('EntitiesGraph.getFieldRelations', () => {
+describe('addRelations → getDependants', () => {
   test('extracts from relationship field', () => {
-    const field = {
-      name: 'author',
-      type: 'relationship',
-      relationTo: 'users',
-      hasMany: false,
-    } as unknown as FlattenedField;
-
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
       {
-        field: 'author',
-        collection: 'users',
+        name: 'author',
+        type: 'relationship',
+        relationTo: 'users' as CollectionSlug,
         hasMany: false,
-        polymorphic: false,
+      },
+    ];
+
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('users' as CollectionSlug);
+    expect(dependants).toEqual([
+      {
+        entity: { type: 'collection', slug: 'posts' },
+        fields: [{ field: 'author', hasMany: false, polymorphic: false }],
       },
     ]);
   });
 
   test('extracts from upload field', () => {
-    const field = {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-    } as unknown as FlattenedField;
-
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
       {
-        field: 'image',
-        collection: 'media',
-        hasMany: false,
-        polymorphic: false,
+        name: 'image',
+        type: 'upload',
+        relationTo: 'media' as CollectionSlug,
+      },
+    ];
+
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('media' as CollectionSlug);
+    expect(dependants).toEqual([
+      {
+        entity: { type: 'collection', slug: 'posts' },
+        fields: [{ field: 'image', hasMany: false, polymorphic: false }],
       },
     ]);
   });
 
   test('handles polymorphic (array) relationTo', () => {
-    const field = {
-      name: 'ref',
-      type: 'relationship',
-      relationTo: ['posts', 'pages'],
-      hasMany: true,
-    } as unknown as FlattenedField;
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
+      {
+        name: 'ref',
+        type: 'relationship',
+        relationTo: ['posts', 'pages'] as CollectionSlug[],
+        hasMany: true,
+      },
+    ];
 
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toHaveLength(2);
-    expect(result[0]).toMatchObject({
-      collection: 'posts',
+    graph.addRelations(
+      { type: 'collection', slug: 'home' as CollectionSlug },
+      fields,
+    );
+
+    const postsDeps = graph.getDependants('posts' as CollectionSlug);
+    expect(postsDeps[0]?.fields[0]).toMatchObject({
       polymorphic: true,
       hasMany: true,
     });
-    expect(result[1]).toMatchObject({
-      collection: 'pages',
+
+    const pagesDeps = graph.getDependants('pages' as CollectionSlug);
+    expect(pagesDeps[0]?.fields[0]).toMatchObject({
       polymorphic: true,
       hasMany: true,
     });
   });
 
   test('recurses into array fields', () => {
-    const field = {
-      name: 'items',
-      type: 'array',
-      flattenedFields: [
-        {
-          name: 'link',
-          type: 'relationship',
-          relationTo: 'pages',
-          hasMany: false,
-        },
-      ],
-    } as unknown as FlattenedField;
-
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
       {
-        field: 'items.link',
-        collection: 'pages',
-        hasMany: false,
-        polymorphic: false,
+        name: 'items',
+        type: 'array',
+        fields: [
+          {
+            name: 'link',
+            type: 'relationship',
+            relationTo: 'pages' as CollectionSlug,
+            hasMany: false,
+          },
+        ],
       },
-    ]);
+    ];
+
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('pages' as CollectionSlug);
+    expect(dependants[0]?.fields[0]).toMatchObject({
+      field: 'items.link',
+      hasMany: false,
+      polymorphic: false,
+    });
   });
 
   test('recurses into group fields', () => {
-    const field = {
-      name: 'meta',
-      type: 'group',
-      flattenedFields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-        },
-      ],
-    } as unknown as FlattenedField;
-
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
       {
-        field: 'meta.image',
-        collection: 'media',
-        hasMany: false,
-        polymorphic: false,
+        name: 'meta',
+        type: 'group',
+        fields: [
+          {
+            name: 'image',
+            type: 'upload',
+            relationTo: 'media' as CollectionSlug,
+          },
+        ],
       },
-    ]);
+    ];
+
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('media' as CollectionSlug);
+    expect(dependants[0]?.fields[0]).toMatchObject({
+      field: 'meta.image',
+      hasMany: false,
+      polymorphic: false,
+    });
   });
 
   test('recurses into blocks', () => {
-    const field = {
-      name: 'content',
-      type: 'blocks',
-      blocks: [
-        {
-          slug: 'cta',
-          flattenedFields: [
-            {
-              name: 'link',
-              type: 'relationship',
-              relationTo: 'pages',
-              hasMany: false,
-            },
-          ],
-        },
-      ],
-    } as unknown as FlattenedField;
-
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [
       {
-        field: 'content.link',
-        collection: 'pages',
-        hasMany: false,
-        polymorphic: false,
+        name: 'content',
+        type: 'blocks',
+        blocks: [
+          {
+            slug: 'cta',
+            fields: [
+              {
+                name: 'link',
+                type: 'relationship',
+                relationTo: 'pages' as CollectionSlug,
+                hasMany: false,
+              },
+            ],
+          },
+        ],
       },
-    ]);
+    ];
+
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('pages' as CollectionSlug);
+    expect(dependants[0]?.fields[0]).toMatchObject({
+      field: 'content.link',
+      hasMany: false,
+      polymorphic: false,
+    });
   });
 
-  test('returns empty for leaf types', () => {
-    const field = {
-      name: 'title',
-      type: 'text',
-    } as unknown as FlattenedField;
+  test('returns empty for fields with no relations', () => {
+    const graph = new EntitiesGraph();
+    const fields: Field[] = [{ name: 'title', type: 'text' }];
 
-    const result = EntitiesGraph.getFieldRelations(field, []);
-    expect(result).toEqual([]);
+    graph.addRelations(
+      { type: 'collection', slug: 'posts' as CollectionSlug },
+      fields,
+    );
+
+    const dependants = graph.getDependants('anything' as CollectionSlug);
+    expect(dependants).toEqual([]);
   });
 });

@@ -5,49 +5,43 @@ import type {
   CollectionAfterDeleteHook,
   GlobalAfterChangeHook,
 } from 'payload';
-import type {
-  DocumentWithStatus,
-  GraphResolverResult,
-  InvalidationConfig,
-} from '@/types';
+import type { DocumentInvalidationCallback, DocumentWithStatus } from '@/types';
+import type { EntitiesGraph } from './utils/dependency-graph';
 
-interface InvalidateWithDependentsOptions {
-  resolved: GraphResolverResult;
-  config: InvalidationConfig;
-  payload: BasePayload;
-  collection: string;
-  ids: string[];
-}
-
-async function invalidateWithDependents({
-  resolved: { graph: depGraph, registeredCollections },
-  config,
-  payload,
-  collection,
-  ids,
-}: InvalidateWithDependentsOptions): Promise<void> {
+async function invalidateWithDependents(
+  payload: BasePayload,
+  {
+    graph,
+    invalidationCallback,
+    collection,
+    ids,
+  }: {
+    graph: EntitiesGraph;
+    invalidationCallback: DocumentInvalidationCallback | undefined;
+    collection: string;
+    ids: string[];
+  },
+): Promise<void> {
   const tagsToInvalidate = new Set<string>();
 
   tagsToInvalidate.add(collection);
 
-  await walkDependents(depGraph, payload, collection, ids, new Set());
+  await walkDependents(graph, payload, collection, ids, new Set());
 
   for (const tag of tagsToInvalidate) {
     revalidateTag(tag);
   }
 
-  if (registeredCollections.has(collection)) {
-    for (const id of ids) {
-      await config.onInvalidate?.({
-        type: 'collection',
-        slug: collection,
-        docID: id,
-      });
-    }
+  for (const id of ids) {
+    await invalidationCallback?.({
+      type: 'collection',
+      slug: collection,
+      docID: id,
+    });
   }
 
   async function walkDependents(
-    graph: typeof depGraph,
+    graph: EntitiesGraph,
     payload: BasePayload,
     changedCollection: string,
     changedIds: string[],
@@ -101,14 +95,12 @@ async function invalidateWithDependents({
 
       tagsToInvalidate.add(dependent.entity.slug);
 
-      if (registeredCollections.has(dependent.entity.slug)) {
-        for (const item of affectedItems) {
-          await config.onInvalidate?.({
-            type: 'collection',
-            slug: dependent.entity.slug,
-            docID: item.id.toString(),
-          });
-        }
+      for (const item of affectedItems) {
+        await invalidationCallback?.({
+          type: 'collection',
+          slug: dependent.entity.slug,
+          docID: item.id.toString(),
+        });
       }
 
       await walkDependents(
@@ -122,30 +114,36 @@ async function invalidateWithDependents({
   }
 }
 
-export function invalidateCollectionCache(
-  config: InvalidationConfig,
-): CollectionAfterChangeHook<DocumentWithStatus> {
+export function invalidateCollectionCache({
+  graph,
+  invalidationCallback,
+}: {
+  graph: EntitiesGraph;
+  invalidationCallback: DocumentInvalidationCallback | undefined;
+}): CollectionAfterChangeHook<DocumentWithStatus> {
   return async ({ req: { payload }, doc, collection }) => {
     if (collection.versions?.drafts && doc._status !== 'published') return;
 
-    await invalidateWithDependents({
-      resolved: config.resolve(payload),
-      config,
-      payload,
+    await invalidateWithDependents(payload, {
+      graph,
+      invalidationCallback,
       collection: collection.slug,
       ids: [doc.id.toString()],
     });
   };
 }
 
-export function invalidateCollectionCacheOnDelete(
-  config: InvalidationConfig,
-): CollectionAfterDeleteHook<DocumentWithStatus> {
+export function invalidateCollectionCacheOnDelete({
+  graph,
+  invalidationCallback,
+}: {
+  graph: EntitiesGraph;
+  invalidationCallback: DocumentInvalidationCallback;
+}): CollectionAfterDeleteHook<DocumentWithStatus> {
   return async ({ req: { payload }, doc, collection }) => {
-    await invalidateWithDependents({
-      resolved: config.resolve(payload),
-      config,
-      payload,
+    await invalidateWithDependents(payload, {
+      graph,
+      invalidationCallback,
       collection: collection.slug,
       ids: [doc.id.toString()],
     });
@@ -153,14 +151,10 @@ export function invalidateCollectionCacheOnDelete(
 }
 
 export function invalidateGlobalCache(
-  config: InvalidationConfig,
+  invalidationCallback: DocumentInvalidationCallback,
 ): GlobalAfterChangeHook {
-  return async ({ req: { payload }, global }) => {
-    const { registeredGlobals } = config.resolve(payload);
-
-    if (!registeredGlobals.has(global.slug)) return;
-
+  return async ({ global }) => {
     revalidateTag(global.slug);
-    await config.onInvalidate?.({ type: 'global', slug: global.slug });
+    await invalidationCallback?.({ type: 'global', slug: global.slug });
   };
 }
