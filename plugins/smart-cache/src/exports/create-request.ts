@@ -19,10 +19,10 @@ export interface RequestHandlerCacheOptions {
  */
 export const createRequestHandler = <Data, Inputs extends unknown[]>(
   handler: (...inputs: Inputs) => Promise<Data>,
-  slugs?: EntitySlug[],
+  slugs: EntitySlug[],
   options?: RequestHandlerCacheOptions,
 ): ((...inputs: Inputs) => Promise<Data>) =>
   unstable_cache(handler, undefined, {
-    tags: [...(slugs ?? []), ...(options?.tags ?? [])],
+    tags: [...slugs, ...(options?.tags ?? [])],
     revalidate: options?.revalidate ?? false,
   });
