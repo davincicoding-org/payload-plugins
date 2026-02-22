@@ -1,5 +1,11 @@
 # @davincicoding/payload-utils
 
+## 0.0.4
+
+### Patch Changes
+
+- [`cf531b6`](https://github.com/davincicoding-org/payload-plugins/commit/cf531b62b57297b4ff8d142b17d7545841275ee4) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Refactor repo structure
+
 ## 0.0.3
 
 ### Patch Changes
