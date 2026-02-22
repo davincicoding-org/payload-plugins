@@ -7,14 +7,14 @@ Intelligent, dependency-aware cache invalidation for Next.js + Payload CMS appli
 
 ## Overview
 
-payload-smart-cache tracks document changes in a publish queue and builds a dependency graph from your collection relationships. When you publish, it walks the graph and revalidates all affected Next.js cache tags — including indirectly related documents. A publish button in the admin UI shows when unpublished changes exist.
+payload-smart-cache hooks into Payload's save and publish flow to provide automatic, dependency-aware cache invalidation. It builds a dependency graph from your collection relationships and walks it on every change, revalidating all affected Next.js cache tags — including indirectly related documents. There is no queue and no button; invalidation is invisible to editors.
 
 **Features**
 
-- **Deferred publishing** — changes are queued and only pushed to the cache when you explicitly publish.
 - **Dependency graph** — automatically discovers relationships between collections, so changing a referenced document revalidates its dependents.
 - **Tag-based revalidation** — precise, granular cache invalidation via Next.js `revalidateTag()`.
-- **Request caching utility** — `createRequestHandler` wraps data-fetching functions with entity-level cache tags for automatic revalidation.
+- **Draft-aware** — for collections with drafts enabled, cache invalidation only fires on publish, not on draft saves.
+- **Request caching utility** — `createRequestHandler` wraps data-fetching functions with collection/global-level cache tags for automatic revalidation.
 
 ## Installation
 
@@ -44,7 +44,7 @@ export default buildConfig({
 });
 ```
 
-Wrap your data-fetching functions with `createRequestHandler` so they are cached by entity tags and automatically revalidated on publish:
+Wrap your data-fetching functions with `createRequestHandler` so they are cached by collection/global tags and automatically revalidated when documents change:
 
 ```ts
 import { createRequestHandler } from "payload-smart-cache";
@@ -54,18 +54,18 @@ const getPosts = createRequestHandler(
     const payload = await getPayload({ config });
     return payload.find({ collection: "posts" });
   },
-  ["posts"], // collection/global slugs — revalidated when posts are published
+  ["posts"], // collection/global slugs — revalidated when posts change
 );
 ```
 
 ### Options
 
-| Option                | Type                                                   | Default | Description                                                                                                                     |
-| --------------------- | ------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `collections`         | `CollectionSlug[]`                                     | `[]`    | Collections to track changes for. Referenced collections are auto-tracked.                                                      |
-| `globals`             | `GlobalSlug[]`                                         | `[]`    | Globals to track changes for. Referenced collections are auto-tracked.                                                          |
-| `disableAutoTracking` | `boolean`                                              | `false` | Disable automatic tracking of collections referenced via relationship/upload fields.                                            |
-| `publishHandler`      | `(changes: ChangedDocuments) => void \| Promise<void>` | —       | Custom handler called when changes are published. Receives a record mapping collection slugs to arrays of changed document IDs. |
+| Option                | Type                                                                          | Default | Description                                                                                                          |
+| --------------------- | ----------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `collections`         | `CollectionSlug[]`                                                            | `[]`    | Collections to track changes for. Referenced collections are auto-tracked.                                            |
+| `globals`             | `GlobalSlug[]`                                                                | `[]`    | Globals to track changes for. Referenced collections are auto-tracked.                                                |
+| `disableAutoTracking` | `boolean`                                                                     | `false` | Disable automatic tracking of collections referenced via relationship/upload fields.                                  |
+| `onInvalidate`        | `(change: { collection: EntitySlug; docID: string }) => void \| Promise<void>` | —       | Called per document when cache invalidation is triggered. Only fires for explicitly registered collections/globals. |
 
 ## Contributing
 
