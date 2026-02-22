@@ -763,46 +763,25 @@ importers:
       '@davincicoding/payload-plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
-      '@payloadcms/next':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       graph-data-structure:
         specifier: ^4.5.0
         version: 4.5.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.23
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.5
     devDependencies:
-      '@payloadcms/ui':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
       '@types/node':
         specifier: ^22.5.4
         version: 22.19.7
-      '@types/react':
-        specifier: catalog:payload-stack
-        version: 19.2.1
-      '@types/react-dom':
-        specifier: catalog:payload-stack
-        version: 19.2.1(@types/react@19.2.1)
       next:
         specifier: catalog:payload-stack
         version: 15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4)
       payload:
         specifier: catalog:payload-stack
         version: 3.72.0(graphql@16.12.0)(typescript@5.7.3)
-      react:
-        specifier: catalog:payload-stack
-        version: 19.2.1
-      react-dom:
-        specifier: catalog:payload-stack
-        version: 19.2.1(react@19.2.1)
       typescript:
         specifier: catalog:payload-stack
         version: 5.7.3
