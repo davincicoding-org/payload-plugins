@@ -22,7 +22,6 @@ vi.mock('@/utils/dependency-graph', () => ({
 }));
 
 import { revalidateTag } from 'next/cache';
-import { createDependencyGraph } from '@/utils/dependency-graph';
 
 type AfterChangeArgs = Parameters<CollectionAfterChangeHook<TypeWithID>>[0];
 type AfterDeleteArgs = Parameters<CollectionAfterDeleteHook<TypeWithID>>[0];
