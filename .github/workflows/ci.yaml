@@ -55,7 +55,7 @@ jobs:
         if: github.event_name == 'push'
         uses: changesets/action@v1
         with:
-          publish: pnpm -r publish --access public
+          publish: pnpm changeset publish
           commit: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
