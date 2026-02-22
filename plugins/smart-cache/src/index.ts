@@ -4,14 +4,18 @@ import {
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
 } from '@/hooks';
-import type { GraphResolver, OnInvalidate } from '@/types';
-import {
-  createDependencyGraph,
-  type EntitiesGraph,
-} from '@/utils/dependency-graph';
+import type {
+  DocumentInvalidation,
+  DocumentInvalidationCallback,
+  ResolvedPluginOptions,
+} from '@/types';
+import { createDependencyGraph } from '@/utils/dependency-graph';
 import { getTrackedCollections } from '@/utils/tracked-collections';
 
-export type { InvalidationChange, OnInvalidate } from '@/types';
+export type {
+  DocumentInvalidation as InvalidationChange,
+  DocumentInvalidationCallback as OnInvalidate,
+} from '@/types';
 export {
   createRequestHandler,
   type RequestHandlerCacheOptions,
@@ -42,18 +46,7 @@ export interface SmartCachePluginConfig<
    * Called when cache invalidation is triggered.
    * Only fires for collections/globals explicitly registered in the config.
    */
-  onInvalidate?: OnInvalidate<C, G>;
-}
-
-function createGraphResolver(
-  registeredCollections: Set<CollectionSlug>,
-  registeredGlobals: Set<GlobalSlug>,
-): GraphResolver {
-  let graph: EntitiesGraph | undefined;
-  return (payload) => {
-    graph ??= createDependencyGraph(payload);
-    return { graph, registeredCollections, registeredGlobals };
-  };
+  onInvalidate?: DocumentInvalidationCallback<C, G>;
 }
 
 export const smartCachePlugin =
@@ -71,18 +64,22 @@ export const smartCachePlugin =
       return config;
     }
 
-    const resolve = createGraphResolver(
-      new Set(collections),
-      new Set(globals),
-    );
-    const hookConfig = { resolve, onInvalidate };
+    const graph = createDependencyGraph(config);
+
+    const invalidationCallback = wrapInvalidationCallback({
+      collections,
+      globals,
+      onInvalidate,
+    });
 
     config.globals ??= [];
     for (const global of config.globals) {
       if (!globals.includes(global.slug as GlobalSlug)) continue;
       global.hooks ??= {};
       global.hooks.afterChange ??= [];
-      global.hooks.afterChange.push(invalidateGlobalCache(hookConfig));
+      global.hooks.afterChange.push(
+        invalidateGlobalCache(invalidationCallback),
+      );
     }
 
     config.collections ??= [];
@@ -96,10 +93,38 @@ export const smartCachePlugin =
       if (!collectionsToTrack.has(collection.slug as CollectionSlug)) continue;
       collection.hooks ??= {};
       collection.hooks.afterChange ??= [];
-      collection.hooks.afterChange.push(invalidateCollectionCache(hookConfig));
+      collection.hooks.afterChange.push(
+        invalidateCollectionCache({ graph, invalidationCallback }),
+      );
       collection.hooks.afterDelete ??= [];
-      collection.hooks.afterDelete.push(invalidateCollectionCacheOnDelete(hookConfig));
+      collection.hooks.afterDelete.push(
+        invalidateCollectionCacheOnDelete({
+          graph,
+          invalidationCallback,
+        }),
+      );
     }
 
     return config;
   };
+
+function wrapInvalidationCallback({
+  collections,
+  globals,
+  onInvalidate,
+}: ResolvedPluginOptions<
+  'collections' | 'globals',
+  'onInvalidate'
+>): DocumentInvalidationCallback {
+  if (!onInvalidate) return () => void 0;
+
+  const registeredCollections = new Set(collections);
+  const registeredGlobals = new Set(globals);
+
+  return (change: DocumentInvalidation) => {
+    if (change.type === 'collection' && !registeredCollections.has(change.slug))
+      return;
+    if (change.type === 'global' && !registeredGlobals.has(change.slug)) return;
+    return onInvalidate(change);
+  };
+}

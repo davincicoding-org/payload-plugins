@@ -1,33 +1,35 @@
+import { findFields } from '@davincicoding/payload-plugin-kit';
 import { Graph } from 'graph-data-structure';
 import { groupBy } from 'lodash-es';
 import type {
-  BasePayload,
   CollectionSlug,
-  FlattenedField,
+  Config,
+  Field,
   GlobalSlug,
+  RelationshipField,
+  UploadField,
 } from 'payload';
 
-export function createDependencyGraph({ collections, globals }: BasePayload) {
+const isRelationshipOrUpload = (
+  field: Field,
+): field is RelationshipField | UploadField =>
+  field.type === 'relationship' || field.type === 'upload';
+
+export function createDependencyGraph({
+  collections = [],
+  globals = [],
+}: Pick<Config, 'collections' | 'globals'>) {
   const graph = new EntitiesGraph();
 
-  for (const {
-    config: { slug, flattenedFields },
-  } of Object.values(collections)) {
-    graph.addRelations({ type: 'collection', slug }, flattenedFields);
+  for (const { slug, fields } of collections) {
+    graph.addRelations({ type: 'collection', slug }, fields);
   }
 
-  for (const { slug, flattenedFields } of Object.values(globals.config)) {
-    graph.addRelations({ type: 'global', slug }, flattenedFields);
+  for (const { slug, fields } of globals) {
+    graph.addRelations({ type: 'global', slug }, fields);
   }
 
   return graph;
-}
-
-interface FieldRelation {
-  field: string;
-  collection: CollectionSlug;
-  hasMany: boolean;
-  polymorphic: boolean;
 }
 
 type StringifiedEntityReference =
@@ -86,50 +88,6 @@ export class EntitiesGraph extends Graph<
     }
   }
 
-  static getFieldRelations(
-    field: FlattenedField,
-    prevPath: string[],
-  ): FieldRelation[] {
-    const fieldPath = [...prevPath, field.name];
-
-    switch (field.type) {
-      case 'upload':
-      case 'relationship':
-        if (Array.isArray(field.relationTo)) {
-          return field.relationTo.map((slug) => ({
-            field: fieldPath.join('.'),
-            collection: slug,
-            hasMany: field.hasMany ?? false,
-            polymorphic: true,
-          }));
-        }
-        return [
-          {
-            field: fieldPath.join('.'),
-            collection: field.relationTo,
-            hasMany: field.hasMany ?? false,
-            polymorphic: false,
-          },
-        ];
-      case 'array':
-        return field.flattenedFields.flatMap((subField) =>
-          EntitiesGraph.getFieldRelations(subField, fieldPath),
-        );
-      case 'group':
-        return field.flattenedFields.flatMap((subField) =>
-          EntitiesGraph.getFieldRelations(subField, fieldPath),
-        );
-      case 'blocks':
-        return field.blocks.flatMap((block) =>
-          block.flattenedFields.flatMap((subField) =>
-            EntitiesGraph.getFieldRelations(subField, fieldPath),
-          ),
-        );
-      default:
-        return [];
-    }
-  }
-
   getDependants(collection: CollectionSlug) {
     const collectionRelations = this.edgeProperties.get(
       `collection|${collection}`,
@@ -143,28 +101,35 @@ export class EntitiesGraph extends Graph<
     }));
   }
 
-  addRelations(entity: EntityReference, flattenedFields: FlattenedField[]) {
-    const fieldRelations = flattenedFields.flatMap((field) =>
-      EntitiesGraph.getFieldRelations(field, []),
-    );
+  addRelations(entity: EntityReference, fields: Field[]) {
+    const relationFields = findFields(fields, isRelationshipOrUpload);
 
-    const fieldRelationsByCollection = Object.entries(
-      groupBy(fieldRelations, 'collection'),
-    ).map(([collection, fields]) => ({
-      collection: collection as CollectionSlug,
-      fields: fields.map(({ field, hasMany, polymorphic }) => ({
-        field,
-        hasMany,
+    const fieldRelations = relationFields.flatMap((field) => {
+      const targets = Array.isArray(field.relationTo)
+        ? field.relationTo
+        : [field.relationTo];
+      const polymorphic = Array.isArray(field.relationTo);
+
+      return targets.map((collection) => ({
+        collection: collection as CollectionSlug,
+        field: field.path.join('.'),
+        hasMany: field.hasMany ?? false,
         polymorphic,
-      })),
-    }));
+      }));
+    });
 
-    for (const { collection, fields } of fieldRelationsByCollection) {
+    const byCollection = Object.entries(groupBy(fieldRelations, 'collection'));
+
+    for (const [collection, fields] of byCollection) {
       this.addEdge(
         `collection|${collection}`,
         EntitiesGraph.stringifyEntityReference(entity),
         {
-          props: fields,
+          props: fields.map(({ field, hasMany, polymorphic }) => ({
+            field,
+            hasMany,
+            polymorphic,
+          })),
         },
       );
     }

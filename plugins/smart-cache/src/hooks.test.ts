@@ -13,7 +13,7 @@ import {
   invalidateCollectionCacheOnDelete,
   invalidateGlobalCache,
 } from '@/hooks';
-import type { DocumentWithStatus, InvalidationConfig } from '@/types';
+import type { DocumentInvalidationCallback, DocumentWithStatus } from '@/types';
 
 vi.mock('next/cache', () => ({
   revalidateTag: vi.fn(),
@@ -33,24 +33,12 @@ function makePayload(): BasePayload {
   return {} as BasePayload;
 }
 
-function makeConfig(
-  overrides: {
-    collections?: string[];
-    globals?: string[];
-    onInvalidate?: InvalidationConfig['onInvalidate'];
-  } = {},
-): InvalidationConfig {
-  const registeredCollections = new Set(
-    (overrides.collections ?? []) as CollectionSlug[],
-  );
-  const registeredGlobals = new Set((overrides.globals ?? []) as GlobalSlug[]);
+function makeCollectionHookConfig(
+  overrides: { invalidationCallback?: DocumentInvalidationCallback } = {},
+) {
   return {
-    resolve: () => ({
-      graph: { getDependants: () => [] } as any,
-      registeredCollections,
-      registeredGlobals,
-    }),
-    onInvalidate: overrides.onInvalidate,
+    graph: { getDependants: () => [] } as any,
+    invalidationCallback: overrides.invalidationCallback,
   };
 }
 
@@ -117,9 +105,7 @@ describe('invalidateCollectionCache', () => {
   test('revalidates tag for non-draft collection on every save', async () => {
     vi.mocked(revalidateTag).mockClear();
 
-    const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'] }),
-    );
+    const hook = invalidateCollectionCache(makeCollectionHookConfig());
 
     await hook(makeCollectionAfterChangeArgs({}));
 
@@ -129,9 +115,7 @@ describe('invalidateCollectionCache', () => {
   test('does NOT revalidate when draft save and not publishing', async () => {
     vi.mocked(revalidateTag).mockClear();
 
-    const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'] }),
-    );
+    const hook = invalidateCollectionCache(makeCollectionHookConfig());
 
     await hook(
       makeCollectionAfterChangeArgs({
@@ -146,9 +130,7 @@ describe('invalidateCollectionCache', () => {
   test('revalidates when publishing a draft', async () => {
     vi.mocked(revalidateTag).mockClear();
 
-    const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'] }),
-    );
+    const hook = invalidateCollectionCache(makeCollectionHookConfig());
 
     await hook(
       makeCollectionAfterChangeArgs({
@@ -164,9 +146,7 @@ describe('invalidateCollectionCache', () => {
   test('revalidates when re-saving an already published doc', async () => {
     vi.mocked(revalidateTag).mockClear();
 
-    const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'] }),
-    );
+    const hook = invalidateCollectionCache(makeCollectionHookConfig());
 
     await hook(
       makeCollectionAfterChangeArgs({
@@ -184,9 +164,10 @@ describe('invalidateCollectionCacheOnDelete', () => {
   test('always revalidates tag on delete', async () => {
     vi.mocked(revalidateTag).mockClear();
 
-    const hook = invalidateCollectionCacheOnDelete(
-      makeConfig({ collections: ['posts'] }),
-    );
+    const hook = invalidateCollectionCacheOnDelete({
+      graph: { getDependants: () => [] } as any,
+      invalidationCallback: () => void 0,
+    });
 
     await hook(makeCollectionAfterDeleteArgs());
 
@@ -195,64 +176,52 @@ describe('invalidateCollectionCacheOnDelete', () => {
 });
 
 describe('invalidateGlobalCache', () => {
-  test('revalidates tag with global slug and fires onInvalidate', async () => {
+  test('revalidates tag with global slug and fires callback', async () => {
     vi.mocked(revalidateTag).mockClear();
-    const onInvalidate = vi.fn();
+    const invalidationCallback = vi.fn();
 
-    const hook = invalidateGlobalCache(
-      makeConfig({ globals: ['nav'], onInvalidate }),
-    );
+    const hook = invalidateGlobalCache(invalidationCallback);
 
     await hook(makeGlobalAfterChangeArgs());
 
     expect(revalidateTag).toHaveBeenCalledWith('nav');
-    expect(onInvalidate).toHaveBeenCalledWith({
+    expect(invalidationCallback).toHaveBeenCalledWith({
       type: 'global',
       slug: 'nav',
     });
   });
-
-  test('does NOT revalidate or fire onInvalidate for unregistered globals', async () => {
-    vi.mocked(revalidateTag).mockClear();
-    const onInvalidate = vi.fn();
-
-    const hook = invalidateGlobalCache(
-      makeConfig({ globals: ['nav'], onInvalidate }),
-    );
-
-    await hook(makeGlobalAfterChangeArgs({ slug: 'footer' }));
-
-    expect(revalidateTag).not.toHaveBeenCalled();
-    expect(onInvalidate).not.toHaveBeenCalled();
-  });
 });
 
-describe('onInvalidate filtering', () => {
-  test('does NOT fire onInvalidate for non-registered collections', async () => {
+describe('invalidationCallback', () => {
+  test('fires callback for any collection (filtering is in wrapper)', async () => {
     vi.mocked(revalidateTag).mockClear();
-    const onInvalidate = vi.fn();
+    const invalidationCallback = vi.fn();
 
     const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'], onInvalidate }),
+      makeCollectionHookConfig({ invalidationCallback }),
     );
 
     await hook(makeCollectionAfterChangeArgs({ slug: 'media' }));
 
     expect(revalidateTag).toHaveBeenCalledWith('media');
-    expect(onInvalidate).not.toHaveBeenCalled();
+    expect(invalidationCallback).toHaveBeenCalledWith({
+      type: 'collection',
+      slug: 'media',
+      docID: '1',
+    });
   });
 
-  test('fires onInvalidate for registered collections', async () => {
+  test('fires callback for registered collections', async () => {
     vi.mocked(revalidateTag).mockClear();
-    const onInvalidate = vi.fn();
+    const invalidationCallback = vi.fn();
 
     const hook = invalidateCollectionCache(
-      makeConfig({ collections: ['posts'], onInvalidate }),
+      makeCollectionHookConfig({ invalidationCallback }),
     );
 
     await hook(makeCollectionAfterChangeArgs({ slug: 'posts' }));
 
-    expect(onInvalidate).toHaveBeenCalledWith({
+    expect(invalidationCallback).toHaveBeenCalledWith({
       type: 'collection',
       slug: 'posts',
       docID: '1',
