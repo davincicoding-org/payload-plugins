@@ -9,7 +9,11 @@ import type {
 } from 'payload';
 import { describe, expect, test, vi } from 'vitest';
 
-import { createHooks } from '@/hooks';
+import {
+  invalidateCollectionCache,
+  invalidateCollectionCacheOnDelete,
+  invalidateGlobalCache,
+} from '@/hooks';
 
 vi.mock('next/cache', () => ({
   revalidateTag: vi.fn(),
@@ -90,157 +94,146 @@ function makeGlobalAfterChangeArgs(
   } as unknown as GlobalAfterChangeArgs;
 }
 
-describe('createHooks', () => {
-  describe('collectionAfterChange', () => {
-    test('revalidates tag for non-draft collection on every save', async () => {
-      vi.mocked(revalidateTag).mockClear();
+describe('invalidateCollectionCache', () => {
+  test('revalidates tag for non-draft collection on every save', async () => {
+    vi.mocked(revalidateTag).mockClear();
 
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-      });
-
-      await collectionAfterChange(makeCollectionAfterChangeArgs({}));
-
-      expect(revalidateTag).toHaveBeenCalledWith('posts');
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
     });
 
-    test('does NOT revalidate when draft save and not publishing', async () => {
-      vi.mocked(revalidateTag).mockClear();
+    await hook(makeCollectionAfterChangeArgs({}));
 
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-      });
-
-      await collectionAfterChange(
-        makeCollectionAfterChangeArgs({
-          drafts: true,
-          _status: 'draft',
-        }),
-      );
-
-      expect(revalidateTag).not.toHaveBeenCalled();
-    });
-
-    test('revalidates when publishing a draft', async () => {
-      vi.mocked(revalidateTag).mockClear();
-
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-      });
-
-      await collectionAfterChange(
-        makeCollectionAfterChangeArgs({
-          drafts: true,
-          _status: 'published',
-          previousStatus: 'draft',
-        }),
-      );
-
-      expect(revalidateTag).toHaveBeenCalledWith('posts');
-    });
-
-    test('revalidates when re-saving an already published doc', async () => {
-      vi.mocked(revalidateTag).mockClear();
-
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-      });
-
-      await collectionAfterChange(
-        makeCollectionAfterChangeArgs({
-          drafts: true,
-          _status: 'published',
-          previousStatus: 'published',
-        }),
-      );
-
-      // The hook only checks doc._status === 'published', not previousDoc,
-      // so re-saving a published doc still triggers revalidation.
-      expect(revalidateTag).toHaveBeenCalledWith('posts');
-    });
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
 
-  describe('collectionAfterDelete', () => {
-    test('always revalidates tag on delete', async () => {
-      vi.mocked(revalidateTag).mockClear();
+  test('does NOT revalidate when draft save and not publishing', async () => {
+    vi.mocked(revalidateTag).mockClear();
 
-      const { collectionAfterDelete } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-      });
-
-      await collectionAfterDelete(makeCollectionAfterDeleteArgs());
-
-      expect(revalidateTag).toHaveBeenCalledWith('posts');
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
     });
+
+    await hook(
+      makeCollectionAfterChangeArgs({
+        drafts: true,
+        _status: 'draft',
+      }),
+    );
+
+    expect(revalidateTag).not.toHaveBeenCalled();
   });
 
-  describe('globalAfterChange', () => {
-    test('revalidates tag with global slug and fires onInvalidate', async () => {
-      vi.mocked(revalidateTag).mockClear();
-      const onInvalidate = vi.fn();
+  test('revalidates when publishing a draft', async () => {
+    vi.mocked(revalidateTag).mockClear();
 
-      const { globalAfterChange } = createHooks({
-        collections: [],
-        globals: ['nav' as GlobalSlug],
-        onInvalidate,
-      });
-
-      await globalAfterChange(makeGlobalAfterChangeArgs());
-
-      expect(revalidateTag).toHaveBeenCalledWith('nav');
-      expect(onInvalidate).toHaveBeenCalledWith({
-        collection: 'nav',
-        docID: 'nav',
-      });
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
     });
+
+    await hook(
+      makeCollectionAfterChangeArgs({
+        drafts: true,
+        _status: 'published',
+        previousStatus: 'draft',
+      }),
+    );
+
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
 
-  describe('onInvalidate filtering', () => {
-    test('does NOT fire onInvalidate for non-registered collections', async () => {
-      vi.mocked(revalidateTag).mockClear();
-      const onInvalidate = vi.fn();
+  test('revalidates when re-saving an already published doc', async () => {
+    vi.mocked(revalidateTag).mockClear();
 
-      // Register 'posts' but not 'media'
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-        onInvalidate,
-      });
-
-      // Trigger a change on 'media' which is auto-tracked but not registered
-      await collectionAfterChange(
-        makeCollectionAfterChangeArgs({ slug: 'media' }),
-      );
-
-      // revalidateTag still fires (cache invalidation happens regardless)
-      expect(revalidateTag).toHaveBeenCalledWith('media');
-      // but onInvalidate should NOT fire for non-registered collections
-      expect(onInvalidate).not.toHaveBeenCalled();
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
     });
 
-    test('fires onInvalidate for registered collections', async () => {
-      vi.mocked(revalidateTag).mockClear();
-      const onInvalidate = vi.fn();
+    await hook(
+      makeCollectionAfterChangeArgs({
+        drafts: true,
+        _status: 'published',
+        previousStatus: 'published',
+      }),
+    );
 
-      const { collectionAfterChange } = createHooks({
-        collections: ['posts' as CollectionSlug],
-        globals: [],
-        onInvalidate,
-      });
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
+  });
+});
 
-      await collectionAfterChange(
-        makeCollectionAfterChangeArgs({ slug: 'posts' }),
-      );
+describe('invalidateCollectionCacheOnDelete', () => {
+  test('always revalidates tag on delete', async () => {
+    vi.mocked(revalidateTag).mockClear();
 
-      expect(onInvalidate).toHaveBeenCalledWith({
-        collection: 'posts',
-        docID: '1',
-      });
+    const hook = invalidateCollectionCacheOnDelete({
+      collections: ['posts'],
+      globals: [],
+    });
+
+    await hook(makeCollectionAfterDeleteArgs());
+
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
+  });
+});
+
+describe('invalidateGlobalCache', () => {
+  test('revalidates tag with global slug and fires onInvalidate', async () => {
+    vi.mocked(revalidateTag).mockClear();
+    const onInvalidate = vi.fn();
+
+    const hook = invalidateGlobalCache({
+      collections: [],
+      globals: ['nav'],
+      onInvalidate,
+    });
+
+    await hook(makeGlobalAfterChangeArgs());
+
+    expect(revalidateTag).toHaveBeenCalledWith('nav');
+    expect(onInvalidate).toHaveBeenCalledWith({
+      type: 'global',
+      slug: 'nav',
+    });
+  });
+});
+
+describe('onInvalidate filtering', () => {
+  test('does NOT fire onInvalidate for non-registered collections', async () => {
+    vi.mocked(revalidateTag).mockClear();
+    const onInvalidate = vi.fn();
+
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
+      onInvalidate,
+    });
+
+    await hook(makeCollectionAfterChangeArgs({ slug: 'media' }));
+
+    expect(revalidateTag).toHaveBeenCalledWith('media');
+    expect(onInvalidate).not.toHaveBeenCalled();
+  });
+
+  test('fires onInvalidate for registered collections', async () => {
+    vi.mocked(revalidateTag).mockClear();
+    const onInvalidate = vi.fn();
+
+    const hook = invalidateCollectionCache({
+      collections: ['posts'],
+      globals: [],
+      onInvalidate,
+    });
+
+    await hook(makeCollectionAfterChangeArgs({ slug: 'posts' }));
+
+    expect(onInvalidate).toHaveBeenCalledWith({
+      type: 'collection',
+      slug: 'posts',
+      docID: '1',
     });
   });
 });

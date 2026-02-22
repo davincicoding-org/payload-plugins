@@ -1,6 +1,10 @@
+import type { DocumentID } from '@davincicoding/payload-plugin-kit';
 import type { CollectionSlug, GlobalSlug, Plugin } from 'payload';
-import { createHooks } from '@/hooks';
-import type { EntitySlug } from '@/types';
+import {
+  invalidateCollectionCache,
+  invalidateCollectionCacheOnDelete,
+  invalidateGlobalCache,
+} from '@/hooks';
 import { getTrackedCollections } from '@/utils/tracked-collections';
 
 export {
@@ -8,32 +12,43 @@ export {
   type RequestHandlerCacheOptions,
 } from './exports/create-request';
 
-export interface SmartCachePluginConfig {
+export interface SmartCachePluginConfig<
+  C extends CollectionSlug = CollectionSlug,
+  G extends GlobalSlug = GlobalSlug,
+> {
   /**
    * The collections to track changes for.
    * By default, collections referenced via relationship or upload fields
    * are automatically tracked as well.
    */
-  collections?: CollectionSlug[];
+  collections?: C[];
   /**
    * The globals to track changes for.
    * Collections referenced by these globals via relationship or upload
    * fields are automatically tracked as well.
    */
-  globals?: GlobalSlug[];
+  globals?: G[];
   /**
    * Disable automatic tracking of collections referenced by the configured ones.
    * @default false
    */
   disableAutoTracking?: boolean;
   /**
-   * Called when a document triggers cache invalidation.
+   * Called when cache invalidation is triggered.
    * Only fires for collections/globals explicitly registered in the config.
    */
-  onInvalidate?: (change: {
-    collection: EntitySlug;
-    docID: string;
-  }) => void | Promise<void>;
+  onInvalidate?: (
+    change:
+      | {
+          type: 'collection';
+          slug: C;
+          docID: DocumentID;
+        }
+      | {
+          type: 'global';
+          slug: G;
+        },
+  ) => void | Promise<void>;
 }
 
 export const smartCachePlugin =
@@ -51,18 +66,18 @@ export const smartCachePlugin =
       return config;
     }
 
-    const hooks = createHooks({
-      collections,
-      globals,
-      onInvalidate,
-    });
+    const hookConfig = { collections, globals, onInvalidate };
+
+    const afterChange = invalidateCollectionCache(hookConfig);
+    const afterDelete = invalidateCollectionCacheOnDelete(hookConfig);
+    const afterGlobalChange = invalidateGlobalCache(hookConfig);
 
     config.globals ??= [];
     for (const global of config.globals) {
       if (!globals.includes(global.slug as GlobalSlug)) continue;
       global.hooks ??= {};
       global.hooks.afterChange ??= [];
-      global.hooks.afterChange.push(hooks.globalAfterChange);
+      global.hooks.afterChange.push(afterGlobalChange);
     }
 
     config.collections ??= [];
@@ -76,9 +91,9 @@ export const smartCachePlugin =
       if (!collectionsToTrack.has(collection.slug as CollectionSlug)) continue;
       collection.hooks ??= {};
       collection.hooks.afterChange ??= [];
-      collection.hooks.afterChange.push(hooks.collectionAfterChange);
+      collection.hooks.afterChange.push(afterChange);
       collection.hooks.afterDelete ??= [];
-      collection.hooks.afterDelete.push(hooks.collectionAfterDelete);
+      collection.hooks.afterDelete.push(afterDelete);
     }
 
     return config;
