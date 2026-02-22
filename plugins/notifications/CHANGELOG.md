@@ -1,5 +1,14 @@
 # payload-notifications
 
+## 0.1.6
+
+### Patch Changes
+
+- [`cf531b6`](https://github.com/davincicoding-org/payload-plugins/commit/cf531b62b57297b4ff8d142b17d7545841275ee4) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Refactor repo structure
+
+- Updated dependencies [[`cf531b6`](https://github.com/davincicoding-org/payload-plugins/commit/cf531b62b57297b4ff8d142b17d7545841275ee4)]:
+  - @davincicoding/payload-plugin-kit@0.0.4
+
 ## 0.1.5
 
 ### Patch Changes

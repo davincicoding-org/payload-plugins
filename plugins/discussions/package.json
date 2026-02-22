@@ -1,6 +1,6 @@
 {
   "name": "payload-discussions",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Payload CMS plugin that adds threaded comment discussions with nested replies, and author tracking to collections and globals.",
   "keywords": [
     "payload"
