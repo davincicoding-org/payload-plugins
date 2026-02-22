@@ -6,11 +6,3 @@ export type ResolvedPluginOptions<
 > = Pick<Required<SmartCachePluginConfig>, K>;
 
 export type EntitySlug = CollectionSlug | GlobalSlug;
-
-export type CollectionOperation = CollectionChangeOperation | 'delete';
-
-export type CollectionChangeOperation = 'create' | 'update';
-
-type CollectionId = string; //| number;
-
-export type ChangedDocuments = Partial<Record<CollectionSlug, CollectionId[]>>;
