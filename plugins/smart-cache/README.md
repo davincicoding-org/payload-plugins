@@ -7,13 +7,13 @@ Intelligent, dependency-aware cache invalidation for Next.js + Payload CMS appli
 
 ## Overview
 
-payload-smart-cache hooks into Payload's save and publish flow to provide automatic, dependency-aware cache invalidation. It builds a dependency graph from your collection relationships and walks it on every change, revalidating all affected Next.js cache tags — including indirectly related collections and globals.
+payload-smart-cache hooks into Payload's save and publish flow to provide automatic, dependency-aware cache invalidation. It builds a dependency graph from your collection and global relationships and walks it on every change, revalidating all affected Next.js cache tags — including indirectly related collections and globals.
 
 **Features**
 
 - **Dependency graph** — automatically discovers relationships between collections, so changing a referenced document revalidates its dependents.
 - **Tag-based revalidation** — precise, granular cache invalidation via Next.js `revalidateTag()`.
-- **Versions-aware** — for collections with versions and drafts enabled, cache invalidation only fires on publish, not on draft saves.
+- **Versions-aware** — for versioned collections, cache invalidation only fires on publish, not on draft saves.
 - **Request caching utility** — `createRequestHandler` wraps data-fetching functions with collection/global-level cache tags for automatic revalidation.
 
 ## Installation
