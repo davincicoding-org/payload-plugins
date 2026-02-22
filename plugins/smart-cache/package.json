@@ -6,7 +6,6 @@
     "payload",
     "cached",
     "cache",
-    "react",
     "next.js"
   ],
   "repository": {
@@ -22,18 +21,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./rsc": {
-      "types": "./dist/exports/rsc.d.ts",
-      "import": "./dist/exports/rsc.js",
-      "default": "./dist/exports/rsc.js"
-    },
-    "./client": {
-      "types": "./dist/exports/client.d.ts",
-      "import": "./dist/exports/client.js",
-      "default": "./dist/exports/client.js"
-    },
-    "./styles.css": "./dist/styles.css"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -57,26 +45,18 @@
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
     "graph-data-structure": "^4.5.0",
-    "lodash-es": "^4.17.21",
-    "zod": "catalog:"
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@payloadcms/ui": "catalog:payload-stack",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.5.4",
-    "@types/react": "catalog:payload-stack",
-    "@types/react-dom": "catalog:payload-stack",
     "next": "catalog:payload-stack",
     "payload": "catalog:payload-stack",
-    "react": "catalog:payload-stack",
-    "react-dom": "catalog:payload-stack",
     "typescript": "catalog:payload-stack",
     "vite": "catalog:vite",
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@payloadcms/next": "catalog:payload-stack",
-    "@payloadcms/ui": ">=3.72.0",
     "next": "catalog:payload-stack",
     "payload": "catalog:payload-stack"
   },

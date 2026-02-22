@@ -17,9 +17,10 @@ import {
 interface HooksConfig {
   collections: CollectionSlug[];
   globals: GlobalSlug[];
-  onInvalidate?: (
-    changes: Partial<Record<CollectionSlug, string[]>>,
-  ) => void | Promise<void>;
+  onInvalidate?: (change: {
+    collection: EntitySlug;
+    docID: string;
+  }) => void | Promise<void>;
 }
 
 export function createHooks(config: HooksConfig) {
@@ -44,13 +45,9 @@ export function createHooks(config: HooksConfig) {
   ): Promise<void> {
     const depGraph = getGraph(payload);
     const tagsToInvalidate = new Set<EntitySlug>();
-    const affectedDocuments = new Map<CollectionSlug, Set<string>>();
 
     // Seed the initial collection
     tagsToInvalidate.add(collection);
-    if (registeredCollections.has(collection)) {
-      affectedDocuments.set(collection, new Set(ids));
-    }
 
     // Recursively walk dependents
     await walkDependents(depGraph, payload, collection, ids, new Set());
@@ -60,13 +57,11 @@ export function createHooks(config: HooksConfig) {
       revalidateTag(tag);
     }
 
-    // Fire onInvalidate for registered collections only
-    if (config.onInvalidate && affectedDocuments.size > 0) {
-      const serialized: Partial<Record<CollectionSlug, string[]>> = {};
-      for (const [slug, docIds] of affectedDocuments) {
-        serialized[slug] = Array.from(docIds);
+    // Fire onInvalidate for the source documents if registered
+    if (config.onInvalidate && registeredCollections.has(collection)) {
+      for (const id of ids) {
+        await config.onInvalidate({ collection, docID: id });
       }
-      await config.onInvalidate(serialized);
     }
 
     async function walkDependents(
@@ -127,18 +122,16 @@ export function createHooks(config: HooksConfig) {
 
         tagsToInvalidate.add(dependent.entity.slug);
 
-        // Only track for onInvalidate if this is a registered collection
-        if (registeredCollections.has(dependent.entity.slug)) {
-          const existing = affectedDocuments.get(dependent.entity.slug);
-          if (existing) {
-            for (const item of affectedItems) {
-              existing.add(item.id.toString());
-            }
-          } else {
-            affectedDocuments.set(
-              dependent.entity.slug,
-              new Set(affectedItems.map((item) => item.id.toString())),
-            );
+        // Fire onInvalidate per affected document in registered collections
+        if (
+          config.onInvalidate &&
+          registeredCollections.has(dependent.entity.slug)
+        ) {
+          for (const item of affectedItems) {
+            await config.onInvalidate({
+              collection: dependent.entity.slug,
+              docID: item.id.toString(),
+            });
           }
         }
 
@@ -186,7 +179,10 @@ export function createHooks(config: HooksConfig) {
       config.onInvalidate &&
       registeredGlobals.has(global.slug as GlobalSlug)
     ) {
-      await config.onInvalidate({});
+      await config.onInvalidate({
+        collection: global.slug as GlobalSlug,
+        docID: global.slug,
+      });
     }
   };
 
