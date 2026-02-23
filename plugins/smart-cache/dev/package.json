@@ -3,11 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "pnpm seed",
     "build": "next build",
-    "predev": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts",
+    "predev": "pnpm seed",
     "dev": "next dev",
     "generate:importmap": "payload generate:importmap",
-    "generate:types": "payload generate:types"
+    "generate:types": "payload generate:types",
+    "seed": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts"
   },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
