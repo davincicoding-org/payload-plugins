@@ -49,7 +49,7 @@
     "zod": "catalog:"
   },
   "peerDependencies": {
-    "payload": "catalog:payload-stack"
+    "payload": "catalog:payload-peers"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",

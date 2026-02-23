@@ -22,11 +22,14 @@ export function createDependencyGraph({
   const graph = new EntitiesGraph();
 
   for (const { slug, fields } of collections) {
-    graph.addRelations({ type: 'collection', slug }, fields);
+    graph.addRelations(
+      { type: 'collection', slug: slug as CollectionSlug },
+      fields,
+    );
   }
 
   for (const { slug, fields } of globals) {
-    graph.addRelations({ type: 'global', slug }, fields);
+    graph.addRelations({ type: 'global', slug: slug as GlobalSlug }, fields);
   }
 
   return graph;
@@ -122,7 +125,7 @@ export class EntitiesGraph extends Graph<
 
     for (const [collection, fields] of byCollection) {
       this.addEdge(
-        `collection|${collection}`,
+        `collection|${collection}` as StringifiedEntityReference,
         EntitiesGraph.stringifyEntityReference(entity),
         {
           props: fields.map(({ field, hasMany, polymorphic }) => ({

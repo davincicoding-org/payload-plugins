@@ -58,6 +58,21 @@
       "pinVersion": "catalog:vite"
     },
     {
+      "label": "Payload ecosystem must use catalog:payload-peers in peerDependencies",
+      "dependencies": [
+        "@payloadcms/**",
+        "payload",
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "typescript"
+      ],
+      "dependencyTypes": ["peer"],
+      "pinVersion": "catalog:payload-peers"
+    },
+    {
       "label": "Plugins must not ship Payload ecosystem as regular dependencies",
       "packages": ["plugins/**"],
       "dependencies": [
