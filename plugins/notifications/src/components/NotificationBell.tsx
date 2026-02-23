@@ -39,7 +39,7 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
     state,
     dispatch,
   );
-  const { markRead, markAllRead, deleteNotification } = useNotificationActions(
+  const { markRead, deleteNotification } = useNotificationActions(
     apiRoute,
     dispatch,
   );
