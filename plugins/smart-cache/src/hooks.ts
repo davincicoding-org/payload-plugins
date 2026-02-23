@@ -3,8 +3,8 @@ import type {
   BasePayload,
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
+  CollectionSlug,
   GlobalAfterChangeHook,
-  TypeWithID,
 } from 'payload';
 import type { DocumentInvalidationCallback, DocumentWithStatus } from './types';
 import type { EntitiesGraph } from './utils/dependency-graph';
@@ -19,7 +19,7 @@ async function invalidateWithDependents(
   }: {
     graph: EntitiesGraph;
     invalidationCallback: DocumentInvalidationCallback | undefined;
-    collection: string;
+    collection: CollectionSlug;
     ids: string[];
   },
 ): Promise<void> {
@@ -44,7 +44,7 @@ async function invalidateWithDependents(
   async function walkDependents(
     graph: EntitiesGraph,
     payload: BasePayload,
-    changedCollection: string,
+    changedCollection: CollectionSlug,
     changedIds: string[],
     visited: Set<string>,
   ): Promise<void> {

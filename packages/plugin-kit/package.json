@@ -63,7 +63,7 @@
     "@swc/core": "^1.11.0",
     "commander": "^14.0.2",
     "tsc-alias": "^1.8.0",
-    "tsx": "^4.0.0",
+    "tsx": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -76,7 +76,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "payload": "catalog:payload-stack"
+    "payload": "catalog:payload-peers"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

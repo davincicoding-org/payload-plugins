@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build --turbo",
+    "build": "next build",
     "predev": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types"
   },
@@ -29,7 +29,7 @@
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",
     "playwright": "1.56.1",
-    "tsx": "^4.20.6",
+    "tsx": "catalog:",
     "typescript": "catalog:payload-stack",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
