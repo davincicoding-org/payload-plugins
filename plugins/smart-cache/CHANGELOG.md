@@ -1,5 +1,17 @@
 # payload-smart-cache
 
+## 1.2.0
+
+### Minor Changes
+
+- [#25](https://github.com/davincicoding-org/payload-plugins/pull/25) [`ce6a46a`](https://github.com/davincicoding-org/payload-plugins/commit/ce6a46a69bc6ad14f161afbd5e7740246d2ceb10) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Rewrite cache invalidation to use direct hooks instead of a publish queue.
+
+  - Remove `publish-queue` collection, endpoints, and publish button
+  - Invalidate via `revalidateTag` and `onInvalidate` callback directly from collection/global hooks
+  - Build dependency graph eagerly at config time and walk dependents on change
+  - Make `slugs` required in `createRequestHandler`
+  - Re-export `OnInvalidate` and `InvalidationChange` types for consumers
+
 ## 1.1.10
 
 ### Patch Changes
