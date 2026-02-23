@@ -13,7 +13,7 @@ import {
   BeautifulMentionNode,
   BeautifulMentionsPlugin,
 } from 'lexical-beautiful-mentions';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatVariableLabel } from '@/components/input/utils';
 import {
   isTagElement,
@@ -88,28 +88,25 @@ export function MessageInput({
     };
   }, [variables]);
 
-  const initialConfig = useMemo(
-    () => ({
-      namespace: 'ICUMessageEditor',
-      nodes: [
-        VariableMentionNode,
-        {
-          replace: BeautifulMentionNode,
-          with: (node: BeautifulMentionNode) =>
-            new VariableMentionNode(
-              node.getTrigger(),
-              node.getValue(),
-              node.getData(),
-            ),
-          withKlass: VariableMentionNode,
-        },
-      ],
-      editorState: JSON.stringify(parseIcuToLexicalState(value)),
-      editable: true,
-      onError: console.error,
-    }),
-    [],
-  );
+  const [initialConfig] = useState(() => ({
+    namespace: 'ICUMessageEditor',
+    nodes: [
+      VariableMentionNode,
+      {
+        replace: BeautifulMentionNode,
+        with: (node: BeautifulMentionNode) =>
+          new VariableMentionNode(
+            node.getTrigger(),
+            node.getValue(),
+            node.getData(),
+          ),
+        withKlass: VariableMentionNode,
+      },
+    ],
+    editorState: JSON.stringify(parseIcuToLexicalState(value)),
+    editable: true,
+    onError: console.error,
+  }));
 
   return (
     <LexicalComposer initialConfig={initialConfig}>

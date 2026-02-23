@@ -30,7 +30,7 @@ export function NumericVariableEditor({
     return undefined;
   });
   const getValueRef = useRef<{ getValue: () => string }>(null);
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FIXME
   useEffect(() => {
     return () => {
       if (!getValueRef.current) return;

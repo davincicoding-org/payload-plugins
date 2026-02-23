@@ -57,8 +57,6 @@
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
     "@davincicoding/payload-utils": "workspace:*",
-    "@payloadcms/db-sqlite": "catalog:payload-stack",
-    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.11.0",
     "commander": "^14.0.2",
@@ -67,6 +65,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@payloadcms/db-sqlite": "catalog:payload-stack",
+    "@payloadcms/richtext-lexical": "catalog:payload-stack",
     "@payloadcms/ui": "catalog:payload-stack",
     "@playwright/test": "1.56.1",
     "@types/node": "^22.5.4",
@@ -76,7 +76,17 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "payload": "catalog:payload-peers"
+    "@payloadcms/db-sqlite": ">=3.72.0",
+    "@payloadcms/richtext-lexical": ">=3.72.0",
+    "payload": ">=3.72.0"
+  },
+  "peerDependenciesMeta": {
+    "@payloadcms/db-sqlite": {
+      "optional": true
+    },
+    "@payloadcms/richtext-lexical": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

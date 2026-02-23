@@ -27,6 +27,7 @@ export function TemporalVariablePicker({
   });
   const getValueRef = useRef<{ getValue: () => string }>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FIXME
   useEffect(() => {
     return () => {
       if (!getValueRef.current) return;

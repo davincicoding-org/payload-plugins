@@ -45,7 +45,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "payload": "catalog:payload-peers"
+    "payload": ">=3.72.0"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

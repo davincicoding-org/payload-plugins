@@ -72,10 +72,10 @@
     "zod": "catalog:"
   },
   "peerDependencies": {
-    "@payloadcms/next": "catalog:payload-peers",
-    "@payloadcms/ui": "catalog:payload-peers",
-    "next": "catalog:payload-peers",
-    "payload": "catalog:payload-peers"
+    "@payloadcms/next": ">=3.72.0",
+    "@payloadcms/ui": ">=3.72.0",
+    "next": ">=15.5.9",
+    "payload": ">=3.72.0"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",

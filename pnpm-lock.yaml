@@ -18,10 +18,6 @@ catalogs:
     zod:
       specifier: 4.3.5
       version: 4.3.5
-  payload-peers:
-    '@payloadcms/next':
-      specifier: '>=3.72.0'
-      version: 3.72.0
   payload-stack:
     '@payloadcms/db-sqlite':
       specifier: 3.72.0
@@ -104,12 +100,6 @@ importers:
       '@davincicoding/payload-utils':
         specifier: workspace:*
         version: link:../utils
-      '@payloadcms/db-sqlite':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@types/pg@8.10.2)(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(pg@8.16.3)
-      '@payloadcms/richtext-lexical':
-        specifier: catalog:payload-stack
-        version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
       '@swc/cli':
         specifier: ^0.6.0
         version: 0.6.0(@swc/core@1.15.10)
@@ -129,6 +119,12 @@ importers:
         specifier: 'catalog:'
         version: 4.3.5
     devDependencies:
+      '@payloadcms/db-sqlite':
+        specifier: catalog:payload-stack
+        version: 3.72.0(@types/pg@8.10.2)(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(pg@8.16.3)
+      '@payloadcms/richtext-lexical':
+        specifier: catalog:payload-stack
+        version: 3.72.0(@faceless-ui/modal@3.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@payloadcms/next@3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3))(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)(yjs@13.6.29)
       '@payloadcms/ui':
         specifier: catalog:payload-stack
         version: 3.72.0(@types/react@19.2.1)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
@@ -182,7 +178,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-kit
       '@payloadcms/next':
-        specifier: catalog:payload-peers
+        specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       '@react-pdf/renderer':
         specifier: ^4.3.2
@@ -301,7 +297,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-kit
       '@payloadcms/next':
-        specifier: catalog:payload-peers
+        specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       react-textarea-autosize:
         specifier: ^8.5.9
@@ -417,7 +413,7 @@ importers:
         specifier: ^2.11.2
         version: 2.11.4
       '@payloadcms/next':
-        specifier: catalog:payload-peers
+        specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       '@tabler/icons-react':
         specifier: ^3.36.1
@@ -548,7 +544,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-kit
       '@payloadcms/next':
-        specifier: catalog:payload-peers
+        specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       zod:
         specifier: 'catalog:'
@@ -658,7 +654,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-kit
       '@payloadcms/next':
-        specifier: catalog:payload-peers
+        specifier: '>=3.72.0'
         version: 3.72.0(@types/react@19.2.1)(graphql@16.12.0)(monaco-editor@0.55.1)(next@15.5.9(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.72.0(graphql@16.12.0)(typescript@5.7.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.3)
       '@tabler/icons-react':
         specifier: ^3.36.1

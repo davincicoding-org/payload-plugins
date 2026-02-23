@@ -22,7 +22,7 @@ export function TagVariableEditor({
   const { register, getValues } = useForm<{ content: string }>({
     defaultValues: { content },
   });
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FIXME
   useEffect(() => {
     return () => {
       const { content } = getValues();

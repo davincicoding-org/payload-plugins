@@ -33,6 +33,7 @@ export function SelectVariableEditor({
     name: 'options',
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FIXME
   useEffect(() => {
     return () => {
       const values = getValues();
