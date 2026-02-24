@@ -1,4 +1,4 @@
-import { defineProcedure } from '@davincicoding/payload-plugin-kit';
+import { defineProcedure } from '@davincicoding/payload-plugin-kit/procedure';
 
 export const SETTINGS_SLUG = 'clienthub-settings';
 

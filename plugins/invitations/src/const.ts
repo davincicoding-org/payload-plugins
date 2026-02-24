@@ -1,4 +1,4 @@
-import { defineProcedure } from '@davincicoding/payload-plugin-kit';
+import { defineProcedure } from '@davincicoding/payload-plugin-kit/procedure';
 import { acceptInviteSchema, reinviteSchema } from './types';
 
 export const ENDPOINTS = {

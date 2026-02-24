@@ -14,6 +14,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./procedure": {
+      "types": "./dist/procedure.d.ts",
+      "import": "./dist/procedure.js",
+      "default": "./dist/procedure.js"
+    },
     "./base.tsconfig.json": "./tsconfig.base.json",
     "./vitest.config": "./vitest.config.ts",
     "./testing": {
