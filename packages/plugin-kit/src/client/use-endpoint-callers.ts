@@ -24,7 +24,8 @@ export function useEndpointCallers<T extends Record<string, EndpointConfig>>(
     const callers = {} as Record<string, Function>;
     for (const [key, config] of Object.entries(endpoints)) {
       callers[key] = (...args: unknown[]) =>
-        callEndpoint(config, apiRoute, ...(args as [never]));
+        // biome-ignore lint/complexity/noBannedTypes: internal dynamic dispatch
+        (callEndpoint as Function)(config, apiRoute, ...args);
     }
     return callers as EndpointCallers<T>;
   }, [endpoints, apiRoute]);

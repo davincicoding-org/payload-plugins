@@ -18,17 +18,15 @@ export interface EndpointConfig<
 }
 
 /** Infer the parsed input type from an EndpointConfig. Void if no input schema. */
-export type InferInput<T extends EndpointConfig> =
-  T extends EndpointConfig<infer I, any>
-    ? I extends ZodLike<infer O>
-      ? O
-      : void
-    : void;
+export type InferInput<T extends EndpointConfig> = T extends {
+  input: ZodLike<infer O>;
+}
+  ? O
+  : void;
 
 /** Infer the parsed output type from an EndpointConfig. unknown if no output schema. */
-export type InferOutput<T extends EndpointConfig> =
-  T extends EndpointConfig<any, infer O>
-    ? O extends ZodLike<infer R>
-      ? R
-      : unknown
-    : unknown;
+export type InferOutput<T extends EndpointConfig> = T extends {
+  output: ZodLike<infer O>;
+}
+  ? O
+  : unknown;

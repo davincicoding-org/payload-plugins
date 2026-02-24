@@ -2,12 +2,13 @@ import {
   getAdminURL,
   resolveDocumentID,
 } from '@davincicoding/payload-plugin-kit';
-import type { CollectionSlug } from 'payload';
-import { ENDPOINTS } from '@/procedures';
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
+import type { CollectionSlug, PayloadRequest } from 'payload';
+import { ENDPOINTS } from '@/const';
 
 /** Resolves the target URL for a notification, or null if there's no target. */
 function resolveTargetURL(
-  req: Parameters<Parameters<typeof ENDPOINTS.openNotification.endpoint>[0]>[0],
+  req: PayloadRequest,
   notification: {
     url?: string | null;
     documentReference?: {
@@ -37,46 +38,49 @@ function resolveTargetURL(
  * or returns JSON with the resolved URL (for in-app use with `?json=true`).
  */
 export const openNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
-  ENDPOINTS.openNotification.endpoint(async (req, { id, json }) => {
-    if (!req.user) {
-      const loginURL = getAdminURL({ req, path: '/login' });
-      const apiRoute = req.payload.config.routes.api;
-      const currentPath = `${apiRoute}/notifications-plugin/open?id=${id}`;
-      return Response.redirect(
-        `${loginURL}?redirect=${encodeURIComponent(currentPath)}`,
-        302,
-      );
-    }
+  createEndpointHandler(
+    ENDPOINTS.openNotification,
+    async (req, { id, json }) => {
+      if (!req.user) {
+        const loginURL = getAdminURL({ req, path: '/login' });
+        const apiRoute = req.payload.config.routes.api;
+        const currentPath = `${apiRoute}/notifications-plugin/open?id=${id}`;
+        return Response.redirect(
+          `${loginURL}?redirect=${encodeURIComponent(currentPath)}`,
+          302,
+        );
+      }
 
-    const notification = await req.payload.findByID({
-      collection: notificationsSlug as 'notifications',
-      id,
-      depth: 0,
-      req,
-    });
-
-    // Verify ownership
-    const recipientId = resolveDocumentID(notification.recipient);
-
-    if (recipientId !== req.user.id) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    // Mark as read
-    if (!notification.readAt) {
-      await req.payload.update({
+      const notification = await req.payload.findByID({
         collection: notificationsSlug as 'notifications',
         id,
-        data: { readAt: new Date().toISOString() },
+        depth: 0,
         req,
       });
-    }
 
-    const url = resolveTargetURL(req, notification);
+      // Verify ownership
+      const recipientId = resolveDocumentID(notification.recipient);
 
-    if (json === 'true') {
-      return { url };
-    }
+      if (recipientId !== req.user.id) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
-    return Response.redirect(url ?? getAdminURL({ req, path: '' }), 302);
-  });
+      // Mark as read
+      if (!notification.readAt) {
+        await req.payload.update({
+          collection: notificationsSlug as 'notifications',
+          id,
+          data: { readAt: new Date().toISOString() },
+          req,
+        });
+      }
+
+      const url = resolveTargetURL(req, notification);
+
+      if (json === 'true') {
+        return { url };
+      }
+
+      return Response.redirect(url ?? getAdminURL({ req, path: '' }), 302);
+    },
+  );

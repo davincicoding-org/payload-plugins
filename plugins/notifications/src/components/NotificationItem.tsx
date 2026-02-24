@@ -3,13 +3,12 @@
 import { Menu } from '@base-ui/react/menu';
 import { formatTimeToNow, useTranslation } from '@payloadcms/ui';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { ENDPOINTS } from '@/procedures';
 import type { NotificationData, StoredDocumentReference } from '@/types';
 import styles from './NotificationItem.module.css';
 
 interface NotificationItemProps {
   notification: NotificationData;
-  apiRoute: string;
+  onOpen: (id: string | number) => Promise<{ url: string | null }>;
   onMarkRead: (id: string | number) => void;
   onUnsubscribe: (documentReference: StoredDocumentReference) => void;
   onDelete: (id: string | number) => void;
@@ -17,7 +16,7 @@ interface NotificationItemProps {
 
 export function NotificationItem({
   notification,
-  apiRoute,
+  onOpen,
   onMarkRead,
   onUnsubscribe,
   onDelete,
@@ -26,17 +25,14 @@ export function NotificationItem({
   const isUnread = !notification.readAt;
 
   const handleClick = async () => {
-    const { url } = await ENDPOINTS.openNotification.call(apiRoute, {
-      id: notification.id,
-      json: 'true',
-    });
+    const { url } = await onOpen(notification.id);
 
     if (url) {
       window.location.href = url;
       return;
     }
 
-    // No target — just update local state since the server already marked it read
+    // No target -- just update local state since the server already marked it read
     if (isUnread) onMarkRead(notification.id);
   };
 

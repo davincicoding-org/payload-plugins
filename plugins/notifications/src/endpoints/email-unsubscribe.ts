@@ -1,7 +1,8 @@
 import { documentReferenceSchema } from '@davincicoding/payload-plugin-kit';
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import { unsubscribe } from '@/api';
+import { ENDPOINTS } from '@/const';
 import { verifyUnsubscribeToken } from '@/email/email-token';
-import { ENDPOINTS } from '@/procedures';
 
 function escapeHTML(str: string): string {
   return str
@@ -26,7 +27,7 @@ function htmlPage(title: string, message: string, status = 200): Response {
 }
 
 export const emailUnsubscribeEndpoint = () =>
-  ENDPOINTS.emailUnsubscribe.endpoint(async (req, { token }) => {
+  createEndpointHandler(ENDPOINTS.emailUnsubscribe, async (req, { token }) => {
     const payload = verifyUnsubscribeToken(req.payload.config.secret, token);
 
     if (!payload) {
@@ -49,7 +50,7 @@ export const emailUnsubscribeEndpoint = () =>
     try {
       await unsubscribe(req, payload.userId, docRef.data);
     } catch {
-      // Already unsubscribed or subscription didn't exist — that's fine
+      // Already unsubscribed or subscription didn't exist -- that's fine
     }
 
     return htmlPage(

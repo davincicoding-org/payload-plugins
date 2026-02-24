@@ -1,9 +1,10 @@
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import type { CollectionSlug } from 'payload';
-import { ENDPOINTS } from '@/procedures';
+import { ENDPOINTS } from '@/const';
 import { mapNotification } from './map-notification';
 
 export const readNotificationsEndpoint = (notificationsSlug: CollectionSlug) =>
-  ENDPOINTS.read.endpoint(async (req, { page, limit }) => {
+  createEndpointHandler(ENDPOINTS.read, async (req, { page, limit }) => {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }

@@ -1,8 +1,9 @@
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import type { CollectionSlug } from 'payload';
-import { ENDPOINTS } from '@/procedures';
+import { ENDPOINTS } from '@/const';
 
 export const deleteNotificationEndpoint = (notificationsSlug: CollectionSlug) =>
-  ENDPOINTS.deleteNotification.endpoint(async (req, { id }) => {
+  createEndpointHandler(ENDPOINTS.deleteNotification, async (req, { id }) => {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
