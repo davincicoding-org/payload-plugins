@@ -65,6 +65,8 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.11.0",
     "commander": "^14.0.2",
+    "path-to-regexp": "^8.3.0",
+    "ts-to-zod": "^5.1.0",
     "tsc-alias": "^1.8.0",
     "tsx": "catalog:",
     "zod": "catalog:"
@@ -75,7 +77,9 @@
     "@payloadcms/ui": "catalog:payload-stack",
     "@playwright/test": "1.56.1",
     "@types/node": "^22.5.4",
+    "client-only": "^0.0.1",
     "payload": "catalog:payload-stack",
+    "server-only": "^0.0.1",
     "typescript": "catalog:payload-stack",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
@@ -83,13 +87,25 @@
   "peerDependencies": {
     "@payloadcms/db-sqlite": ">=3.72.0",
     "@payloadcms/richtext-lexical": ">=3.72.0",
-    "payload": ">=3.72.0"
+    "@payloadcms/ui": ">=3.72.0",
+    "client-only": "^0.0.1",
+    "payload": ">=3.72.0",
+    "server-only": "^0.0.1"
   },
   "peerDependenciesMeta": {
     "@payloadcms/db-sqlite": {
       "optional": true
     },
     "@payloadcms/richtext-lexical": {
+      "optional": true
+    },
+    "@payloadcms/ui": {
+      "optional": true
+    },
+    "client-only": {
+      "optional": true
+    },
+    "server-only": {
       "optional": true
     }
   },
