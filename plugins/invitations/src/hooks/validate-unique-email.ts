@@ -20,7 +20,7 @@ export const validateUniqueEmail: CollectionBeforeChangeHook<User> = async ({
   });
 
   if (docs.length > 0) {
-    const { APIError } = await import(/* webpackIgnore: true */ 'payload');
+    const { APIError } = await import('payload');
     throw new APIError(`A user with the email "${email}" already exists.`, 400);
   }
 

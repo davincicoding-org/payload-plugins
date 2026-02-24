@@ -81,9 +81,7 @@ function createProcedure<TInput, TOutput>(
               return wrapOutput(output);
             }
 
-            const { addDataAndFileToRequest } = await import(
-              /* webpackIgnore: true */ 'payload'
-            );
+            const { addDataAndFileToRequest } = await import('payload');
             await addDataAndFileToRequest(req);
             const result = inputSchema.safeParse(req.data);
             if (!result.success) {
