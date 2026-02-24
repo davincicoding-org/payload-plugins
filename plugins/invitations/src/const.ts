@@ -1,18 +1,18 @@
-import { defineProcedure } from '@davincicoding/payload-plugin-kit/procedure';
+import type { EndpointConfig } from '@davincicoding/payload-plugin-kit';
 import { acceptInviteSchema, reinviteSchema } from './types';
 
 export const ENDPOINTS = {
-  reinvite: defineProcedure({
+  reinvite: {
     path: '/invitations-plugin/reinvite',
     method: 'post',
     input: reinviteSchema,
-  }).returns<{ success: true }>(),
-  acceptInvite: defineProcedure({
+  },
+  acceptInvite: {
     path: '/invitations-plugin/accept-invite',
     method: 'post',
     input: acceptInviteSchema,
-  }).returns<{ success: true }>(),
-};
+  },
+} satisfies Record<string, EndpointConfig>;
 
 export const INVITATION_PAGE_PATH = '/invitation';
 

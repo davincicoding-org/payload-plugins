@@ -1,6 +1,8 @@
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import { ENDPOINTS } from '../const';
 
-export const acceptInviteEndpoint = ENDPOINTS.acceptInvite.endpoint(
+export const acceptInviteEndpoint = createEndpointHandler(
+  ENDPOINTS.acceptInvite,
   async (req, { token, password }) => {
     const usersCollection = req.payload.config.admin.user as 'users';
 
