@@ -1,4 +1,3 @@
-import { generatePayloadCookie } from 'payload';
 import { ENDPOINTS } from '../const';
 
 export const acceptInviteEndpoint = ENDPOINTS.acceptInvite.endpoint(
@@ -37,6 +36,9 @@ export const acceptInviteEndpoint = ENDPOINTS.acceptInvite.endpoint(
     }
 
     // Set the auth cookie
+    const { generatePayloadCookie } = await import(
+      /* webpackIgnore: true */ 'payload'
+    );
     const cookie = generatePayloadCookie({
       collectionAuthConfig:
         req.payload.collections[usersCollection].config.auth,
