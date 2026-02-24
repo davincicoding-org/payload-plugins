@@ -77,6 +77,7 @@
     "@payloadcms/ui": "catalog:payload-stack",
     "@playwright/test": "1.56.1",
     "@types/node": "^22.5.4",
+    "@types/react": "catalog:payload-stack",
     "client-only": "^0.0.1",
     "payload": "catalog:payload-stack",
     "server-only": "^0.0.1",

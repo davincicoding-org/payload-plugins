@@ -140,6 +140,9 @@ importers:
       '@types/node':
         specifier: ^22.5.4
         version: 22.19.7
+      '@types/react':
+        specifier: catalog:payload-stack
+        version: 19.2.1
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
