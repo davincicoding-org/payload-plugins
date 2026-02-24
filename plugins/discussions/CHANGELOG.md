@@ -1,5 +1,11 @@
 # payload-discussions
 
+## 1.1.8
+
+### Patch Changes
+
+- [`1b04773`](https://github.com/davincicoding-org/payload-plugins/commit/1b0477340907d9fdf883850a2b3d64157a7f3742) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Return `null` instead of throwing when rendering on document create views where no ID exists yet.
+
 ## 1.1.7
 
 ### Patch Changes
