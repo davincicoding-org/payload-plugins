@@ -1,6 +1,6 @@
 {
   "name": "payload-smart-cache",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Payload Plugin for Cached Data",
   "keywords": [
     "payload",

@@ -1,6 +1,6 @@
 {
   "name": "payload-intl",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Payload Plugin for I18N using ICU Messages",
   "keywords": [
     "payload",
