@@ -2,8 +2,9 @@ import {
   fetchDocumentByReference,
   updateDocumentByReference,
 } from '@davincicoding/payload-plugin-kit';
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import type { Endpoint } from 'payload';
-import { ENDPOINTS } from '@/procedures';
+import { ENDPOINTS } from '@/const';
 import { type CreateCommentCallback, discussionsDocumentSchema } from '@/types';
 import { populateComment } from '@/utils';
 
@@ -14,7 +15,8 @@ export const createCommentEndpoint = ({
   commentsSlug: 'comments';
   callback?: CreateCommentCallback;
 }): Endpoint =>
-  ENDPOINTS.createComment.endpoint(
+  createEndpointHandler(
+    ENDPOINTS.createComment,
     async (req, { content, documentReference }) => {
       if (!req.user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });

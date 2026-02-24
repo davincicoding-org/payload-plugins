@@ -4,9 +4,9 @@ import type {
   DocumentID,
   DocumentReference,
 } from '@davincicoding/payload-plugin-kit';
-import { useConfig } from '@payloadcms/ui';
+import { useEndpointCallers } from '@davincicoding/payload-plugin-kit/client';
 import { useCallback, useMemo, useState } from 'react';
-import { ENDPOINTS } from '@/procedures';
+import { ENDPOINTS } from '@/const';
 import type { PopulatedComment } from '../types';
 import { CommentContext, type CommentContextValue } from './CommentContext';
 
@@ -23,11 +23,7 @@ export function CommentProvider({
   maxDepth,
   children,
 }: CommentProviderProps) {
-  const {
-    config: {
-      routes: { api: apiRoute },
-    },
-  } = useConfig();
+  const api = useEndpointCallers(ENDPOINTS);
 
   const [comments, setComments] =
     useState<readonly PopulatedComment[]>(initialComments);
@@ -44,19 +40,19 @@ export function CommentProvider({
   const submitReply = useCallback(
     async (parentId: string | null, content: string) => {
       if (parentId === null) {
-        const populated = await ENDPOINTS.createComment.call(apiRoute, {
+        const populated = (await api.createComment({
           content,
           documentReference,
-        });
+        })) as PopulatedComment;
         setComments((prev) => [populated, ...prev]);
         setActiveReplyId(null);
         return;
       }
 
-      const populated = await ENDPOINTS.createReply.call(apiRoute, {
+      const populated = (await api.createReply({
         parentId: parentId as DocumentID,
         content,
-      });
+      })) as PopulatedComment;
 
       const insertReply = (
         items: readonly PopulatedComment[],
@@ -73,7 +69,7 @@ export function CommentProvider({
       setComments((prev) => insertReply(prev));
       setActiveReplyId(null);
     },
-    [apiRoute, documentReference],
+    [api, documentReference],
   );
 
   const value = useMemo<CommentContextValue>(
