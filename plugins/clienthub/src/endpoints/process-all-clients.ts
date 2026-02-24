@@ -1,3 +1,4 @@
+import { createEndpointHandler } from '@davincicoding/payload-plugin-kit/server';
 import type { Endpoint } from 'payload';
 import { APIError } from 'payload';
 import { ENDPOINTS, SETTINGS_SLUG } from '@/const';
@@ -13,7 +14,7 @@ export const createProcessAllClientsEndpoint = (
     | 'onError'
   >,
 ): Endpoint =>
-  ENDPOINTS.processAllClients.endpoint(async (req) => {
+  createEndpointHandler(ENDPOINTS.processAllClients, async (req) => {
     const authentication = getAuthentication(req, options.cronSecret);
     if (authentication === null) {
       throw new APIError('Unauthorized', 401);
