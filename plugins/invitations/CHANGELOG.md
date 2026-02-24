@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.1.9
+
+### Patch Changes
+
+- [`10d8141`](https://github.com/davincicoding-org/payload-plugins/commit/10d81413a9a14b385a3c5c0952f25629d887ac7a) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Use dynamic imports for runtime `payload` imports to fix "Cannot find package 'payload'" error on Vercel with Turbopack.
+
 ## 0.1.8
 
 ### Patch Changes
