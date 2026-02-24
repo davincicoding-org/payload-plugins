@@ -1,5 +1,11 @@
 # @davincicoding/payload-plugin-kit
 
+## 0.0.6
+
+### Patch Changes
+
+- [`f323ee7`](https://github.com/davincicoding-org/payload-plugins/commit/f323ee7da223606587b840b2b76f1c1d84424461) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Remove unnecessary `/* webpackIgnore: true */` magic comments from dynamic `payload` imports. Payload's `withPayload` Next.js plugin already handles externalizing `payload` in development via `serverExternalPackages`, and intentionally allows bundling in production for tree-shaking. The comments were overriding this behavior and could cause dual module instances.
+
 ## 0.0.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "payload-notifications",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Generic notification infrastructure for Payload CMS with email, in-app, and external callback channels.",
   "repository": {
     "type": "git",
