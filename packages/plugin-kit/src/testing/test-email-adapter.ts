@@ -5,8 +5,14 @@ export const testEmailAdapter: EmailAdapter = () => ({
   defaultFromAddress: 'dev@test.com',
   defaultFromName: 'Test',
   sendEmail: async (message: SendEmailOptions) => {
-    console.log(
-      `[test-email] To: ${Array.isArray(message.to) ? message.to.join(', ') : message.to} | Subject: ${message.subject}`,
-    );
+    const to = Array.isArray(message.to) ? message.to.join(', ') : message.to;
+    const body = message.html ?? message.text ?? message.body ?? '(empty)';
+
+    console.log('┌──────────────────────────────────────');
+    console.log(`│ To:      ${to}`);
+    console.log(`│ Subject: ${message.subject}`);
+    console.log('├──────────────────────────────────────');
+    console.log(String(body));
+    console.log('└──────────────────────────────────────');
   },
 });

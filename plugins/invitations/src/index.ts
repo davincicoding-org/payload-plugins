@@ -4,6 +4,7 @@ import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { hideAuthOnCreateField, joinedAtField } from './fields';
 import { autoGeneratePassword } from './hooks/auto-generate-password';
+import { setJoinedAt } from './hooks/set-joined-at';
 import { validateUniqueEmail } from './hooks/validate-unique-email';
 
 export interface InvitationsPluginConfig {
@@ -113,7 +114,7 @@ export const invitationsPlugin =
         virtual: true,
         admin: {
           disableListColumn: true,
-          condition: (data) => !data.id,
+          condition: (data, _siblingData, { user }) => !data.id && !!user,
         },
       });
 
@@ -125,6 +126,7 @@ export const invitationsPlugin =
       collection.hooks.beforeValidate.push(autoGeneratePassword);
       collection.hooks.beforeChange ??= [];
       collection.hooks.beforeChange.push(validateUniqueEmail);
+      collection.hooks.beforeChange.push(setJoinedAt);
     }
 
     config.endpoints ??= [];

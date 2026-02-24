@@ -2,11 +2,21 @@
   "name": "invitations-dev",
   "private": true,
   "type": "module",
+  "scripts": {
+    "prebuild": "pnpm seed",
+    "build": "next build",
+    "predev": "pnpm seed",
+    "dev": "next dev",
+    "generate:importmap": "payload generate:importmap",
+    "generate:types": "payload generate:types",
+    "seed": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts"
+  },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
     "@payloadcms/db-sqlite": "catalog:payload-stack",
     "@payloadcms/next": "catalog:payload-stack",
     "@payloadcms/richtext-lexical": "catalog:payload-stack",
+    "@payloadcms/ui": "catalog:payload-stack",
     "cross-env": "^7.0.3",
     "next": "catalog:payload-stack",
     "payload": "catalog:payload-stack",
