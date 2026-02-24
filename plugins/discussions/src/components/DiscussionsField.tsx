@@ -15,6 +15,8 @@ export const DiscussionsField = async ({
   commentsSlug,
   maxDepth,
 }: ServerComponentProps & DiscussionsFieldConfig) => {
+  if (source.entity === 'collection' && id === undefined) return null;
+
   const discussionIds: number[] = (data?.discussions as number[]) || [];
 
   const documentReference = ((): DocumentReference => {
@@ -22,13 +24,9 @@ export const DiscussionsField = async ({
       case 'global':
         return source;
       case 'collection':
-        if (id === undefined)
-          throw new Error(
-            'DiscussionsField can only be used on exsting documents',
-          );
         return {
           ...source,
-          id,
+          id: id!,
         };
       default:
         return uncaughtSwitchCase(source);

@@ -1,11 +1,10 @@
 import { getAdminURL } from '@davincicoding/payload-plugin-kit';
-import type { PayloadRequest, Plugin } from 'payload';
+import type { PayloadRequest, Plugin, TypedUser } from 'payload';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { hideAuthOnCreateField, joinedAtField } from './fields';
 import { autoGeneratePassword } from './hooks/auto-generate-password';
 import { validateUniqueEmail } from './hooks/validate-unique-email';
-import type { User } from './payload-types';
 
 export interface InvitationsPluginConfig {
   /**
@@ -14,7 +13,7 @@ export interface InvitationsPluginConfig {
   generateInvitationEmailHTML?: (args: {
     req: PayloadRequest;
     invitationURL: string;
-    user: User;
+    user: TypedUser;
   }) => string | Promise<string>;
   /**
    * Customize the invitation email subject.
@@ -22,7 +21,7 @@ export interface InvitationsPluginConfig {
   generateInvitationEmailSubject?: (args: {
     req: PayloadRequest;
     invitationURL: string;
-    user: User;
+    user: TypedUser;
   }) => Promise<string> | string;
 }
 
