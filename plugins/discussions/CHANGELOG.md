@@ -1,5 +1,20 @@
 # payload-discussions
 
+## 1.1.10
+
+### Patch Changes
+
+- [`715cea2`](https://github.com/davincicoding-org/payload-plugins/commit/715cea2735d6902bd774be5035dc14633a914fbd) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Move `defineProcedure`, `Procedure`, and `ProcedureBuilder` out of the barrel export into a dedicated `@davincicoding/payload-plugin-kit/procedure` subpath export. This prevents client bundles from pulling in `procedure.js` (which dynamically imports `payload`) when importing unrelated utilities from the barrel.
+
+  **Breaking:** If you import `defineProcedure` from `@davincicoding/payload-plugin-kit`, update to:
+
+  ```ts
+  import { defineProcedure } from "@davincicoding/payload-plugin-kit/procedure";
+  ```
+
+- Updated dependencies [[`715cea2`](https://github.com/davincicoding-org/payload-plugins/commit/715cea2735d6902bd774be5035dc14633a914fbd)]:
+  - @davincicoding/payload-plugin-kit@0.0.7
+
 ## 1.1.9
 
 ### Patch Changes

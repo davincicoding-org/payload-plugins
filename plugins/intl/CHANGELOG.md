@@ -1,5 +1,12 @@
 # payload-intl
 
+## 1.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`715cea2`](https://github.com/davincicoding-org/payload-plugins/commit/715cea2735d6902bd774be5035dc14633a914fbd)]:
+  - @davincicoding/payload-plugin-kit@0.0.7
+
 ## 1.4.3
 
 ### Patch Changes
