@@ -9,7 +9,7 @@
     "dev": "next dev",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
-    "seed": "rm -f src/payload.db && tsx --tsconfig tsconfig.json src/seed.ts"
+    "seed": "rm -f src/payload.db"
   },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
