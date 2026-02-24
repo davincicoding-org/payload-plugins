@@ -31,7 +31,7 @@ if (!process.env.__GEN_TYPES_TSX) {
 
 // Note: execSync is used here with a hardcoded npx payload command
 // and no user-controlled input, so shell injection is not a concern.
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
@@ -63,6 +63,7 @@ const plugin = await resolvePlugin();
 const configPath = generateMinimalPayloadConfig(plugin);
 try {
   generateTypes(configPath);
+  generateSchemas();
 } finally {
   cleanup(configPath);
 }
@@ -171,4 +172,21 @@ function generateTypes(configPath) {
 /** @param {string} configPath */
 function cleanup(configPath) {
   fs.rmSync(configPath);
+}
+
+function generateSchemas() {
+  const typesPath = path.join(cwd, 'src/payload-types.ts');
+  const schemasPath = path.join(cwd, 'src/payload-schemas.ts');
+
+  if (!fs.existsSync(typesPath)) {
+    console.warn('payload-types.ts not found, skipping schema generation');
+    return;
+  }
+
+  execFileSync('npx', ['ts-to-zod', typesPath, schemasPath], {
+    stdio: 'inherit',
+    cwd,
+  });
+
+  console.log('Generated payload-schemas.ts');
 }
