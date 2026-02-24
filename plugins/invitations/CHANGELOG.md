@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.1.8
+
+### Patch Changes
+
+- [`1b04773`](https://github.com/davincicoding-org/payload-plugins/commit/1b0477340907d9fdf883850a2b3d64157a7f3742) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Use `TypedUser` from Payload for `generateInvitationEmailHTML` and `generateInvitationEmailSubject` callbacks so consumers get their own User type instead of the plugin's internal one.
+
 ## 0.1.7
 
 ### Patch Changes
