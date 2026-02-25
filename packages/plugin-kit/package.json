@@ -43,9 +43,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "plugin-kit": "./dist/cli/index.js"
+    "plugin-kit": "./bin/plugin-kit.js"
   },
   "files": [
+    "bin",
     "dist",
     "tsconfig.base.json",
     "vitest.config.ts",
