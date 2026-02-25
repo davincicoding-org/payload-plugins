@@ -3,7 +3,10 @@
 "payload-clienthub": patch
 "payload-discussions": patch
 "payload-invitations": patch
+"payload-intl": patch
 "payload-notifications": patch
+"payload-smart-cache": patch
+"payload-smart-deletion": patch
 ---
 
 Replace `defineProcedure` with plain `EndpointConfig` objects and separate `/client` and `/server` entrypoints.
