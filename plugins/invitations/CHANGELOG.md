@@ -1,5 +1,32 @@
 # payload-invitations
 
+## 0.1.12
+
+### Patch Changes
+
+- [`5afc8e9`](https://github.com/davincicoding-org/payload-plugins/commit/5afc8e9eea61ad54e2da35bf6b27f928c9b29093) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Replace `defineProcedure` with plain `EndpointConfig` objects and separate `/client` and `/server` entrypoints.
+
+  - `@davincicoding/payload-plugin-kit` exports `EndpointConfig`, `InferInput`, `InferOutput` from the main barrel
+  - `@davincicoding/payload-plugin-kit/server` exports `createEndpointHandler` (guarded with `server-only`)
+  - `@davincicoding/payload-plugin-kit/client` exports `useEndpointCallers` hook (guarded with `client-only`)
+  - `generate-types` now also generates `payload-schemas.ts` via `ts-to-zod`
+
+  **Breaking:** `defineProcedure` is removed. Update imports:
+
+  ```ts
+  // Server — replace ENDPOINTS.x.endpoint(handler)
+  import { createEndpointHandler } from "@davincicoding/payload-plugin-kit/server";
+  createEndpointHandler(ENDPOINTS.x, handler);
+
+  // Client — replace ENDPOINTS.x.call(apiRoute, input)
+  import { useEndpointCallers } from "@davincicoding/payload-plugin-kit/client";
+  const api = useEndpointCallers(ENDPOINTS);
+  api.x(input);
+  ```
+
+- Updated dependencies [[`5afc8e9`](https://github.com/davincicoding-org/payload-plugins/commit/5afc8e9eea61ad54e2da35bf6b27f928c9b29093)]:
+  - @davincicoding/payload-plugin-kit@0.1.0
+
 ## 0.1.11
 
 ### Patch Changes
