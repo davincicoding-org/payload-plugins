@@ -10,7 +10,22 @@ import { validateUniqueEmail } from './hooks/validate-unique-email';
 export { acceptInvite } from './utils/accept-invite';
 export { getInviteData } from './utils/get-invite-data';
 
+export type AcceptInvitationURLFn = (args: {
+  token: string;
+  user: TypedUser;
+  req: PayloadRequest;
+  defaultURL: string;
+}) => string | Promise<string>;
+
 export interface InvitationsPluginConfig {
+  /**
+   * Custom URL for the accept-invitation page.
+   *
+   * - String: appended with `?token=...` and used in invitation emails. The built-in admin view is not registered.
+   * - Function: called with `{ token, user, req, defaultURL }` to generate the full URL. The built-in admin view is still registered.
+   * - Not set: uses the default admin panel invitation page.
+   */
+  acceptInvitationURL?: string | AcceptInvitationURLFn;
   /**
    * Customize the invitation email.
    */
@@ -31,6 +46,7 @@ export interface InvitationsPluginConfig {
 
 export const invitationsPlugin =
   ({
+    acceptInvitationURL,
     generateInvitationEmailHTML = DEFAULT_HTML,
     generateInvitationEmailSubject = DEFAULT_SUBJECT,
   }: InvitationsPluginConfig = {}): Plugin =>
@@ -75,13 +91,35 @@ export const invitationsPlugin =
         );
     }
 
-    config.admin ??= {};
-    config.admin.components ??= {};
-    config.admin.components.views ??= {};
-    config.admin.components.views.invitation = {
-      Component: 'payload-invitations/rsc#InvitationPage',
-      path: INVITATION_PAGE_PATH,
-      exact: true,
+    if (typeof acceptInvitationURL !== 'string') {
+      config.admin ??= {};
+      config.admin.components ??= {};
+      config.admin.components.views ??= {};
+      config.admin.components.views.invitation = {
+        Component: 'payload-invitations/rsc#InvitationPage',
+        path: INVITATION_PAGE_PATH,
+        exact: true,
+      };
+    }
+
+    const resolveInvitationURL = async ({
+      req,
+      token,
+      user,
+    }: {
+      req: PayloadRequest;
+      token: string;
+      user: TypedUser;
+    }) => {
+      const defaultURL = `${getAdminURL({ req, path: INVITATION_PAGE_PATH })}?token=${token}`;
+
+      if (typeof acceptInvitationURL === 'string') {
+        const separator = acceptInvitationURL.includes('?') ? '&' : '?';
+        return `${acceptInvitationURL}${separator}token=${token}`;
+      }
+      if (typeof acceptInvitationURL === 'function')
+        return acceptInvitationURL({ token, user, req, defaultURL });
+      return defaultURL;
     };
 
     config.collections ??= [];
@@ -92,18 +130,22 @@ export const invitationsPlugin =
       collection.auth = {
         ...(typeof collection.auth === 'object' ? collection.auth : {}),
         verify: {
-          generateEmailHTML: ({ req, token, user }) =>
-            generateInvitationEmailHTML({
+          generateEmailHTML: async ({ req, token, user }) => {
+            const invitationURL = await resolveInvitationURL({
               req,
-              invitationURL: `${getAdminURL({ req, path: INVITATION_PAGE_PATH })}?token=${token}`,
+              token,
               user,
-            }),
-          generateEmailSubject: ({ req, token, user }) =>
-            generateInvitationEmailSubject({
+            });
+            return generateInvitationEmailHTML({ req, invitationURL, user });
+          },
+          generateEmailSubject: async ({ req, token, user }) => {
+            const invitationURL = await resolveInvitationURL({
               req,
-              invitationURL: `${getAdminURL({ req, path: INVITATION_PAGE_PATH })}?token=${token}`,
+              token,
               user,
-            }),
+            });
+            return generateInvitationEmailSubject({ req, invitationURL, user });
+          },
         },
       };
 
