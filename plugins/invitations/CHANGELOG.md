@@ -1,5 +1,18 @@
 # payload-invitations
 
+## 0.2.0
+
+### Minor Changes
+
+- [#33](https://github.com/davincicoding-org/payload-plugins/pull/33) [`8fb58e0`](https://github.com/davincicoding-org/payload-plugins/commit/8fb58e048a3ebff0c807d933da9109bd954c5ddb) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add headless support for custom invitation acceptance pages.
+
+  - New `acceptInvitationURL` plugin option to redirect invitation emails to a custom frontend page
+  - New `getInviteData()` utility to validate tokens and fetch invited user data server-side
+  - New `acceptInvite()` utility to accept invitations programmatically with parsed cookie return
+  - Export `AcceptInvitationURLFn` type for the callback variant
+  - Move cookie parsing to a zod transform schema (`cookieStringSchema`)
+  - Add explicit return types and type-safe sensitive field stripping to utilities
+
 ## 0.1.12
 
 ### Patch Changes
