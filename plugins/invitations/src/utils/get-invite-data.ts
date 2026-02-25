@@ -1,11 +1,13 @@
 import type { Payload } from 'payload';
+import type { User } from '@/payload-types';
+import type { GetInviteDataResult, SanitizedUser } from '../types';
 
-const SENSITIVE_FIELDS = [
+const SENSITIVE_FIELDS: (keyof User)[] = [
   'password',
   'salt',
   'hash',
   '_verificationToken',
-] as const;
+];
 
 export async function getInviteData({
   token,
@@ -13,7 +15,7 @@ export async function getInviteData({
 }: {
   token: string;
   payload: Payload;
-}) {
+}): Promise<GetInviteDataResult> {
   const usersCollection = payload.config.admin.user as 'users';
 
   const {
@@ -25,16 +27,15 @@ export async function getInviteData({
     limit: 1,
   });
 
-  if (!user)
-    return { success: false as const, error: 'INVALID_TOKEN' as const };
+  if (!user) return { success: false, error: 'INVALID_TOKEN' };
 
-  if (user._verified)
-    return { success: false as const, error: 'ALREADY_ACCEPTED' as const };
+  if (user._verified) return { success: false, error: 'ALREADY_ACCEPTED' };
 
-  const sanitized = { ...user };
+  // TypeScript cannot track property deletion, so a single assertion is needed
+  const sanitized: Record<string, unknown> = { ...user };
   for (const field of SENSITIVE_FIELDS) {
     delete sanitized[field];
   }
 
-  return { success: true as const, user: sanitized };
+  return { success: true, user: sanitized as SanitizedUser };
 }
