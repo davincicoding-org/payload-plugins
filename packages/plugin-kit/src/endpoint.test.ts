@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
-import type { EndpointConfig, InferInput, InferOutput } from './endpoint';
+import type { EndpointConfig, InferInput } from './endpoint';
 
 describe('EndpointConfig', () => {
   test('accepts minimal config (path + method only)', () => {

@@ -28,6 +28,18 @@ export interface PopulatedComment extends Omit<Comment, 'author' | 'replies'> {
   replies: PopulatedComment[] | null;
 }
 
+export const populatedCommentSchema: z.ZodType<PopulatedComment> = z.object({
+  id: z.string(),
+  content: z.string(),
+  author: z.object({
+    id: documentIdSchema,
+    displayName: z.string(),
+  }),
+  replies: z.lazy(() => z.array(populatedCommentSchema)).nullable(),
+  updatedAt: z.string(),
+  createdAt: z.string(),
+});
+
 export const discussionsDocumentSchema = z
   .object({
     discussions: z.array(documentIdSchema).nullable().default([]),

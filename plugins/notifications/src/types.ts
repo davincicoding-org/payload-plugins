@@ -134,6 +134,47 @@ export interface StoredDocumentReference {
   documentId?: string;
 }
 
+export const storedDocumentReferenceSchema = z.object({
+  entity: z.enum(['collection', 'global']),
+  slug: z.string(),
+  documentId: z.string().optional(),
+});
+
 export const subscriptionSchema = z.object({
   documentReference: documentReferenceSchema,
 });
+
+// ── Endpoint output schemas ─────────────────────────────────────────
+
+const notificationDataSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+  event: z.string(),
+  message: z.string(),
+  readAt: z.string().nullable().optional(),
+  documentReference: storedDocumentReferenceSchema,
+  createdAt: z.string(),
+});
+
+export const unreadResponseSchema = z.object({
+  docs: z.array(notificationDataSchema),
+  timestamp: z.string(),
+  hasMore: z.boolean().optional(),
+});
+
+export type UnreadResponse = z.infer<typeof unreadResponseSchema>;
+
+export const readResponseSchema = z.object({
+  docs: z.array(notificationDataSchema),
+  hasNextPage: z.boolean(),
+  totalDocs: z.number(),
+});
+
+export type ReadResponse = z.infer<typeof readResponseSchema>;
+
+export const openNotificationResponseSchema = z.object({
+  url: z.string().nullable(),
+});
+
+export type OpenNotificationResponse = z.infer<
+  typeof openNotificationResponseSchema
+>;

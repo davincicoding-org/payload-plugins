@@ -9,11 +9,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { ENDPOINTS } from '@/const';
 import { toDocumentReference } from '@/helpers';
 import type { User } from '@/payload-types';
-import type {
-  NotificationData,
-  ResolvedPluginOptions,
-  StoredDocumentReference,
-} from '@/types';
+import type { ResolvedPluginOptions, StoredDocumentReference } from '@/types';
 import styles from './NotificationBell.module.css';
 import { NotificationItem } from './NotificationItem';
 import {
@@ -24,18 +20,6 @@ import {
 } from './notification-reducer';
 
 type Api = ReturnType<typeof useEndpointCallers<typeof ENDPOINTS>>;
-
-interface UnreadResponse {
-  docs: NotificationData[];
-  timestamp: string;
-  hasMore?: boolean;
-}
-
-interface ReadResponse {
-  docs: NotificationData[];
-  hasNextPage: boolean;
-  totalDocs: number;
-}
 
 export type NotificationBellProps = ResolvedPluginOptions<'pollInterval'>;
 
@@ -66,11 +50,10 @@ export function NotificationBell({ pollInterval }: NotificationBellProps) {
 
   const handleOpen = useCallback(
     async (id: string | number) => {
-      const result = await api.openNotification({
+      return api.openNotification({
         id,
         json: 'true',
       });
-      return result as { url: string | null };
     },
     [api],
   );
@@ -209,9 +192,9 @@ function useUnreadPolling(
   const poll = useCallback(async () => {
     try {
       const since = timestampRef.current ?? undefined;
-      const { docs, timestamp, hasMore } = (await api.unread({
+      const { docs, timestamp, hasMore } = await api.unread({
         since,
-      })) as UnreadResponse;
+      });
 
       if (!timestampRef.current) {
         dispatch({
@@ -270,10 +253,10 @@ function useReadNotifications(
   const loadMore = useCallback(async () => {
     setIsLoadingRead(true);
     try {
-      const { docs, hasNextPage } = (await api.read({
+      const { docs, hasNextPage } = await api.read({
         page: nextPage,
         limit: 10,
-      })) as ReadResponse;
+      });
       dispatch({ type: 'APPEND_READ', docs, hasNextPage });
     } finally {
       setIsLoadingRead(false);

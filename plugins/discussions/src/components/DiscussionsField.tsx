@@ -15,23 +15,24 @@ export const DiscussionsField = async ({
   commentsSlug,
   maxDepth,
 }: ServerComponentProps & DiscussionsFieldConfig) => {
-  if (source.entity === 'collection' && id === undefined) return null;
-
   const discussionIds: number[] = (data?.discussions as number[]) || [];
 
-  const documentReference = ((): DocumentReference => {
+  const documentReference = ((): DocumentReference | null => {
     switch (source.entity) {
       case 'global':
         return source;
       case 'collection':
+        if (id === undefined) return null;
         return {
           ...source,
-          id: id!,
+          id,
         };
       default:
         return uncaughtSwitchCase(source);
     }
   })();
+
+  if (documentReference === null) return null;
 
   const comments: PopulatedComment[] =
     discussionIds.length > 0

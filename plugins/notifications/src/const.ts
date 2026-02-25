@@ -2,7 +2,13 @@ import type { EndpointConfig } from '@davincicoding/payload-plugin-kit';
 import { createPluginContext } from '@davincicoding/payload-plugin-kit';
 import { z } from 'zod';
 import type { NotificationPluginContext } from './types';
-import { markReadSchema, subscriptionSchema } from './types';
+import {
+  markReadSchema,
+  openNotificationResponseSchema,
+  readResponseSchema,
+  subscriptionSchema,
+  unreadResponseSchema,
+} from './types';
 
 export const PLUGIN_KEY = 'notifications-plugin';
 
@@ -28,7 +34,8 @@ export const ENDPOINTS = {
   unread: {
     path: '/notifications-plugin/unread',
     method: 'get',
-    input: z.object({ since: z.string().datetime().optional() }),
+    input: z.object({ since: z.iso.datetime().optional() }),
+    output: unreadResponseSchema,
   },
   read: {
     path: '/notifications-plugin/read',
@@ -37,6 +44,7 @@ export const ENDPOINTS = {
       page: z.coerce.number().optional().default(1),
       limit: z.coerce.number().optional().default(10),
     }),
+    output: readResponseSchema,
   },
   markRead: {
     path: '/notifications-plugin/mark-read',
@@ -66,6 +74,7 @@ export const ENDPOINTS = {
     path: '/notifications-plugin/open',
     method: 'get',
     input: markReadSchema.extend({ json: z.literal('true').optional() }),
+    output: openNotificationResponseSchema,
   },
   emailUnsubscribe: {
     path: '/notifications-plugin/email-unsubscribe',

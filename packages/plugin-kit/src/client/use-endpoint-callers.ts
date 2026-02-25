@@ -21,10 +21,10 @@ export function useEndpointCallers<T extends Record<string, EndpointConfig>>(
   } = useConfig();
 
   return useMemo(() => {
-    const callers = {} as Record<string, Function>;
+    const callers = {} as Record<string, (...args: never) => unknown>;
     for (const [key, config] of Object.entries(endpoints)) {
       callers[key] = (...args: unknown[]) =>
-        // biome-ignore lint/complexity/noBannedTypes: internal dynamic dispatch
+        // biome-ignore lint/complexity/noBannedTypes: this is fine
         (callEndpoint as Function)(config, apiRoute, ...args);
     }
     return callers as EndpointCallers<T>;

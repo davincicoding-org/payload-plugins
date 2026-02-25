@@ -22,7 +22,7 @@ export type InferInput<T extends EndpointConfig> = T extends {
   input: ZodLike<infer O>;
 }
   ? O
-  : void;
+  : undefined;
 
 /** Infer the parsed output type from an EndpointConfig. unknown if no output schema. */
 export type InferOutput<T extends EndpointConfig> = T extends {

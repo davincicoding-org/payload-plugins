@@ -43,12 +43,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "generate-types": "./scripts/generate-types.js",
-    "plugin-build": "./scripts/build.js"
+    "plugin-kit": "./dist/cli/index.js"
   },
   "files": [
     "dist",
-    "scripts",
     "tsconfig.base.json",
     "vitest.config.ts",
     "vitest.integration.config.ts",
@@ -83,9 +81,9 @@
     "@playwright/test": "1.56.1",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
-    "client-only": "^0.0.1",
+    "client-only": ">=0.0.1",
     "payload": "catalog:payload-stack",
-    "server-only": "^0.0.1",
+    "server-only": ">=0.0.1",
     "typescript": "catalog:payload-stack",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
@@ -94,9 +92,9 @@
     "@payloadcms/db-sqlite": ">=3.72.0",
     "@payloadcms/richtext-lexical": ">=3.72.0",
     "@payloadcms/ui": ">=3.72.0",
-    "client-only": "^0.0.1",
+    "client-only": ">=0.0.1",
     "payload": ">=3.72.0",
-    "server-only": "^0.0.1"
+    "server-only": ">=0.0.1"
   },
   "peerDependenciesMeta": {
     "@payloadcms/db-sqlite": {

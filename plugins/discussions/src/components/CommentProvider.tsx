@@ -40,19 +40,19 @@ export function CommentProvider({
   const submitReply = useCallback(
     async (parentId: string | null, content: string) => {
       if (parentId === null) {
-        const populated = (await api.createComment({
+        const populated = await api.createComment({
           content,
           documentReference,
-        })) as PopulatedComment;
+        });
         setComments((prev) => [populated, ...prev]);
         setActiveReplyId(null);
         return;
       }
 
-      const populated = (await api.createReply({
+      const populated = await api.createReply({
         parentId: parentId as DocumentID,
         content,
-      })) as PopulatedComment;
+      });
 
       const insertReply = (
         items: readonly PopulatedComment[],
