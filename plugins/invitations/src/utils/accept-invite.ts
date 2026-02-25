@@ -1,23 +1,5 @@
 import type { Payload } from 'payload';
-
-function parseCookie(cookieString: string) {
-  const parts = cookieString.split(';').map((p) => p.trim());
-  const [nameValue = '', ...attributes] = parts;
-  const [name = '', value = ''] = nameValue.split('=', 2);
-
-  const options: Record<string, unknown> = {};
-  for (const attr of attributes) {
-    const [key = '', val] = attr.split('=', 2);
-    const lowerKey = key.toLowerCase().trim();
-    if (lowerKey === 'httponly') options.httpOnly = true;
-    else if (lowerKey === 'secure') options.secure = true;
-    else if (lowerKey === 'path') options.path = val;
-    else if (lowerKey === 'samesite') options.sameSite = val?.toLowerCase();
-    else if (lowerKey === 'max-age') options.maxAge = Number(val);
-  }
-
-  return { name, value, options };
-}
+import { type AcceptInviteResult, cookieStringSchema } from '../types';
 
 export async function acceptInvite({
   token,
@@ -27,7 +9,7 @@ export async function acceptInvite({
   token: string;
   password: string;
   payload: Payload;
-}) {
+}): Promise<AcceptInviteResult> {
   const usersCollection = payload.config.admin.user as 'users';
 
   const {
@@ -39,11 +21,9 @@ export async function acceptInvite({
     limit: 1,
   });
 
-  if (!user)
-    return { success: false as const, error: 'INVALID_TOKEN' as const };
+  if (!user) return { success: false, error: 'INVALID_TOKEN' };
 
-  if (user._verified)
-    return { success: false as const, error: 'ALREADY_ACCEPTED' as const };
+  if (user._verified) return { success: false, error: 'ALREADY_ACCEPTED' };
 
   await payload.update({
     collection: usersCollection,
@@ -65,10 +45,10 @@ export async function acceptInvite({
   });
 
   return {
-    success: true as const,
+    success: true,
     user: loginResult.user,
     token: loginResult.token ?? '',
-    cookie: parseCookie(cookieString),
+    cookie: cookieStringSchema.parse(cookieString),
     rawCookie: cookieString,
   };
 }
