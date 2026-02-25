@@ -7,6 +7,8 @@ import { autoGeneratePassword } from './hooks/auto-generate-password';
 import { setJoinedAt } from './hooks/set-joined-at';
 import { validateUniqueEmail } from './hooks/validate-unique-email';
 
+export { getInviteData } from './utils/get-invite-data';
+
 export interface InvitationsPluginConfig {
   /**
    * Customize the invitation email.
