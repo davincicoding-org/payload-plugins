@@ -37,6 +37,15 @@ export async function acceptInvite({
     data: { email: user.email, password },
   });
 
+  // Payload clears _verificationToken when _verified is set to true.
+  // Re-save it so getInviteData can identify the user on repeat visits.
+  await payload.update({
+    collection: usersCollection,
+    id: user.id,
+    overrideAccess: true,
+    data: { _verificationToken: token },
+  });
+
   const { generatePayloadCookie } = await import('payload');
   const cookieString = generatePayloadCookie({
     collectionAuthConfig: payload.collections[usersCollection].config.auth,

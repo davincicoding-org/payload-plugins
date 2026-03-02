@@ -117,6 +117,29 @@ describe('invitations plugin', () => {
     }
   });
 
+  test('getInviteData returns ALREADY_ACCEPTED after invitation is accepted', async () => {
+    const user = await payload.create({
+      collection: 'users',
+      data: { _email: uniqueEmail('double-click') } as Record<string, unknown>,
+    });
+
+    const fullUser = await payload.findByID({
+      collection: 'users',
+      id: user.id,
+      overrideAccess: true,
+      showHiddenFields: true,
+    });
+
+    const token = fullUser._verificationToken as string;
+
+    // Accept the invitation
+    await acceptInvite({ token, password: 'newSecurePassword123!', payload });
+
+    // Simulate clicking the invitation link a second time
+    const result = await getInviteData({ token, payload });
+    expect(result).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
+  });
+
   test('getInviteData returns INVALID_TOKEN for bad token', async () => {
     const result = await getInviteData({ token: 'nonexistent', payload });
     expect(result).toEqual({ success: false, error: 'INVALID_TOKEN' });
@@ -159,14 +182,6 @@ describe('invitations plugin', () => {
       >,
     });
 
-    // Manually verify while keeping the token (Payload normally clears it)
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      overrideAccess: true,
-      data: { _verified: true },
-    });
-
     const fullUser = await payload.findByID({
       collection: 'users',
       id: user.id,
@@ -174,12 +189,22 @@ describe('invitations plugin', () => {
       showHiddenFields: true,
     });
 
-    const result = await acceptInvite({
-      token: fullUser._verificationToken as string,
+    const token = fullUser._verificationToken as string;
+
+    // First acceptance should succeed
+    const first = await acceptInvite({
+      token,
+      password: 'newSecurePassword123!',
+      payload,
+    });
+    expect(first.success).toBe(true);
+
+    // Second acceptance should return ALREADY_ACCEPTED
+    const second = await acceptInvite({
+      token,
       password: 'anything',
       payload,
     });
-
-    expect(result).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
+    expect(second).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
   });
 });
