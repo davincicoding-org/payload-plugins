@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.2.1
+
+### Patch Changes
+
+- [`4324a78`](https://github.com/davincicoding-org/payload-plugins/commit/4324a780d52ab3624071e8517c980d3ea28193ce) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Preserve verification token after invitation acceptance so repeat visits return ALREADY_ACCEPTED instead of INVALID_TOKEN.
+
 ## 0.2.0
 
 ### Minor Changes
