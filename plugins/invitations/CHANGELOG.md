@@ -1,5 +1,14 @@
 # payload-invitations
 
+## 0.3.0
+
+### Minor Changes
+
+- [#36](https://github.com/davincicoding-org/payload-plugins/pull/36) [`3a44eb8`](https://github.com/davincicoding-org/payload-plugins/commit/3a44eb881c6c875e8d6e5114b6a1828c9463b26b) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add custom email sender support for invitation emails.
+
+  - New `emailSender` plugin option for custom sender address and name (static or async function)
+  - Export `EmailSender` and `EmailSenderOption` types
+
 ## 0.2.1
 
 ### Patch Changes
