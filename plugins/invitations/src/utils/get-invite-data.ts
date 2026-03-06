@@ -29,8 +29,6 @@ export async function getInviteData({
 
   if (!user) return { success: false, error: 'INVALID_TOKEN' };
 
-  if (user._verified) return { success: false, error: 'ALREADY_ACCEPTED' };
-
   // TypeScript cannot track property deletion, so a single assertion is needed
   const sanitized: Record<string, unknown> = { ...user };
   for (const field of SENSITIVE_FIELDS) {

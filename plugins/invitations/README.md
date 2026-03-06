@@ -85,7 +85,7 @@ const result = await getInviteData({ token, payload });
 if (result.success) {
   console.log(result.user.email);
 } else {
-  console.log(result.error); // 'INVALID_TOKEN' | 'ALREADY_ACCEPTED'
+  console.log(result.error); // 'INVALID_TOKEN'
 }
 
 // Accept the invitation (sets password, verifies user, logs in)
