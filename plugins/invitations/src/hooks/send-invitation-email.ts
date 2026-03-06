@@ -35,15 +35,13 @@ export function createSendInvitationEmailHook({
     // _verificationToken is a hidden field, so it's stripped from `doc` by
     // Payload's afterRead phase. Re-fetch it directly.
     const fullDoc = await req.payload.findByID({
-      collection: collection.slug,
+      collection: collection.slug as 'users',
       id: doc.id,
       showHiddenFields: true,
       overrideAccess: true,
       depth: 0,
     });
-    const token: string | undefined = (
-      fullDoc as unknown as Record<string, unknown>
-    )._verificationToken as string | undefined;
+    const token = fullDoc._verificationToken;
     if (!token) return doc;
 
     const sender = await resolveEmailSender({ emailSender, req, user: doc });
