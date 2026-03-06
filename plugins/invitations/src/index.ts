@@ -1,6 +1,6 @@
 import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, Plugin, TypedUser } from 'payload';
-import { DEFAULT_HTML, DEFAULT_SUBJECT } from './const';
+import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { hideAuthOnCreateField, joinedAtField } from './fields';
 import { autoGeneratePassword } from './hooks/auto-generate-password';
@@ -17,8 +17,6 @@ export type {
 } from './types';
 export { acceptInvite } from './utils/accept-invite';
 export { getInviteData } from './utils/get-invite-data';
-
-const INVITATION_PAGE_PATH = '/invitation';
 
 export interface InvitationsPluginConfig {
   /**
