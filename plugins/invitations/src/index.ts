@@ -4,11 +4,17 @@ import { DEFAULT_HTML, DEFAULT_SUBJECT } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { hideAuthOnCreateField, joinedAtField } from './fields';
 import { autoGeneratePassword } from './hooks/auto-generate-password';
+import { disableVerificationEmail } from './hooks/disable-verification-email';
+import { createSendInvitationEmailHook } from './hooks/send-invitation-email';
 import { setJoinedAt } from './hooks/set-joined-at';
 import { validateUniqueEmail } from './hooks/validate-unique-email';
-import type { AcceptInvitationURLFn } from './types';
+import type { AcceptInvitationURLFn, EmailSenderOption } from './types';
 
-export type { AcceptInvitationURLFn } from './types';
+export type {
+  AcceptInvitationURLFn,
+  EmailSender,
+  EmailSenderOption,
+} from './types';
 export { acceptInvite } from './utils/accept-invite';
 export { getInviteData } from './utils/get-invite-data';
 
@@ -23,6 +29,15 @@ export interface InvitationsPluginConfig {
    * - Not set: uses the default admin panel invitation page.
    */
   acceptInvitationURL?: string | AcceptInvitationURLFn;
+  /**
+   * Custom email sender for invitation emails.
+   *
+   * - Object: `{ email: 'noreply@acme.com', name: 'Acme Corp' }`
+   * - Function: `async ({ req, user }) => ({ email, name })` for dynamic resolution (e.g., from a tenant document)
+   *
+   * Falls back to the Payload email adapter defaults when not set.
+   */
+  emailSender?: EmailSenderOption;
   /**
    * Customize the invitation email.
    */
@@ -44,6 +59,7 @@ export interface InvitationsPluginConfig {
 export const invitationsPlugin =
   ({
     acceptInvitationURL,
+    emailSender,
     generateInvitationEmailHTML = DEFAULT_HTML,
     generateInvitationEmailSubject = DEFAULT_SUBJECT,
   }: InvitationsPluginConfig = {}): Plugin =>
@@ -169,6 +185,20 @@ export const invitationsPlugin =
       collection.hooks.beforeChange ??= [];
       collection.hooks.beforeChange.push(validateUniqueEmail);
       collection.hooks.beforeChange.push(setJoinedAt);
+
+      if (emailSender) {
+        collection.hooks.beforeOperation ??= [];
+        collection.hooks.beforeOperation.push(disableVerificationEmail);
+        collection.hooks.afterChange ??= [];
+        collection.hooks.afterChange.push(
+          createSendInvitationEmailHook({
+            emailSender,
+            generateInvitationEmailHTML,
+            generateInvitationEmailSubject,
+            resolveInvitationURL,
+          }),
+        );
+      }
     }
 
     config.endpoints ??= [];
