@@ -1,8 +1,15 @@
 import crypto from 'node:crypto';
-import type { Payload } from 'payload';
+import type { Payload, SendEmailOptions } from 'payload';
 import { getPayload } from 'payload';
 import { acceptInvite, getInviteData } from 'payload-invitations';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 
 const uniqueEmail = (prefix: string) =>
   `${prefix}-${crypto.randomBytes(4).toString('hex')}@test.com`;
@@ -18,7 +25,21 @@ afterAll(async () => {
   await payload.destroy();
 });
 
+const sentEmails: SendEmailOptions[] = [];
+
 describe('invitations plugin', () => {
+  beforeAll(() => {
+    const originalSendEmail = payload.sendEmail.bind(payload);
+    payload.sendEmail = async (message: SendEmailOptions) => {
+      sentEmails.push(message);
+      return originalSendEmail(message);
+    };
+  });
+
+  beforeEach(() => {
+    sentEmails.length = 0;
+  });
+
   test('adds joinedAt field to the users collection', () => {
     const usersConfig = payload.config.collections.find(
       (c) => c.slug === 'users',
@@ -206,5 +227,37 @@ describe('invitations plugin', () => {
       payload,
     });
     expect(second).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
+  });
+
+  test('invitation email uses custom sender from emailSender config', async () => {
+    const email = uniqueEmail('sender-test');
+    await payload.create({
+      collection: 'users',
+      data: { _email: email } as Record<string, unknown>,
+    });
+
+    const invitation = sentEmails.find((e) =>
+      (Array.isArray(e.to) ? e.to : [e.to]).some((addr) =>
+        String(addr).includes(email),
+      ),
+    );
+    expect(invitation).toBeDefined();
+    expect(invitation?.from).toBe('"Tenant Co" <invites@tenant.com>');
+  });
+
+  test('invitation email contains invitation URL in body', async () => {
+    const email = uniqueEmail('body-test');
+    await payload.create({
+      collection: 'users',
+      data: { _email: email } as Record<string, unknown>,
+    });
+
+    const invitation = sentEmails.find((e) =>
+      (Array.isArray(e.to) ? e.to : [e.to]).some((addr) =>
+        String(addr).includes(email),
+      ),
+    );
+    expect(invitation).toBeDefined();
+    expect(String(invitation?.html)).toContain('Accept Invitation');
   });
 });

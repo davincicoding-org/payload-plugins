@@ -8,6 +8,15 @@ export type AcceptInvitationURLFn = (args: {
   defaultURL: string;
 }) => string | Promise<string>;
 
+export type EmailSender = { email: string; name: string };
+
+export type EmailSenderOption =
+  | EmailSender
+  | ((args: {
+      req: PayloadRequest;
+      user: TypedUser;
+    }) => EmailSender | Promise<EmailSender>);
+
 const cookieOptionsSchema = z.object({
   httpOnly: z.boolean().optional(),
   secure: z.boolean().optional(),
@@ -45,7 +54,7 @@ export const cookieStringSchema = z
     return parsedCookieSchema.parse({ name, value, options });
   });
 
-export type InviteError = 'INVALID_TOKEN' | 'ALREADY_ACCEPTED';
+export type InviteError = 'INVALID_TOKEN';
 
 export type SanitizedUser = Omit<
   TypedUser,

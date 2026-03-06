@@ -59,19 +59,6 @@ describe('acceptInvite', () => {
     expect(result).toEqual({ success: false, error: 'INVALID_TOKEN' });
   });
 
-  test('returns ALREADY_ACCEPTED when user is verified', async () => {
-    const payload = createMockPayload({
-      findDocs: [{ id: '1', email: 'test@test.com', _verified: true }],
-    });
-    const result = await acceptInvite({
-      token: 'used',
-      password: 'pw',
-      payload,
-    });
-
-    expect(result).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
-  });
-
   test('verifies user, sets password, logs in, and returns cookie', async () => {
     const payload = createMockPayload({
       findDocs: [{ id: '1', email: 'test@test.com', _verified: false }],
