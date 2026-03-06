@@ -41,7 +41,9 @@ export function createSendInvitationEmailHook({
       overrideAccess: true,
       depth: 0,
     });
-    const token: string | undefined = fullDoc._verificationToken;
+    const token: string | undefined = (
+      fullDoc as unknown as Record<string, unknown>
+    )._verificationToken as string | undefined;
     if (!token) return doc;
 
     const sender = await resolveEmailSender({ emailSender, req, user: doc });
