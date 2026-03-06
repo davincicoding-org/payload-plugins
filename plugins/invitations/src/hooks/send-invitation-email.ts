@@ -29,10 +29,19 @@ export function createSendInvitationEmailHook({
     user: TypedUser;
   }) => Promise<string>;
 }): CollectionAfterChangeHook {
-  return async ({ doc, operation, req }) => {
+  return async ({ collection, doc, operation, req }) => {
     if (operation !== 'create') return doc;
 
-    const token: string | undefined = doc._verificationToken;
+    // _verificationToken is a hidden field, so it's stripped from `doc` by
+    // Payload's afterRead phase. Re-fetch it directly.
+    const fullDoc = await req.payload.findByID({
+      collection: collection.slug,
+      id: doc.id,
+      showHiddenFields: true,
+      overrideAccess: true,
+      depth: 0,
+    });
+    const token: string | undefined = fullDoc._verificationToken;
     if (!token) return doc;
 
     const sender = await resolveEmailSender({ emailSender, req, user: doc });
