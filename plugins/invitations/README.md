@@ -52,8 +52,34 @@ invitationsPlugin({
 | Option                          | Type                                                        | Default                               | Description                                          |
 | ------------------------------- | ----------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------- |
 | `acceptInvitationURL`           | `string \| AcceptInvitationURLFn`                           | Built-in admin page                   | Custom URL for the accept-invitation page. See [Headless Usage](#headless-usage). |
+| `emailSender`                   | `EmailSender \| EmailSenderOption`                          | Payload email adapter defaults        | Custom sender address and name for invitation emails. See [Custom Email Sender](#custom-email-sender). |
 | `generateInvitationEmailHTML`   | `(args: { req, invitationURL, user }) => string \| Promise` | Simple HTML with an acceptance link   | Customize the invitation email body.                 |
 | `generateInvitationEmailSubject`| `(args: { req, invitationURL, user }) => string \| Promise` | `"You have been invited"`             | Customize the invitation email subject line.         |
+
+### Custom Email Sender
+
+By default, invitation emails are sent from the address configured in your Payload email adapter. To use a different sender (e.g., per-tenant branding in a multi-tenant setup), use the `emailSender` option:
+
+```ts
+// Static sender
+invitationsPlugin({
+  emailSender: { email: "noreply@acme.com", name: "Acme Corp" },
+})
+```
+
+For dynamic resolution (e.g., from a tenant document):
+
+```ts
+invitationsPlugin({
+  emailSender: async ({ req, user }) => {
+    const tenant = await req.payload.findByID({
+      collection: "tenants",
+      id: user.tenant,
+    });
+    return { email: tenant.senderEmail, name: tenant.senderName };
+  },
+})
+```
 
 ### Headless Usage
 
