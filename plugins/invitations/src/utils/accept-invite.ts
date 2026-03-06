@@ -23,6 +23,8 @@ export async function acceptInvite({
 
   if (!user) return { success: false, error: 'INVALID_TOKEN' };
 
+  if (user._verified) return { success: false, error: 'ALREADY_ACCEPTED' };
+
   await payload.update({
     collection: usersCollection,
     id: user.id,

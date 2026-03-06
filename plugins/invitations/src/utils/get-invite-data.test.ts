@@ -46,6 +46,20 @@ describe('getInviteData', () => {
     expect(result).toEqual({ success: false, error: 'INVALID_TOKEN' });
   });
 
+  test('returns ALREADY_ACCEPTED when user is already verified', async () => {
+    const mockUser = {
+      id: '1',
+      email: 'invited@test.com',
+      _verified: true,
+      _verificationToken: 'used-token',
+    };
+    const payload = createMockPayload({ docs: [mockUser] });
+
+    const result = await getInviteData({ token: 'used-token', payload });
+
+    expect(result).toEqual({ success: false, error: 'ALREADY_ACCEPTED' });
+  });
+
   test('queries the correct collection with overrideAccess', async () => {
     const payload = createMockPayload({ docs: [], adminUser: 'members' });
 

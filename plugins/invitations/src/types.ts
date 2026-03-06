@@ -54,7 +54,7 @@ export const cookieStringSchema = z
     return parsedCookieSchema.parse({ name, value, options });
   });
 
-export type InviteError = 'INVALID_TOKEN';
+export type InviteError = 'INVALID_TOKEN' | 'ALREADY_ACCEPTED';
 
 export type SanitizedUser = Omit<
   TypedUser,
