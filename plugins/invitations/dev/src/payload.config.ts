@@ -22,7 +22,11 @@ export default buildConfig({
       fields: [{ name: 'name', type: 'text' }],
     },
   ],
-  plugins: [invitationsPlugin()],
+  plugins: [
+    invitationsPlugin({
+      emailSender: { email: 'invites@tenant.com', name: 'Tenant Co' },
+    }),
+  ],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
