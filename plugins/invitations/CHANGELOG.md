@@ -1,5 +1,15 @@
 # payload-invitations
 
+## 0.3.1
+
+### Patch Changes
+
+- [`b660368`](https://github.com/davincicoding-org/payload-plugins/commit/b660368cda58b52d1ca0d96a9477f496c41a447a) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Fix email branding callbacks receiving unpopulated user relations
+
+  The `sendInvitationEmail` hook was passing the shallow `doc` from the afterChange hook to all callbacks (`emailSender`, `generateInvitationEmailHTML`, `generateInvitationEmailSubject`, `acceptInvitationURL`). User relations like `camps` were bare IDs instead of populated objects, causing consumers to fall back to default branding.
+
+  Changed `findByID` depth from 0 to 1 and pass the populated document to callbacks.
+
 ## 0.3.0
 
 ### Minor Changes
