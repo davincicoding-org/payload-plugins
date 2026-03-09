@@ -39,22 +39,25 @@ export function createSendInvitationEmailHook({
       id: doc.id,
       showHiddenFields: true,
       overrideAccess: true,
-      depth: 0,
+      depth: 1,
     });
     const token = fullDoc._verificationToken;
     if (!token) return doc;
 
-    const sender = await resolveEmailSender({ emailSender, req, user: doc });
-    const invitationURL = await resolveInvitationURL({ req, token, user: doc });
+    // Merge the collection discriminant so fullDoc satisfies TypedUser.
+    const user = { ...fullDoc, collection: collection.slug } as TypedUser;
+
+    const sender = await resolveEmailSender({ emailSender, req, user });
+    const invitationURL = await resolveInvitationURL({ req, token, user });
     const html = await generateInvitationEmailHTML({
       req,
       invitationURL,
-      user: doc,
+      user,
     });
     const subject = await generateInvitationEmailSubject({
       req,
       invitationURL,
-      user: doc,
+      user,
     });
 
     await req.payload.sendEmail({
