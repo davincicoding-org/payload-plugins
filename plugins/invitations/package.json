@@ -51,10 +51,12 @@
   },
   "dependencies": {
     "@davincicoding/payload-plugin-kit": "workspace:*",
+    "jsonwebtoken": "^9.0.3",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@payloadcms/ui": "catalog:payload-stack",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.5.4",
     "@types/react": "catalog:payload-stack",
     "@types/react-dom": "catalog:payload-stack",
