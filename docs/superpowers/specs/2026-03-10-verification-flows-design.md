@@ -17,8 +17,8 @@ Split responsibility (Option C): the plugin provides a generic **named verificat
 ```ts
 interface VerificationFlowConfig {
   emailSender: EmailSenderOption
-  generateEmailHTML: (req: PayloadRequest, verificationURL: string, user: TypedUser) => string | Promise<string>
-  generateEmailSubject: (req: PayloadRequest, verificationURL: string, user: TypedUser) => string | Promise<string>
+  generateEmailHTML: (args: { req: PayloadRequest; verificationURL: string; user: TypedUser }) => string | Promise<string>
+  generateEmailSubject: (args: { req: PayloadRequest; verificationURL: string; user: TypedUser }) => string | Promise<string>
   acceptInvitationURL: string | AcceptInvitationURLFn
 }
 ```
@@ -144,8 +144,8 @@ invitationsPlugin({
   verificationFlows: {
     'self-signup': {
       emailSender: { email: 'noreply@playacms.com', name: 'PlayaCMS' },
-      generateEmailHTML: async (req, url, user) =>
-        renderSignupVerificationEmail({ url, firstName: user.firstName }),
+      generateEmailHTML: async ({ verificationURL, user }) =>
+        renderSignupVerificationEmail({ url: verificationURL, firstName: user.firstName }),
       generateEmailSubject: async () => 'Verify your email to activate your camp',
       acceptInvitationURL: ({ token }) =>
         `https://playacms.com/verify?token=${token}`,
