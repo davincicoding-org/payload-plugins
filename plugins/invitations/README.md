@@ -55,6 +55,7 @@ invitationsPlugin({
 | `emailSender`                   | `EmailSender \| EmailSenderOption`                          | Payload email adapter defaults        | Custom sender address and name for invitation emails. See [Custom Email Sender](#custom-email-sender). |
 | `generateInvitationEmailHTML`   | `(args: { req, invitationURL, user }) => string \| Promise` | Simple HTML with an acceptance link   | Customize the invitation email body.                 |
 | `generateInvitationEmailSubject`| `(args: { req, invitationURL, user }) => string \| Promise` | `"You have been invited"`             | Customize the invitation email subject line.         |
+| `verificationFlows`             | `Record<string, VerificationFlowConfig>`                    | —                                     | Named flows for non-invite creation paths (e.g., self-signup). See [Verification Flows](#verification-flows). |
 
 ### Custom Email Sender
 
@@ -125,6 +126,58 @@ if (acceptance.success) {
   );
 }
 ```
+
+### Verification Flows
+
+For user creation paths beyond admin invitations (e.g., self-signup), the plugin supports named **verification flows**. Each flow has its own email sender, email template, and verification URL — independent of the top-level invitation config.
+
+```ts
+invitationsPlugin({
+  verificationFlows: {
+    "self-signup": {
+      emailSender: { email: "noreply@myapp.com", name: "MyApp" },
+      generateEmailHTML: async ({ verificationURL, user }) =>
+        `<p>Welcome ${user.email}! <a href="${verificationURL}">Verify your account</a>.</p>`,
+      generateEmailSubject: async () => "Verify your account",
+      acceptInvitationURL: "https://myapp.com/verify",
+    },
+  },
+})
+```
+
+**Creating a user with a verification flow:**
+
+```ts
+await payload.create({
+  collection: "users",
+  data: {
+    email: "newuser@example.com",
+    password: "their-chosen-password",
+    _verificationFlow: "self-signup",
+  },
+});
+```
+
+The `_verificationFlow` virtual field tells the plugin which flow to use. The user is created with their own password (no auto-generation), and the flow's email template is sent instead of the default invitation email.
+
+**Verifying a self-signup user:**
+
+After the user clicks the verification link, use `verifyAndLogin` to verify the token and get a session cookie — no password required:
+
+```ts
+import { verifyAndLogin } from "payload-invitations";
+
+const result = await verifyAndLogin({ token, payload });
+if (result.success) {
+  cookies().set(
+    result.cookie.name,
+    result.cookie.value,
+    result.cookie.options,
+  );
+}
+```
+
+There is also an HTTP endpoint at `POST /api/invitations-plugin/verify-and-login` that accepts `{ token }` in the request body.
 
 ## Contributing
 
