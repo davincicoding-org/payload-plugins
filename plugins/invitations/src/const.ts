@@ -1,5 +1,9 @@
 import type { EndpointConfig } from '@davincicoding/payload-plugin-kit';
-import { acceptInviteSchema, reinviteSchema } from './types';
+import {
+  acceptInviteSchema,
+  reinviteSchema,
+  verifyAndLoginSchema,
+} from './types';
 
 export const ENDPOINTS = {
   reinvite: {
@@ -11,6 +15,11 @@ export const ENDPOINTS = {
     path: '/invitations-plugin/accept-invite',
     method: 'post',
     input: acceptInviteSchema,
+  },
+  verifyAndLogin: {
+    path: '/invitations-plugin/verify-and-login',
+    method: 'post',
+    input: verifyAndLoginSchema,
   },
 } satisfies Record<string, EndpointConfig>;
 
