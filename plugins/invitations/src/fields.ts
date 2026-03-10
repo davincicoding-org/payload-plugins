@@ -12,6 +12,17 @@ export const joinedAtField: Field = {
   },
 };
 
+export const verificationFlowField: Field = {
+  name: '_verificationFlow',
+  type: 'text',
+  access: { read: () => false, update: () => false },
+  admin: { hidden: true, disableListColumn: true },
+  hooks: {
+    beforeChange: [({ value }) => undefined],
+  },
+  virtual: true,
+};
+
 export const hideAuthOnCreateField: Field = {
   name: '_hideAuthOnCreate',
   type: 'ui',
