@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.4.1
+
+### Patch Changes
+
+- [`48414d9`](https://github.com/davincicoding-org/payload-plugins/commit/48414d90f99e3a91ac921323573a68d524f7670f) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Pass `req` to `findByID` in send-invitation-email hook to preserve request context (tenant scoping, transactions) in multi-tenant setups
+
 ## 0.4.0
 
 ### Minor Changes
