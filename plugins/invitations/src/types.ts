@@ -17,6 +17,26 @@ export type EmailSenderOption =
       user: TypedUser;
     }) => EmailSender | Promise<EmailSender>);
 
+export interface VerificationFlowConfig {
+  emailSender: EmailSenderOption;
+  generateEmailHTML: (args: {
+    req: PayloadRequest;
+    verificationURL: string;
+    user: TypedUser;
+  }) => string | Promise<string>;
+  generateEmailSubject: (args: {
+    req: PayloadRequest;
+    verificationURL: string;
+    user: TypedUser;
+  }) => string | Promise<string>;
+  acceptInvitationURL: string | AcceptInvitationURLFn;
+}
+
+export type CreateFlow =
+  | { type: 'admin-invite' }
+  | { type: 'verification-flow'; name: string; config: VerificationFlowConfig }
+  | { type: 'direct-create' };
+
 const cookieOptionsSchema = z.object({
   httpOnly: z.boolean().optional(),
   secure: z.boolean().optional(),
@@ -82,6 +102,10 @@ export const reinviteSchema = z.object({
 export const acceptInviteSchema = z.object({
   token: z.string(),
   password: z.string(),
+});
+
+export const verifyAndLoginSchema = z.object({
+  token: z.string(),
 });
 
 export type ReinviteInput = z.infer<typeof reinviteSchema>;

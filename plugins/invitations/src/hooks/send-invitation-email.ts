@@ -3,7 +3,7 @@ import type {
   PayloadRequest,
   TypedUser,
 } from 'payload';
-import type { EmailSenderOption } from '../types';
+import type { CreateFlow, EmailSenderOption } from '../types';
 import { resolveEmailSender } from '../utils/resolve-email-sender';
 
 export function createSendInvitationEmailHook({
@@ -12,7 +12,7 @@ export function createSendInvitationEmailHook({
   generateInvitationEmailSubject,
   resolveInvitationURL,
 }: {
-  emailSender: EmailSenderOption;
+  emailSender: EmailSenderOption | undefined;
   generateInvitationEmailHTML: (args: {
     req: PayloadRequest;
     invitationURL: string;
@@ -47,18 +47,51 @@ export function createSendInvitationEmailHook({
     // Merge the collection discriminant so fullDoc satisfies TypedUser.
     const user = { ...fullDoc, collection: collection.slug } as TypedUser;
 
-    const sender = await resolveEmailSender({ emailSender, req, user });
-    const invitationURL = await resolveInvitationURL({ req, token, user });
-    const html = await generateInvitationEmailHTML({
-      req,
-      invitationURL,
-      user,
-    });
-    const subject = await generateInvitationEmailSubject({
-      req,
-      invitationURL,
-      user,
-    });
+    // Read flow from req.context — stashed by autoGeneratePassword in beforeValidate.
+    // Cannot re-resolve from doc because _verificationFlow is a virtual field
+    // stripped before persistence.
+    const flow = (req.context.createFlow as CreateFlow | undefined) ?? {
+      type: 'admin-invite' as const,
+    };
+
+    let sender: { email: string; name: string };
+    let html: string;
+    let subject: string;
+
+    if (flow.type === 'verification-flow') {
+      sender = await resolveEmailSender({
+        emailSender: flow.config.emailSender,
+        req,
+        user,
+      });
+      const verificationURL = await resolveFlowInvitationURL({
+        acceptInvitationURL: flow.config.acceptInvitationURL,
+        req,
+        token,
+        user,
+      });
+      html = await flow.config.generateEmailHTML({
+        req,
+        verificationURL,
+        user,
+      });
+      subject = await flow.config.generateEmailSubject({
+        req,
+        verificationURL,
+        user,
+      });
+    } else if (flow.type === 'admin-invite' && emailSender) {
+      sender = await resolveEmailSender({ emailSender, req, user });
+      const invitationURL = await resolveInvitationURL({ req, token, user });
+      html = await generateInvitationEmailHTML({ req, invitationURL, user });
+      subject = await generateInvitationEmailSubject({
+        req,
+        invitationURL,
+        user,
+      });
+    } else {
+      return doc;
+    }
 
     await req.payload.sendEmail({
       from: `"${sender.name}" <${sender.email}>`,
@@ -69,4 +102,29 @@ export function createSendInvitationEmailHook({
 
     return doc;
   };
+}
+
+async function resolveFlowInvitationURL({
+  acceptInvitationURL,
+  req,
+  token,
+  user,
+}: {
+  acceptInvitationURL:
+    | string
+    | ((args: {
+        token: string;
+        user: TypedUser;
+        req: PayloadRequest;
+        defaultURL: string;
+      }) => string | Promise<string>);
+  req: PayloadRequest;
+  token: string;
+  user: TypedUser;
+}): Promise<string> {
+  if (typeof acceptInvitationURL === 'string') {
+    const separator = acceptInvitationURL.includes('?') ? '&' : '?';
+    return `${acceptInvitationURL}${separator}token=${token}`;
+  }
+  return acceptInvitationURL({ token, user, req, defaultURL: '' });
 }

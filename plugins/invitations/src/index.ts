@@ -2,21 +2,32 @@ import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, Plugin, TypedUser } from 'payload';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
-import { hideAuthOnCreateField, joinedAtField } from './fields';
-import { autoGeneratePassword } from './hooks/auto-generate-password';
+import { verifyAndLoginEndpoint } from './endpoints/verify-and-login';
+import {
+  hideAuthOnCreateField,
+  joinedAtField,
+  verificationFlowField,
+} from './fields';
+import { createAutoGeneratePasswordHook } from './hooks/auto-generate-password';
 import { disableVerificationEmail } from './hooks/disable-verification-email';
 import { createSendInvitationEmailHook } from './hooks/send-invitation-email';
 import { setJoinedAt } from './hooks/set-joined-at';
 import { validateUniqueEmail } from './hooks/validate-unique-email';
-import type { AcceptInvitationURLFn, EmailSenderOption } from './types';
+import type {
+  AcceptInvitationURLFn,
+  EmailSenderOption,
+  VerificationFlowConfig,
+} from './types';
 
 export type {
   AcceptInvitationURLFn,
   EmailSender,
   EmailSenderOption,
+  VerificationFlowConfig,
 } from './types';
 export { acceptInvite } from './utils/accept-invite';
 export { getInviteData } from './utils/get-invite-data';
+export { verifyAndLogin } from './utils/verify-and-login';
 
 export interface InvitationsPluginConfig {
   /**
@@ -52,6 +63,14 @@ export interface InvitationsPluginConfig {
     invitationURL: string;
     user: TypedUser;
   }) => Promise<string> | string;
+  /**
+   * Named verification flows for non-invite user creation paths.
+   *
+   * Each flow defines its own email sender, template, and verification URL.
+   * The consumer triggers a flow by passing `_verificationFlow: '<name>'`
+   * during `payload.create`.
+   */
+  verificationFlows?: Record<string, VerificationFlowConfig>;
 }
 
 export const invitationsPlugin =
@@ -60,6 +79,7 @@ export const invitationsPlugin =
     emailSender,
     generateInvitationEmailHTML = DEFAULT_HTML,
     generateInvitationEmailSubject = DEFAULT_SUBJECT,
+    verificationFlows,
   }: InvitationsPluginConfig = {}): Plugin =>
   (config) => {
     if (!config.admin?.user) {
@@ -176,15 +196,18 @@ export const invitationsPlugin =
 
       collection.fields.push(joinedAtField);
       collection.fields.push(hideAuthOnCreateField);
+      collection.fields.push(verificationFlowField);
 
       collection.hooks ??= {};
       collection.hooks.beforeValidate ??= [];
-      collection.hooks.beforeValidate.push(autoGeneratePassword);
+      collection.hooks.beforeValidate.push(
+        createAutoGeneratePasswordHook({ verificationFlows }),
+      );
       collection.hooks.beforeChange ??= [];
       collection.hooks.beforeChange.push(validateUniqueEmail);
       collection.hooks.beforeChange.push(setJoinedAt);
 
-      if (emailSender) {
+      if (emailSender || verificationFlows) {
         collection.hooks.beforeOperation ??= [];
         collection.hooks.beforeOperation.push(disableVerificationEmail);
         collection.hooks.afterChange ??= [];
@@ -201,6 +224,7 @@ export const invitationsPlugin =
 
     config.endpoints ??= [];
     config.endpoints.push(acceptInviteEndpoint);
+    config.endpoints.push(verifyAndLoginEndpoint);
 
     return config;
   };
