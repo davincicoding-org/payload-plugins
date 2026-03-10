@@ -40,6 +40,7 @@ export function createSendInvitationEmailHook({
       showHiddenFields: true,
       overrideAccess: true,
       depth: 1,
+      req,
     });
     const token = fullDoc._verificationToken;
     if (!token) return doc;
