@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { Payload } from 'payload';
+import type { Payload, TypedUser } from 'payload';
 import { type AcceptInviteResult, cookieStringSchema } from '../types';
 
 export async function verifyAndLogin({
@@ -61,7 +61,7 @@ export async function verifyAndLogin({
 
   return {
     success: true,
-    user: { ...user, collection: usersCollection } as any,
+    user: { ...user, collection: usersCollection } as TypedUser,
     token: jwtToken,
     cookie: cookieStringSchema.parse(cookieString),
     rawCookie: cookieString,

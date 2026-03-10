@@ -18,7 +18,7 @@ export const verificationFlowField: Field = {
   access: { read: () => false, update: () => false },
   admin: { hidden: true, disableListColumn: true },
   hooks: {
-    beforeChange: [({ value }) => undefined],
+    beforeChange: [() => undefined],
   },
   virtual: true,
 };
