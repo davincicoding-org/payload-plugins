@@ -13,7 +13,6 @@ import { createDependencyGraph } from './utils/dependency-graph';
 import { getTenantScopedCollections } from './utils/tenant-scoped-collections';
 import { getTrackedCollections } from './utils/tracked-collections';
 
-export { tenantCacheTag } from './exports/cache';
 export {
   createRequestHandler,
   type RequestHandlerCacheOptions,
