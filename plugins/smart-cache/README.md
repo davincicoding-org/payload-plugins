@@ -78,12 +78,67 @@ const getPosts = createRequestHandler(
 
 ### Options
 
-| Option                | Type                                                                          | Default | Description                                                                                                          |
-| --------------------- | ----------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `collections`         | `CollectionSlug[]`                                                            | `[]`    | Collections to track changes for. Referenced collections are auto-tracked.                                            |
-| `globals`             | `GlobalSlug[]`                                                                | `[]`    | Globals to track changes for. Referenced collections are auto-tracked.                                                |
-| `disableAutoTracking` | `boolean`                                                                     | `false` | Disable automatic tracking of collections referenced via relationship/upload fields.                                  |
-| `onInvalidate`        | `(change) => void \| Promise<void>` | —       | Called when cache invalidation fires for a registered collection (`{ type: 'collection', slug, docID }`) or global (`{ type: 'global', slug }`). |
+| Option                | Type                                                                          | Default     | Description                                                                                                          |
+| --------------------- | ----------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| `collections`         | `CollectionSlug[]`                                                            | `[]`        | Collections to track changes for. Referenced collections are auto-tracked.                                            |
+| `globals`             | `GlobalSlug[]`                                                                | `[]`        | Globals to track changes for. Referenced collections are auto-tracked.                                                |
+| `disableAutoTracking` | `boolean`                                                                     | `false`     | Disable automatic tracking of collections referenced via relationship/upload fields.                                  |
+| `onInvalidate`        | `(change) => void \| Promise<void>` | —           | Called when cache invalidation fires for a registered collection (`{ type: 'collection', slug, docID }`) or global (`{ type: 'global', slug }`). |
+| `tenantField`         | `string`                                                                      | `undefined` | Name of the tenant relationship field. When set, cache invalidation is scoped per-tenant. Collections without this field use global invalidation. |
+
+### Multi-Tenant Support
+
+For multi-tenant Payload applications using `@payloadcms/plugin-multi-tenant` (or a custom tenant field), set `tenantField` to scope cache invalidation per tenant. When a tenant's document changes, only that tenant's cached data is revalidated — other tenants' caches remain warm.
+
+```ts
+smartCachePlugin({
+  collections: ["posts", "media", "members", "events"],
+  tenantField: "tenant", // matches your multi-tenant plugin field name
+})
+```
+
+Collections without the tenant field (e.g., shared content) are automatically detected and use global invalidation as before.
+
+#### Tenant-scoped data fetching
+
+**Next.js 15+ (unstable_cache)**
+
+```ts
+import { createTenantRequestHandler } from "payload-smart-cache";
+
+const getPosts = createTenantRequestHandler(
+  async (tenantId: string, slug: string) => {
+    const payload = await getPayload({ config });
+    return payload.find({
+      collection: "posts",
+      where: { slug: { equals: slug }, tenant: { equals: tenantId } },
+    });
+  },
+  (tenantId) => ["posts", `posts:${tenantId}`],
+);
+
+// Usage
+const posts = await getPosts(tenantId, "my-post");
+```
+
+**Next.js 16+ ("use cache" directive)**
+
+```ts
+import { tenantCacheTag } from "payload-smart-cache";
+
+async function getPosts(tenantId: string) {
+  "use cache";
+  tenantCacheTag("posts", tenantId);
+
+  const payload = await getPayload({ config });
+  return payload.find({
+    collection: "posts",
+    where: { tenant: { equals: tenantId } },
+  });
+}
+```
+
+`tenantCacheTag` requires `cacheComponents: true` in your `next.config`.
 
 ## Contributing
 

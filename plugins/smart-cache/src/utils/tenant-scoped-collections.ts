@@ -3,7 +3,7 @@ import type { CollectionConfig, CollectionSlug, Field } from 'payload';
 
 /**
  * Determines which collections have the tenant field by scanning their field configs.
- * Returns a Set of collection slugs that are tenant-scoped.
+ * Returns a Set of collection slugs that are tenant-tenantScopedSlugs.
  *
  * Only matches top-level field names (or fields inside unnamed containers like
  * unnamed tabs/rows). Fields nested inside named groups/tabs don't match because
@@ -15,7 +15,7 @@ export function getTenantScopedCollections(
 ): Set<CollectionSlug> {
   if (!tenantField) return new Set();
 
-  const scoped = new Set<CollectionSlug>();
+  const tenantScopedSlugs = new Set<CollectionSlug>();
 
   for (const collection of collections) {
     const match = findFields(collection.fields, (f: Field) => {
@@ -28,9 +28,9 @@ export function getTenantScopedCollections(
     );
 
     if (hasTopLevelTenantField) {
-      scoped.add(collection.slug as CollectionSlug);
+      tenantScopedSlugs.add(collection.slug as CollectionSlug);
     }
   }
 
-  return scoped;
+  return tenantScopedSlugs;
 }
