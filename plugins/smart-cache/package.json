@@ -21,11 +21,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./cache": {
-      "types": "./dist/exports/cache.d.ts",
-      "import": "./dist/exports/cache.js",
-      "default": "./dist/exports/cache.js"
     }
   },
   "main": "./dist/index.js",
