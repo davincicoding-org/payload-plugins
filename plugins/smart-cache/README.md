@@ -124,7 +124,7 @@ const posts = await getPosts(tenantId, "my-post");
 **Next.js 16+ ("use cache" directive)**
 
 ```ts
-import { tenantCacheTag } from "payload-smart-cache";
+import { tenantCacheTag } from "payload-smart-cache/cache";
 
 async function getPosts(tenantId: string) {
   "use cache";
