@@ -15,7 +15,7 @@ export type DocumentInvalidation<
   C extends CollectionSlug = CollectionSlug,
   G extends GlobalSlug = GlobalSlug,
 > =
-  | { type: 'collection'; slug: C; docID: DocumentID }
+  | { type: 'collection'; slug: C; docID: DocumentID; tenantId?: string }
   | { type: 'global'; slug: G };
 
 /** Callback type for the `onInvalidate` option. */
