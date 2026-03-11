@@ -208,6 +208,7 @@ describe('invalidationCallback', () => {
       type: 'collection',
       slug: 'media',
       docID: '1',
+      tenantId: undefined,
     });
   });
 
@@ -225,6 +226,190 @@ describe('invalidationCallback', () => {
       type: 'collection',
       slug: 'posts',
       docID: '1',
+      tenantId: undefined,
     });
+  });
+});
+
+describe('tenant-scoped invalidation', () => {
+  const tenantScopedCollections = new Set([
+    'posts' as CollectionSlug,
+    'media' as CollectionSlug,
+  ]);
+
+  function makeTenantHookConfig(
+    overrides: { invalidationCallback?: DocumentInvalidationCallback } = {},
+  ) {
+    return {
+      graph: { getDependants: () => [] } as any,
+      invalidationCallback: overrides.invalidationCallback,
+      tenantField: 'camp',
+      tenantScopedCollections,
+    };
+  }
+
+  test('emits tenant-scoped tag when doc has tenant value', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateCollectionCache(makeTenantHookConfig());
+    const args = makeCollectionAfterChangeArgs({ slug: 'posts' });
+    (args.doc as any).camp = 'tenant-abc';
+
+    await hook(args);
+
+    expect(revalidateTag).toHaveBeenCalledWith('posts:tenant-abc');
+    expect(revalidateTag).not.toHaveBeenCalledWith('posts');
+  });
+
+  test('falls back to collection-level tag when doc has no tenant value', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateCollectionCache(makeTenantHookConfig());
+    await hook(makeCollectionAfterChangeArgs({ slug: 'posts' }));
+
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
+  });
+
+  test('emits collection-level tag for non-tenant-scoped collection', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateCollectionCache({
+      graph: { getDependants: () => [] } as any,
+      invalidationCallback: undefined,
+      tenantField: 'camp',
+      tenantScopedCollections: new Set(['posts' as CollectionSlug]),
+    });
+
+    await hook(makeCollectionAfterChangeArgs({ slug: 'events' }));
+
+    expect(revalidateTag).toHaveBeenCalledWith('events');
+  });
+
+  test('passes tenantId to invalidation callback', async () => {
+    vi.mocked(revalidateTag).mockClear();
+    const invalidationCallback = vi.fn();
+
+    const hook = invalidateCollectionCache(
+      makeTenantHookConfig({ invalidationCallback }),
+    );
+
+    const args = makeCollectionAfterChangeArgs({ slug: 'posts' });
+    (args.doc as any).camp = 'tenant-abc';
+
+    await hook(args);
+
+    expect(invalidationCallback).toHaveBeenCalledWith({
+      type: 'collection',
+      slug: 'posts',
+      docID: '1',
+      tenantId: 'tenant-abc',
+    });
+  });
+
+  test('delete hook emits tenant-scoped tag', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateCollectionCacheOnDelete({
+      graph: { getDependants: () => [] } as any,
+      invalidationCallback: () => void 0,
+      tenantField: 'camp',
+      tenantScopedCollections,
+    });
+
+    const args = makeCollectionAfterDeleteArgs({ slug: 'posts' });
+    (args.doc as any).camp = 'tenant-abc';
+
+    await hook(args);
+
+    expect(revalidateTag).toHaveBeenCalledWith('posts:tenant-abc');
+  });
+});
+
+describe('cross-boundary dependency walks', () => {
+  test('tenant-scoped → shared: drops tenant filter for shared dependent', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const tenantScopedCollections = new Set(['posts' as CollectionSlug]);
+    // 'events' is NOT in tenantScopedCollections (shared)
+    const findMock = vi.fn().mockResolvedValue({ docs: [{ id: '99' }] });
+
+    const hook = invalidateCollectionCache({
+      graph: {
+        getDependants: (slug: string) => {
+          if (slug === 'posts') {
+            return [
+              {
+                entity: { type: 'collection', slug: 'events' },
+                fields: [
+                  { field: 'relatedPost', hasMany: false, polymorphic: false },
+                ],
+              },
+            ];
+          }
+          return [];
+        },
+      } as any,
+      invalidationCallback: undefined,
+      tenantField: 'camp',
+      tenantScopedCollections,
+    });
+
+    const args = makeCollectionAfterChangeArgs({ slug: 'posts' });
+    (args.doc as any).camp = 'tenant-abc';
+    (args.req as any).payload = { find: findMock } as any;
+
+    await hook(args);
+
+    // The events query should NOT include a tenant filter
+    expect(findMock).toHaveBeenCalledWith({
+      collection: 'events',
+      where: { relatedPost: { in: ['1'] } },
+    });
+
+    // posts tag is tenant-scoped, events tag is collection-level
+    expect(revalidateTag).toHaveBeenCalledWith('posts:tenant-abc');
+    expect(revalidateTag).toHaveBeenCalledWith('events');
+  });
+
+  test('shared → tenant-scoped: falls back to collection-level invalidation', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const tenantScopedCollections = new Set(['posts' as CollectionSlug]);
+    const findMock = vi.fn().mockResolvedValue({ docs: [{ id: '77' }] });
+
+    const hook = invalidateCollectionCache({
+      graph: {
+        getDependants: (slug: string) => {
+          if (slug === 'events') {
+            return [
+              {
+                entity: { type: 'collection', slug: 'posts' },
+                fields: [
+                  { field: 'event', hasMany: false, polymorphic: false },
+                ],
+              },
+            ];
+          }
+          return [];
+        },
+      } as any,
+      invalidationCallback: undefined,
+      tenantField: 'camp',
+      tenantScopedCollections,
+    });
+
+    // 'events' is shared — no tenant on the doc
+    const args = makeCollectionAfterChangeArgs({ slug: 'events' });
+    (args.req as any).payload = { find: findMock } as any;
+
+    await hook(args);
+
+    // events is shared, no tenant → collection-level tag
+    expect(revalidateTag).toHaveBeenCalledWith('events');
+    // posts is tenant-scoped but tenantId is undefined (came from shared) → collection-level
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
+    expect(revalidateTag).not.toHaveBeenCalledWith(
+      expect.stringContaining('posts:'),
+    );
   });
 });

@@ -10,12 +10,17 @@ import type {
   ResolvedPluginOptions,
 } from './types';
 import { createDependencyGraph } from './utils/dependency-graph';
+import { getTenantScopedCollections } from './utils/tenant-scoped-collections';
 import { getTrackedCollections } from './utils/tracked-collections';
 
 export {
   createRequestHandler,
   type RequestHandlerCacheOptions,
 } from './exports/create-request';
+export {
+  createTenantRequestHandler,
+  type TenantRequestHandlerOptions,
+} from './exports/create-tenant-request';
 export type {
   DocumentInvalidation as InvalidationChange,
   DocumentInvalidationCallback as OnInvalidate,
@@ -47,6 +52,13 @@ export interface SmartCachePluginConfig<
    * Only fires for collections/globals explicitly registered in the config.
    */
   onInvalidate?: DocumentInvalidationCallback<C, G>;
+  /**
+   * Name of the tenant relationship field on your collections.
+   * When set, cache invalidation is scoped per-tenant.
+   * Collections without this field are treated as shared and use global invalidation.
+   * Must match the field name used by `@payloadcms/plugin-multi-tenant` or your custom tenant field.
+   */
+  tenantField?: string;
 }
 
 export const smartCachePlugin =
@@ -58,6 +70,7 @@ export const smartCachePlugin =
     globals = [],
     onInvalidate,
     disableAutoTracking,
+    tenantField,
   }: SmartCachePluginConfig<C, G>): Plugin =>
   (config) => {
     if (collections.length + globals.length === 0) {
@@ -86,6 +99,10 @@ export const smartCachePlugin =
     }
 
     config.collections ??= [];
+    const tenantScopedCollections = getTenantScopedCollections(
+      config.collections,
+      tenantField,
+    );
     const collectionsToTrack = disableAutoTracking
       ? new Set(collections)
       : getTrackedCollections(
@@ -97,13 +114,20 @@ export const smartCachePlugin =
       collection.hooks ??= {};
       collection.hooks.afterChange ??= [];
       collection.hooks.afterChange.push(
-        invalidateCollectionCache({ graph, invalidationCallback }),
+        invalidateCollectionCache({
+          graph,
+          invalidationCallback,
+          tenantField,
+          tenantScopedCollections,
+        }),
       );
       collection.hooks.afterDelete ??= [];
       collection.hooks.afterDelete.push(
         invalidateCollectionCacheOnDelete({
           graph,
           invalidationCallback,
+          tenantField,
+          tenantScopedCollections,
         }),
       );
     }
