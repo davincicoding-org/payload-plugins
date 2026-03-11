@@ -1,5 +1,11 @@
 # payload-smart-cache
 
+## 1.3.0
+
+### Minor Changes
+
+- [#42](https://github.com/davincicoding-org/payload-plugins/pull/42) [`5ab1dd0`](https://github.com/davincicoding-org/payload-plugins/commit/5ab1dd00dc1308cf6c4fbc1c58b6d0733a17dea6) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add multi-tenant cache invalidation support via `tenantField` option. When set, cache tags are scoped per tenant (`posts:tenant-abc`) instead of per collection (`posts`), preventing unnecessary cache busts across tenants. Includes `createTenantRequestHandler` for Next.js 15+ and `tenantCacheTag` helper for Next.js 16+.
+
 ## 1.2.4
 
 ### Patch Changes
