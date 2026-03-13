@@ -38,8 +38,8 @@ export default buildConfig({
     const { totalDocs } = await payload.count({ collection: 'users' });
     if (totalDocs > 0) return;
 
-    // Provide email + password directly (not _email) so the
-    // autoGeneratePassword hook is skipped and we have known credentials.
+    // Provide password so the autoGeneratePassword hook is skipped
+    // and we have known credentials for testing.
     await payload.create({
       collection: 'users',
       overrideAccess: true,
