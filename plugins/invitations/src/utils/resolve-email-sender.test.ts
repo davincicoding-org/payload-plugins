@@ -4,7 +4,7 @@ import type { EmailSenderOption } from '../types';
 import { resolveEmailSender } from './resolve-email-sender';
 
 const mockReq = {} as PayloadRequest;
-const mockUser = { id: '1', email: 'user@test.com' } as TypedUser;
+const mockUser = { id: 1, email: 'user@test.com' } as unknown as TypedUser;
 
 describe('resolveEmailSender', () => {
   test('returns static email sender as-is', async () => {
