@@ -21,7 +21,7 @@ export function resolveCreateFlow({
     return { type: 'verification-flow', name: flowName, config };
   }
 
-  if (data._email) {
+  if (!data.password) {
     return { type: 'admin-invite' };
   }
 
