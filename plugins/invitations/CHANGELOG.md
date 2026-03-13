@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.5.0
+
+### Minor Changes
+
+- [`a8edaed`](https://github.com/davincicoding-org/payload-plugins/commit/a8edaedc3341cacba10bbc2d06250709be74cd59) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Remove `_email` virtual field. Users are now created with the native `email` field directly. The admin-invite flow is detected by the absence of a `password` field instead of the presence of `_email`. This is a breaking change for consumers using `_email` — replace `_email` with `email` and remove any `as never` / `as Record<string, unknown>` casts.
+
 ## 0.4.1
 
 ### Patch Changes
