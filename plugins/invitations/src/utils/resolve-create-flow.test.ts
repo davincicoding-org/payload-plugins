@@ -10,12 +10,36 @@ const mockFlowConfig: VerificationFlowConfig = {
 };
 
 describe('resolveCreateFlow', () => {
-  test('returns admin-invite when _email is set', () => {
+  test('returns admin-invite when password is undefined', () => {
     const result = resolveCreateFlow({
-      data: { _email: 'test@example.com' },
+      data: { email: 'test@example.com' },
       verificationFlows: {},
     });
     expect(result).toEqual({ type: 'admin-invite' });
+  });
+
+  test('returns admin-invite when password is empty string', () => {
+    const result = resolveCreateFlow({
+      data: { email: 'test@example.com', password: '' },
+      verificationFlows: {},
+    });
+    expect(result).toEqual({ type: 'admin-invite' });
+  });
+
+  test('returns admin-invite when password is null', () => {
+    const result = resolveCreateFlow({
+      data: { email: 'test@example.com', password: null },
+      verificationFlows: {},
+    });
+    expect(result).toEqual({ type: 'admin-invite' });
+  });
+
+  test('returns direct-create when password is provided', () => {
+    const result = resolveCreateFlow({
+      data: { email: 'test@example.com', password: 'secure123' },
+      verificationFlows: {},
+    });
+    expect(result).toEqual({ type: 'direct-create' });
   });
 
   test('returns verification-flow when _verificationFlow matches a configured flow', () => {
@@ -48,17 +72,9 @@ describe('resolveCreateFlow', () => {
     ).toThrow();
   });
 
-  test('returns direct-create when neither _email nor _verificationFlow is set', () => {
+  test('_verificationFlow takes precedence over password absence', () => {
     const result = resolveCreateFlow({
-      data: { email: 'test@example.com' },
-      verificationFlows: {},
-    });
-    expect(result).toEqual({ type: 'direct-create' });
-  });
-
-  test('_verificationFlow takes precedence over _email when both set', () => {
-    const result = resolveCreateFlow({
-      data: { _email: 'test@example.com', _verificationFlow: 'self-signup' },
+      data: { email: 'test@example.com', _verificationFlow: 'self-signup' },
       verificationFlows: { 'self-signup': mockFlowConfig },
     });
     expect(result.type).toBe('verification-flow');
