@@ -182,18 +182,6 @@ export const invitationsPlugin =
 
       collection.fields ??= [];
 
-      collection.fields.unshift({
-        name: '_email',
-        label: ({ t }) => t('general:email'),
-        type: 'email',
-        required: true,
-        virtual: true,
-        admin: {
-          disableListColumn: true,
-          condition: (data, _siblingData, { user }) => !data.id && !!user,
-        },
-      });
-
       collection.fields.push(joinedAtField);
       collection.fields.push(hideAuthOnCreateField);
       collection.fields.push(verificationFlowField);
