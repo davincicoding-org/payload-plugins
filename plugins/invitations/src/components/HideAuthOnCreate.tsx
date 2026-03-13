@@ -18,13 +18,6 @@ export function HideAuthOnCreate() {
 
     dispatchFields({
       type: 'UPDATE',
-      path: 'email',
-      value: 'placeholder@replaced-server-side.com',
-      valid: true,
-    });
-
-    dispatchFields({
-      type: 'UPDATE',
       path: 'password',
       value: 'placeholder-replaced-server-side',
       valid: true,
@@ -37,22 +30,35 @@ export function HideAuthOnCreate() {
     });
   }, [id, dispatchFields, isInitializing]);
 
-  // Disable autocomplete on hidden auth fields to prevent browser password manager prompts
+  // Disable autocomplete on hidden password fields to prevent browser password manager prompts
   useEffect(() => {
     if (id) return;
 
-    const inputs = document.querySelectorAll('.auth-fields input');
-    for (const input of inputs) {
+    const passwordInputs = document.querySelectorAll(
+      '.auth-fields input[type="password"]',
+    );
+    for (const input of passwordInputs) {
       input.setAttribute('autocomplete', 'off');
     }
   }, [id]);
 
-  // Only hide auth fields on create (new document)
+  // Only restyle auth fields on create (new document)
   if (id) return null;
 
   return (
     <style>{`
-      .auth-fields { display: none !important; }
+      /* Hide password fields and their empty wrappers, keep email visible */
+      .auth-fields .field-type.password { display: none !important; }
+      .auth-fields .field-type.confirm-password { display: none !important; }
+      .auth-fields__changing-password { display: none !important; }
+      .auth-fields__controls { display: none !important; }
+      /* Remove auth group styling so email appears as a plain field */
+      .auth-fields {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
     `}</style>
   );
 }
