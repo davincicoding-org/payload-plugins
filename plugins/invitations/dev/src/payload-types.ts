@@ -120,9 +120,9 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
-  _email?: string | null;
   name?: string | null;
   joinedAt?: string | null;
+  _verificationFlow?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -217,9 +217,9 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  _email?: T;
   name?: T;
   joinedAt?: T;
+  _verificationFlow?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
