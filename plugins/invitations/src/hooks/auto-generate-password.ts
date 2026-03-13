@@ -25,7 +25,6 @@ export function createAutoGeneratePasswordHook({
 
     return {
       ...data,
-      email: data._email,
       password,
       'confirm-password': password,
     };
