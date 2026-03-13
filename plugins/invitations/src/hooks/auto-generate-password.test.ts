@@ -7,7 +7,7 @@ const autoGeneratePassword = createAutoGeneratePasswordHook({
 
 describe('createAutoGeneratePasswordHook', () => {
   test('generates 64-char hex password on admin-invite create', () => {
-    const data = { _email: 'test@example.com' };
+    const data = { email: 'test@example.com' };
     const result = autoGeneratePassword({
       operation: 'create',
       data,
@@ -19,8 +19,8 @@ describe('createAutoGeneratePasswordHook', () => {
     expect(result?.['confirm-password']).toBe(result?.password);
   });
 
-  test('sets email from _email', () => {
-    const data = { _email: 'test@example.com' };
+  test('preserves email as-is (no copy from _email)', () => {
+    const data = { email: 'test@example.com' };
     const result = autoGeneratePassword({
       operation: 'create',
       data,
@@ -31,7 +31,7 @@ describe('createAutoGeneratePasswordHook', () => {
   });
 
   test('returns new object (immutability)', () => {
-    const data = { _email: 'test@example.com' };
+    const data = { email: 'test@example.com' };
     const result = autoGeneratePassword({
       operation: 'create',
       data,
@@ -42,7 +42,7 @@ describe('createAutoGeneratePasswordHook', () => {
   });
 
   test('returns data unchanged for non-create operations', () => {
-    const data = { _email: 'test@example.com' };
+    const data = { email: 'test@example.com' };
     const result = autoGeneratePassword({
       operation: 'update',
       data,
@@ -78,7 +78,7 @@ describe('createAutoGeneratePasswordHook', () => {
     expect(result?.password).toBe('real-pw');
   });
 
-  test('returns data unchanged for direct-create (no _email, no _verificationFlow)', () => {
+  test('returns data unchanged for direct-create (email + password)', () => {
     const data = { email: 'test@example.com', password: 'pw' };
     const result = autoGeneratePassword({
       operation: 'create',
@@ -91,7 +91,7 @@ describe('createAutoGeneratePasswordHook', () => {
 
   test('stashes flow on req.context.createFlow', () => {
     const req = { context: {} } as any;
-    const data = { _email: 'test@example.com' };
+    const data = { email: 'test@example.com' };
     autoGeneratePassword({ operation: 'create', data, req } as any);
 
     expect(req.context.createFlow).toEqual({ type: 'admin-invite' });
