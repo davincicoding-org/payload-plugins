@@ -52,18 +52,6 @@ describe('invitations plugin', () => {
     expect(joinedAt?.type).toBe('date');
   });
 
-  test('adds virtual _email field to the users collection', () => {
-    const usersConfig = payload.config.collections.find(
-      (c) => c.slug === 'users',
-    );
-    expect(usersConfig).toBeDefined();
-
-    const flatFields = usersConfig?.flattenedFields;
-    const emailField = flatFields?.find((f) => f.name === '_email');
-    expect(emailField).toBeDefined();
-    expect(emailField?.type).toBe('email');
-  });
-
   test('sets auth.verify on the users collection', () => {
     const usersConfig = payload.config.collections.find(
       (c) => c.slug === 'users',
@@ -74,13 +62,13 @@ describe('invitations plugin', () => {
     expect(usersConfig?.auth?.verify).toBeTruthy();
   });
 
-  test('creating a user with _email auto-generates a password', async () => {
+  test('creating a user without password auto-generates one and sends invite', async () => {
     const email = uniqueEmail('invited');
     const user = await payload.create({
       collection: 'users',
       data: {
-        _email: email,
-      } as Record<string, unknown>,
+        email,
+      },
     });
 
     expect(user.email).toBe(email);
@@ -91,13 +79,13 @@ describe('invitations plugin', () => {
     const email = uniqueEmail('duplicate');
     await payload.create({
       collection: 'users',
-      data: { _email: email } as Record<string, unknown>,
+      data: { email },
     });
 
     await expect(
       payload.create({
         collection: 'users',
-        data: { _email: email } as Record<string, unknown>,
+        data: { email },
       }),
     ).rejects.toThrow();
   });
@@ -115,7 +103,7 @@ describe('invitations plugin', () => {
     const email = uniqueEmail('headless');
     const user = await payload.create({
       collection: 'users',
-      data: { _email: email } as Record<string, unknown>,
+      data: { email },
     });
 
     const fullUser = await payload.findByID({
@@ -141,7 +129,7 @@ describe('invitations plugin', () => {
   test('getInviteData returns ALREADY_ACCEPTED after invitation is accepted', async () => {
     const user = await payload.create({
       collection: 'users',
-      data: { _email: uniqueEmail('double-click') } as Record<string, unknown>,
+      data: { email: uniqueEmail('double-click') },
     });
 
     const fullUser = await payload.findByID({
@@ -169,7 +157,7 @@ describe('invitations plugin', () => {
   test('acceptInvite verifies user and returns cookie', async () => {
     const user = await payload.create({
       collection: 'users',
-      data: { _email: uniqueEmail('accept') } as Record<string, unknown>,
+      data: { email: uniqueEmail('accept') },
     });
 
     const fullUser = await payload.findByID({
@@ -197,10 +185,7 @@ describe('invitations plugin', () => {
   test('acceptInvite returns ALREADY_ACCEPTED for verified user', async () => {
     const user = await payload.create({
       collection: 'users',
-      data: { _email: uniqueEmail('already-accepted') } as Record<
-        string,
-        unknown
-      >,
+      data: { email: uniqueEmail('already-accepted') },
     });
 
     const fullUser = await payload.findByID({
@@ -233,7 +218,7 @@ describe('invitations plugin', () => {
     const email = uniqueEmail('sender-test');
     await payload.create({
       collection: 'users',
-      data: { _email: email } as Record<string, unknown>,
+      data: { email },
     });
 
     const invitation = sentEmails.find((e) =>
@@ -249,7 +234,7 @@ describe('invitations plugin', () => {
     const email = uniqueEmail('body-test');
     await payload.create({
       collection: 'users',
-      data: { _email: email } as Record<string, unknown>,
+      data: { email },
     });
 
     const invitation = sentEmails.find((e) =>
