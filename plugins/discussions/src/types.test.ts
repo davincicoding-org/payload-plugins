@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
-import { createCommentSchema, createReplySchema } from './types';
+import {
+  createCommentSchema,
+  createReplySchema,
+  populatedCommentSchema,
+} from './types';
 
 describe('createCommentSchema', () => {
   test('validates valid input', () => {
@@ -39,6 +43,38 @@ describe('createCommentSchema', () => {
       documentReference: { slug: 'posts', id: '123' },
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('populatedCommentSchema', () => {
+  const validComment = {
+    id: 'abc-123',
+    content: 'Hello world',
+    author: { id: 'user-1', displayName: 'Alice' },
+    replies: null,
+    updatedAt: '2026-01-01T00:00:00Z',
+    createdAt: '2026-01-01T00:00:00Z',
+  };
+
+  test('validates with string id', () => {
+    const result = populatedCommentSchema.safeParse(validComment);
+    expect(result.success).toBe(true);
+  });
+
+  test('validates with numeric id', () => {
+    const result = populatedCommentSchema.safeParse({
+      ...validComment,
+      id: 42,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  test('validates with numeric author id', () => {
+    const result = populatedCommentSchema.safeParse({
+      ...validComment,
+      author: { id: 7, displayName: 'Bob' },
+    });
+    expect(result.success).toBe(true);
   });
 });
 

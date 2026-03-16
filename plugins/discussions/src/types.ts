@@ -29,7 +29,7 @@ export interface PopulatedComment extends Omit<Comment, 'author' | 'replies'> {
 }
 
 export const populatedCommentSchema: z.ZodType<PopulatedComment> = z.object({
-  id: z.string(),
+  id: documentIdSchema,
   content: z.string(),
   author: z.object({
     id: documentIdSchema,
