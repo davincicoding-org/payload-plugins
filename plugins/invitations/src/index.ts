@@ -1,5 +1,6 @@
 import { getAdminURL } from '@davincicoding/payload-plugin-kit';
-import type { PayloadRequest, Plugin, TypedUser } from 'payload';
+import type { Payload, PayloadRequest, Plugin, TypedUser } from 'payload';
+import { formatAdminURL } from 'payload/shared';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { reinviteEndpoint } from './endpoints/reinvite';
@@ -139,22 +140,38 @@ export const invitationsPlugin =
     }
 
     const resolveInvitationURL = async ({
+      payload,
       req,
       token,
       user,
     }: {
-      req: PayloadRequest;
+      payload: Payload;
+      req: PayloadRequest | undefined;
       token: string;
       user: TypedUser;
     }) => {
-      const defaultURL = `${getAdminURL({ req, path: INVITATION_PAGE_PATH })}?token=${token}`;
-
       if (typeof acceptInvitationURL === 'string') {
         const separator = acceptInvitationURL.includes('?') ? '&' : '?';
         return `${acceptInvitationURL}${separator}token=${token}`;
       }
+
+      const serverURL =
+        req != null
+          ? getAdminURL({ req, path: INVITATION_PAGE_PATH })
+          : formatAdminURL({
+              adminRoute: payload.config.routes.admin,
+              serverURL: payload.config.serverURL ?? '',
+              path: INVITATION_PAGE_PATH,
+            });
+      const defaultURL = `${serverURL}?token=${token}`;
+
       if (typeof acceptInvitationURL === 'function')
-        return acceptInvitationURL({ token, user, req, defaultURL });
+        return acceptInvitationURL({
+          token,
+          user,
+          req: req as PayloadRequest,
+          defaultURL,
+        });
       return defaultURL;
     };
 
@@ -168,6 +185,7 @@ export const invitationsPlugin =
         verify: {
           generateEmailHTML: async ({ req, token, user }) => {
             const invitationURL = await resolveInvitationURL({
+              payload: req.payload,
               req,
               token,
               user,
@@ -176,6 +194,7 @@ export const invitationsPlugin =
           },
           generateEmailSubject: async ({ req, token, user }) => {
             const invitationURL = await resolveInvitationURL({
+              payload: req.payload,
               req,
               token,
               user,

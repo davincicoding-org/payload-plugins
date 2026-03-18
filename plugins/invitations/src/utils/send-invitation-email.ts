@@ -23,7 +23,8 @@ interface SendInvitationEmailConfig {
     user: TypedUser;
   }) => string | Promise<string>;
   resolveInvitationURL: (args: {
-    req: PayloadRequest;
+    payload: Payload;
+    req: PayloadRequest | undefined;
     token: string;
     user: TypedUser;
   }) => Promise<string>;
@@ -70,6 +71,8 @@ export function createSendInvitationEmail(
 
     if (!user) return { status: 'user_not_found' };
 
+    if (user._verified) return { status: 'already_accepted' };
+
     const token = user._verificationToken as string | null | undefined;
     if (!token) return { status: 'already_accepted' };
 
@@ -97,7 +100,8 @@ export function createSendInvitationEmail(
       }
 
       const invitationURL = await config.resolveInvitationURL({
-        req: req as PayloadRequest,
+        payload,
+        req,
         token,
         user: typedUser,
       });

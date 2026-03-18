@@ -1,7 +1,11 @@
 import crypto from 'node:crypto';
 import type { Payload, SendEmailOptions } from 'payload';
 import { getPayload } from 'payload';
-import { acceptInvite, getInviteData } from 'payload-invitations';
+import {
+  acceptInvite,
+  getInviteData,
+  sendInvitationEmail,
+} from 'payload-invitations';
 import {
   afterAll,
   beforeAll,
@@ -244,5 +248,132 @@ describe('invitations plugin', () => {
     );
     expect(invitation).toBeDefined();
     expect(String(invitation?.html)).toContain('Accept Invitation');
+  });
+
+  test('skipInvitationEmail suppresses email but creates user with token', async () => {
+    const email = uniqueEmail('suppressed');
+    const user = await payload.create({
+      collection: 'users',
+      data: { email },
+      context: { skipInvitationEmail: true },
+    });
+
+    expect(user.id).toBeDefined();
+
+    const fullUser = await payload.findByID({
+      collection: 'users',
+      id: user.id,
+      overrideAccess: true,
+      showHiddenFields: true,
+    });
+    expect(fullUser._verificationToken).toBeTruthy();
+
+    const emailToUser = sentEmails.find((e) =>
+      (Array.isArray(e.to) ? e.to : [e.to]).some((addr) =>
+        String(addr).includes(email),
+      ),
+    );
+    expect(emailToUser).toBeUndefined();
+  });
+
+  test('sendInvitationEmail sends email for previously suppressed user', async () => {
+    const email = uniqueEmail('deferred');
+    const user = await payload.create({
+      collection: 'users',
+      data: { email },
+      context: { skipInvitationEmail: true },
+    });
+
+    sentEmails.length = 0;
+
+    const result = await sendInvitationEmail({
+      payload,
+      userId: user.id,
+    });
+
+    expect(result).toEqual({ status: 'sent' });
+    const invitation = sentEmails.find((e) =>
+      (Array.isArray(e.to) ? e.to : [e.to]).some((addr) =>
+        String(addr).includes(email),
+      ),
+    );
+    expect(invitation).toBeDefined();
+    expect(invitation?.from).toBe('"Tenant Co" <invites@tenant.com>');
+  });
+
+  test('sendInvitationEmail returns already_accepted for verified user', async () => {
+    const email = uniqueEmail('already-verified');
+    const user = await payload.create({
+      collection: 'users',
+      data: { email },
+    });
+
+    const fullUser = await payload.findByID({
+      collection: 'users',
+      id: user.id,
+      overrideAccess: true,
+      showHiddenFields: true,
+    });
+
+    await acceptInvite({
+      token: fullUser._verificationToken as string,
+      password: 'securePassword123!',
+      payload,
+    });
+
+    const result = await sendInvitationEmail({ payload, userId: user.id });
+    expect(result).toEqual({ status: 'already_accepted' });
+  });
+
+  test('sendInvitationEmail returns user_not_found for nonexistent user', async () => {
+    const result = await sendInvitationEmail({
+      payload,
+      userId: 'nonexistent-id-9999',
+    });
+    expect(result).toEqual({ status: 'user_not_found' });
+  });
+
+  test('sendInvitationEmail returns no_invitation_flow for direct-create user', async () => {
+    const email = uniqueEmail('direct');
+    const user = await payload.create({
+      collection: 'users',
+      data: { email, password: 'directPassword123!' },
+    });
+
+    const result = await sendInvitationEmail({ payload, userId: user.id });
+    expect(result).toEqual({ status: 'no_invitation_flow' });
+  });
+
+  test('reinvite endpoint is registered', () => {
+    const endpoints = payload.config.endpoints;
+    const reinvite = endpoints.find(
+      (e) => e.path === '/invitations-plugin/reinvite' && e.method === 'post',
+    );
+    expect(reinvite).toBeDefined();
+  });
+
+  test('batch scenario: create suppressed, then send all', async () => {
+    const emails = Array.from({ length: 3 }, (_, i) =>
+      uniqueEmail(`batch-${i}`),
+    );
+
+    const users = await Promise.all(
+      emails.map((email) =>
+        payload.create({
+          collection: 'users',
+          data: { email },
+          context: { skipInvitationEmail: true },
+        }),
+      ),
+    );
+
+    sentEmails.length = 0;
+
+    const results = await Promise.all(
+      users.map((user) => sendInvitationEmail({ payload, userId: user.id })),
+    );
+
+    expect(results.every((r) => r.status === 'sent')).toBe(true);
+    expect(sentEmails).toHaveLength(3);
   });
 });
