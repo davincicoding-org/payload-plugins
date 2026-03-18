@@ -19,7 +19,14 @@ export function createAutoGeneratePasswordHook({
     // so afterChange hooks cannot resolve the flow from the doc.
     req.context.createFlow = flow;
 
-    if (flow.type !== 'admin-invite') return data;
+    if (flow.type === 'direct-create') return data;
+
+    if (flow.type === 'verification-flow') {
+      return {
+        ...data,
+        _invitationFlow: flow.name,
+      };
+    }
 
     const password = crypto.randomBytes(32).toString('hex');
 
@@ -27,6 +34,7 @@ export function createAutoGeneratePasswordHook({
       ...data,
       password,
       'confirm-password': password,
+      _invitationFlow: 'admin-invite',
     };
   };
 }

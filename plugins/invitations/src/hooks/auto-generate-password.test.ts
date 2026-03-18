@@ -74,7 +74,7 @@ describe('createAutoGeneratePasswordHook', () => {
       req: { context: {} },
     } as any);
 
-    expect(result).toBe(data);
+    expect(result?.email).toBe('test@example.com');
     expect(result?.password).toBe('real-pw');
   });
 
@@ -87,6 +87,53 @@ describe('createAutoGeneratePasswordHook', () => {
     } as any);
 
     expect(result).toBe(data);
+  });
+
+  test('sets _invitationFlow to "admin-invite" for admin-invite create', () => {
+    const data = { email: 'test@example.com' };
+    const result = autoGeneratePassword({
+      operation: 'create',
+      data,
+      req: { context: {} },
+    } as any);
+
+    expect(result?._invitationFlow).toBe('admin-invite');
+  });
+
+  test('sets _invitationFlow to flow name for verification-flow create', () => {
+    const hook = createAutoGeneratePasswordHook({
+      verificationFlows: {
+        'self-signup': {
+          emailSender: { email: 'test@test.com', name: 'Test' },
+          generateEmailHTML: async () => '',
+          generateEmailSubject: async () => '',
+          acceptInvitationURL: 'https://example.com/verify',
+        },
+      },
+    });
+    const data = {
+      _verificationFlow: 'self-signup',
+      email: 'test@example.com',
+      password: 'real-pw',
+    };
+    const result = hook({
+      operation: 'create',
+      data,
+      req: { context: {} },
+    } as any);
+
+    expect(result?._invitationFlow).toBe('self-signup');
+  });
+
+  test('does not set _invitationFlow for direct-create', () => {
+    const data = { email: 'test@example.com', password: 'pw' };
+    const result = autoGeneratePassword({
+      operation: 'create',
+      data,
+      req: { context: {} },
+    } as any);
+
+    expect(result).not.toHaveProperty('_invitationFlow');
   });
 
   test('stashes flow on req.context.createFlow', () => {
