@@ -1,5 +1,11 @@
 # payload-invitations
 
+## 0.6.0
+
+### Minor Changes
+
+- [`0642230`](https://github.com/davincicoding-org/payload-plugins/commit/0642230fd57260a7df037b1bfbb84ebeceacbc8d) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Add deferred invitation email support: suppress email on user creation via `context: { skipInvitationEmail: true }`, then send it later with the new `sendInvitationEmail` utility. Also adds the `/invitations-plugin/reinvite` endpoint and always registers email hooks (fixing a behavioral inconsistency when no `emailSender` was configured).
+
 ## 0.5.0
 
 ### Minor Changes
