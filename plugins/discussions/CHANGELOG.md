@@ -1,5 +1,11 @@
 # payload-discussions
 
+## 1.1.12
+
+### Patch Changes
+
+- [`877244b`](https://github.com/davincicoding-org/payload-plugins/commit/877244b0bd240235188acadb49ced7588a52844e) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Fix 500 error when creating comments on collections with numeric IDs by using `documentIdSchema` instead of `z.string()` for the comment `id` field in `populatedCommentSchema`.
+
 ## 1.1.11
 
 ### Patch Changes
