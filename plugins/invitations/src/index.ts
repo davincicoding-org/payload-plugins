@@ -2,6 +2,7 @@ import { getAdminURL } from '@davincicoding/payload-plugin-kit';
 import type { PayloadRequest, Plugin, TypedUser } from 'payload';
 import { DEFAULT_HTML, DEFAULT_SUBJECT, INVITATION_PAGE_PATH } from './const';
 import { acceptInviteEndpoint } from './endpoints/accept-invite';
+import { reinviteEndpoint } from './endpoints/reinvite';
 import { verifyAndLoginEndpoint } from './endpoints/verify-and-login';
 import {
   hideAuthOnCreateField,
@@ -218,6 +219,7 @@ export const invitationsPlugin =
 
     config.endpoints ??= [];
     config.endpoints.push(acceptInviteEndpoint);
+    config.endpoints.push(reinviteEndpoint);
     config.endpoints.push(verifyAndLoginEndpoint);
 
     return config;
