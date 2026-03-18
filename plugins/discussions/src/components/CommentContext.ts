@@ -1,16 +1,17 @@
 'use client';
 
+import type { DocumentID } from '@davincicoding/payload-plugin-kit';
 import { createContext, useContext } from 'react';
 import type { PopulatedComment } from '../types';
 
 export interface CommentContextValue {
   readonly comments: readonly PopulatedComment[];
-  readonly activeReplyId: string | null;
+  readonly activeReplyId: DocumentID | null;
   readonly maxDepth: number;
-  readonly openReply: (id: string) => void;
+  readonly openReply: (id: DocumentID) => void;
   readonly closeReply: () => void;
   readonly submitReply: (
-    parentId: string | null,
+    parentId: DocumentID | null,
     content: string,
   ) => Promise<void>;
 }

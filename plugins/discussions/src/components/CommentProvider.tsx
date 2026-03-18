@@ -27,9 +27,9 @@ export function CommentProvider({
 
   const [comments, setComments] =
     useState<readonly PopulatedComment[]>(initialComments);
-  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [activeReplyId, setActiveReplyId] = useState<DocumentID | null>(null);
 
-  const openReply = useCallback((id: string) => {
+  const openReply = useCallback((id: DocumentID) => {
     setActiveReplyId(id);
   }, []);
 
@@ -38,7 +38,7 @@ export function CommentProvider({
   }, []);
 
   const submitReply = useCallback(
-    async (parentId: string | null, content: string) => {
+    async (parentId: DocumentID | null, content: string) => {
       if (parentId === null) {
         const populated = await api.createComment({
           content,
@@ -50,7 +50,7 @@ export function CommentProvider({
       }
 
       const populated = await api.createReply({
-        parentId: parentId as DocumentID,
+        parentId,
         content,
       });
 

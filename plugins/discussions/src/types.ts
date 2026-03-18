@@ -23,7 +23,9 @@ export interface DiscussionsFieldConfig {
     : never;
 }
 
-export interface PopulatedComment extends Omit<Comment, 'author' | 'replies'> {
+export interface PopulatedComment
+  extends Omit<Comment, 'id' | 'author' | 'replies'> {
+  id: DocumentID;
   author: { id: DocumentID; displayName: string };
   replies: PopulatedComment[] | null;
 }
