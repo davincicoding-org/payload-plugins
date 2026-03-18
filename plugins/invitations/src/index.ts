@@ -5,6 +5,7 @@ import { acceptInviteEndpoint } from './endpoints/accept-invite';
 import { verifyAndLoginEndpoint } from './endpoints/verify-and-login';
 import {
   hideAuthOnCreateField,
+  invitationFlowField,
   joinedAtField,
   verificationFlowField,
 } from './fields';
@@ -185,6 +186,7 @@ export const invitationsPlugin =
       collection.fields.push(joinedAtField);
       collection.fields.push(hideAuthOnCreateField);
       collection.fields.push(verificationFlowField);
+      collection.fields.push(invitationFlowField);
 
       collection.hooks ??= {};
       collection.hooks.beforeValidate ??= [];

@@ -23,6 +23,13 @@ export const verificationFlowField: Field = {
   virtual: true,
 };
 
+export const invitationFlowField: Field = {
+  name: '_invitationFlow',
+  type: 'text',
+  access: { read: () => false, update: () => false },
+  admin: { hidden: true, disableListColumn: true },
+};
+
 export const hideAuthOnCreateField: Field = {
   name: '_hideAuthOnCreate',
   type: 'ui',
