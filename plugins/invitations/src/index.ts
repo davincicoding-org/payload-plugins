@@ -19,6 +19,7 @@ import type {
   EmailSenderOption,
   VerificationFlowConfig,
 } from './types';
+import { createSendInvitationEmail } from './utils/send-invitation-email';
 
 export type {
   AcceptInvitationURLFn,
@@ -28,6 +29,8 @@ export type {
 } from './types';
 export { acceptInvite } from './utils/accept-invite';
 export { getInviteData } from './utils/get-invite-data';
+export type { SendInvitationEmailResult } from './utils/send-invitation-email';
+export { sendInvitationEmail } from './utils/send-invitation-email';
 export { verifyAndLogin } from './utils/verify-and-login';
 
 export interface InvitationsPluginConfig {
@@ -197,19 +200,20 @@ export const invitationsPlugin =
       collection.hooks.beforeChange.push(validateUniqueEmail);
       collection.hooks.beforeChange.push(setJoinedAt);
 
-      if (emailSender || verificationFlows) {
-        collection.hooks.beforeOperation ??= [];
-        collection.hooks.beforeOperation.push(disableVerificationEmail);
-        collection.hooks.afterChange ??= [];
-        collection.hooks.afterChange.push(
-          createSendInvitationEmailHook({
-            emailSender,
-            generateInvitationEmailHTML,
-            generateInvitationEmailSubject,
-            resolveInvitationURL,
-          }),
-        );
-      }
+      const boundSendEmail = createSendInvitationEmail({
+        emailSender,
+        generateInvitationEmailHTML,
+        generateInvitationEmailSubject,
+        resolveInvitationURL,
+        verificationFlows,
+      });
+
+      collection.hooks.beforeOperation ??= [];
+      collection.hooks.beforeOperation.push(disableVerificationEmail);
+      collection.hooks.afterChange ??= [];
+      collection.hooks.afterChange.push(
+        createSendInvitationEmailHook({ sendEmail: boundSendEmail }),
+      );
     }
 
     config.endpoints ??= [];
