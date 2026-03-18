@@ -123,6 +123,7 @@ export interface User {
   name?: string | null;
   joinedAt?: string | null;
   _verificationFlow?: string | null;
+  _invitationFlow?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -220,6 +221,7 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   joinedAt?: T;
   _verificationFlow?: T;
+  _invitationFlow?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
