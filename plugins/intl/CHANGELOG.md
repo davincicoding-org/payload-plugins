@@ -1,5 +1,17 @@
 # payload-intl
 
+## 1.4.6
+
+### Patch Changes
+
+- [`388e297`](https://github.com/davincicoding-org/payload-plugins/commit/388e297e82d788ca04d93c282cb0eaf5d011200a) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Fix infinite re-render loop when typing in message input fields
+
+  The `MessagesField` component had a circular state update: `form.watch()` called
+  `setValue()` on every react-hook-form sync — including when Payload pushed the
+  same value back via `useForm({ values })`. This caused a
+  `setValue → re-render → watch → setValue` loop that hit React's maximum update
+  depth. The fix tracks the last pushed value in a ref and skips redundant updates.
+
 ## 1.4.5
 
 ### Patch Changes
