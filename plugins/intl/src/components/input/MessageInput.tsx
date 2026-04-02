@@ -123,7 +123,7 @@ export function MessageInput({
         />
         {multiline && <SingleLinePlugin />}
         <SyncValuePlugin value={value} />
-        <OnChangePlugin onChange={handleChange} />
+        <OnChangePlugin ignoreSelectionChange onChange={handleChange} />
         <HistoryPlugin />
 
         <BeautifulMentionsPlugin
