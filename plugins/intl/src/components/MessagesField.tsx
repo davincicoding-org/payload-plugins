@@ -1,10 +1,11 @@
 'use client';
 
-import { useField } from '@payloadcms/ui';
+import { useConfig, useField, useLocale } from '@payloadcms/ui';
 import type { JSONFieldClientProps } from 'payload';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Messages, MessagesSchema } from '@/types';
+import { mergeMessages } from '@/utils/merge';
 import { MessagesTree } from './layout/MessagesTree';
 
 export interface MessagesFieldProps {
@@ -48,6 +49,9 @@ export function MessagesField({
   schema,
   hiddenGroups,
   path,
+  fallbackLocales,
+  messagesGlobalSlug,
+  scope,
 }: JSONFieldClientProps & MessagesFieldProps) {
   const { value, setValue } = useField<Messages>({ path });
   const lastSyncedRef = useRef(stableStringify(value));
@@ -79,9 +83,65 @@ export function MessagesField({
     return () => subscription.unsubscribe();
   }, [form, setValue]);
 
+  const { code: locale } = useLocale();
+  const { config: clientConfig } = useConfig();
+  const [placeholders, setPlaceholders] = useState<Messages>({});
+
+  // Fetch fallback-locale messages so untranslated fields can show a
+  // greyed placeholder from the default (or configured fallback) locale.
+  useEffect(() => {
+    const targets = fallbackLocales?.[locale] ?? [];
+    if (targets.length === 0 || !messagesGlobalSlug) {
+      setPlaceholders({});
+      return;
+    }
+
+    let cancelled = false;
+    const apiRoute = clientConfig.routes?.api ?? '/api';
+    const baseUrl = `${clientConfig.serverURL ?? ''}${apiRoute}`;
+
+    const load = async (): Promise<void> => {
+      try {
+        let merged: Messages = {};
+        for (const fallbackLocale of targets) {
+          const response = await fetch(
+            `${baseUrl}/globals/${messagesGlobalSlug}?locale=${fallbackLocale}&depth=0`,
+            { credentials: 'include' },
+          );
+          if (!response.ok) continue;
+          const document = await response.json();
+          const data = scope ? document?.data?.[scope] : document?.data;
+          if (data && typeof data === 'object') {
+            merged = mergeMessages(merged, data);
+          }
+        }
+        if (!cancelled) setPlaceholders(merged);
+      } catch (error) {
+        console.error(
+          '[payload-intl] failed to load fallback placeholders',
+          error,
+        );
+        if (!cancelled) setPlaceholders({});
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    locale,
+    fallbackLocales,
+    messagesGlobalSlug,
+    scope,
+    clientConfig.serverURL,
+    clientConfig.routes?.api,
+  ]);
+
   return (
     <MessagesTree
       control={form.control}
+      fallbackValues={placeholders}
       hiddenGroups={hiddenGroups}
       path=""
       schema={schema}
