@@ -87,10 +87,12 @@ export function MessagesField({
   const { config: clientConfig } = useConfig();
   const [placeholders, setPlaceholders] = useState<Messages>({});
 
+  const fallbackTargetsKey = JSON.stringify(fallbackLocales?.[locale] ?? []);
+
   // Fetch fallback-locale messages so untranslated fields can show a
   // greyed placeholder from the default (or configured fallback) locale.
   useEffect(() => {
-    const targets = fallbackLocales?.[locale] ?? [];
+    const targets: string[] = JSON.parse(fallbackTargetsKey);
     if (targets.length === 0 || !messagesGlobalSlug) {
       setPlaceholders({});
       return;
@@ -111,7 +113,7 @@ export function MessagesField({
           if (!response.ok) continue;
           const document = await response.json();
           const data = scope ? document?.data?.[scope] : document?.data;
-          if (data && typeof data === 'object') {
+          if (data && typeof data === 'object' && !Array.isArray(data)) {
             merged = mergeMessages(merged, data);
           }
         }
@@ -130,8 +132,7 @@ export function MessagesField({
       cancelled = true;
     };
   }, [
-    locale,
-    fallbackLocales,
+    fallbackTargetsKey,
     messagesGlobalSlug,
     scope,
     clientConfig.serverURL,
