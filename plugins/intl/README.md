@@ -81,6 +81,27 @@ import { fetchMessages } from "payload-intl";
 const messages = await fetchMessages(payload, "en");
 ```
 
+### Missing-translation fallback
+
+Keys missing in a locale fall back to the fallback locale, following your
+Payload localization config. `fetchMessages` fills untranslated keys from the
+locale's `fallbackLocale` (or `defaultLocale`) — single-hop, matching Payload's
+own behavior. If `localization.fallback` is `false`, no fallback is applied.
+
+```ts
+// de is missing `common.items`; en has it → merged in automatically
+const messages = await fetchMessages(payload, "de");
+
+// disable fallback for this call
+const raw = await fetchMessages(payload, "de", { fallbackLocale: false });
+
+// override the fallback locale(s)
+const custom = await fetchMessages(payload, "de", { fallbackLocale: "en" });
+```
+
+In the admin editor, untranslated fields show the fallback locale's value as a
+greyed placeholder.
+
 ### Options
 
 | Option           | Type                                                   | Default                      | Description                                                                                                                                             |
