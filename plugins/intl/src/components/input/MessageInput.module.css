@@ -37,3 +37,24 @@
     margin: 0;
   }
 }
+
+.placeholder {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  padding-inline: 0.75rem;
+  color: var(--theme-elevation-400);
+  font-size: var(--font-size-large);
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.editor[data-multiline="true"] .placeholder {
+  top: 0.25rem;
+  transform: none;
+}
