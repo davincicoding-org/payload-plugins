@@ -32,12 +32,12 @@ describe('resolveFallbackLocales', () => {
   test('uses a per-locale fallbackLocale string', () => {
     const localization: Config['localization'] = {
       locales: [
-        { code: 'en' },
-        { code: 'de' },
-        { code: 'ch', fallbackLocale: 'de' },
+        { code: 'en', label: 'English' },
+        { code: 'de', label: 'German' },
+        { code: 'ch', label: 'Swiss', fallbackLocale: 'de' },
       ],
       defaultLocale: 'en',
-    } as any;
+    };
     expect(resolveFallbackLocales({ localization, locale: 'ch' })).toEqual([
       'de',
     ]);
@@ -46,12 +46,12 @@ describe('resolveFallbackLocales', () => {
   test('uses a per-locale fallbackLocale array in order', () => {
     const localization: Config['localization'] = {
       locales: [
-        { code: 'en' },
-        { code: 'de' },
-        { code: 'ch', fallbackLocale: ['de', 'en'] },
+        { code: 'en', label: 'English' },
+        { code: 'de', label: 'German' },
+        { code: 'ch', label: 'Swiss', fallbackLocale: ['de', 'en'] },
       ],
       defaultLocale: 'en',
-    } as any;
+    };
     expect(resolveFallbackLocales({ localization, locale: 'ch' })).toEqual([
       'de',
       'en',
@@ -60,9 +60,12 @@ describe('resolveFallbackLocales', () => {
 
   test('filters unknown fallback codes', () => {
     const localization: Config['localization'] = {
-      locales: [{ code: 'en' }, { code: 'ch', fallbackLocale: 'xx' }],
+      locales: [
+        { code: 'en', label: 'English' },
+        { code: 'ch', label: 'Swiss', fallbackLocale: 'xx' },
+      ],
       defaultLocale: 'en',
-    } as any;
+    };
     expect(resolveFallbackLocales({ localization, locale: 'ch' })).toEqual([]);
   });
 

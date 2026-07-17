@@ -19,15 +19,12 @@ export function resolveFallbackLocales(options: {
 
   const knownLocales = getSupportedLocales(localization);
 
-  const localeConfig = (
-    localization.locales as (
-      | string
-      | { code: string; fallbackLocale?: Locale | Locale[] }
-    )[]
-  ).find(
-    (entry): entry is { code: string; fallbackLocale?: Locale | Locale[] } =>
-      typeof entry !== 'string' && entry.code === locale,
+  const foundEntry = localization.locales.find(
+    (entry) => typeof entry !== 'string' && entry.code === locale,
   );
+
+  const localeConfig =
+    foundEntry && typeof foundEntry !== 'string' ? foundEntry : undefined;
 
   const configuredFallback = localeConfig?.fallbackLocale;
 
