@@ -107,7 +107,7 @@ export function MessagesField({
         let merged: Messages = {};
         for (const fallbackLocale of targets) {
           const response = await fetch(
-            `${baseUrl}/globals/${messagesGlobalSlug}?locale=${fallbackLocale}&depth=0`,
+            `${baseUrl}/globals/${messagesGlobalSlug}?locale=${fallbackLocale}&depth=0&fallback-locale=none`,
             { credentials: 'include' },
           );
           if (!response.ok) continue;
