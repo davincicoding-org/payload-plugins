@@ -10,6 +10,9 @@ import { MessagesTree } from './layout/MessagesTree';
 export interface MessagesFieldProps {
   readonly schema: MessagesSchema;
   readonly hiddenGroups?: string[];
+  readonly fallbackLocales?: Record<string, string[]>;
+  readonly messagesGlobalSlug?: string;
+  readonly scope?: string;
 }
 
 /**

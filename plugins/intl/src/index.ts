@@ -5,6 +5,7 @@ import type {
   GlobalConfig,
   Plugin,
 } from 'payload';
+import { getSupportedLocales } from './config';
 import { PLUGIN_CONTEXT, VIRTUAL_MESSAGES_FIELD_NAME } from './const';
 import type { MessagesFieldProps } from './exports/client';
 import {
@@ -23,6 +24,7 @@ import type {
   Messages as MessagesType,
   TypedMessagesScopesConfig,
 } from './types.ts';
+import { resolveFallbackLocales } from './utils/fallback-locales';
 import { normalizeScopes } from './utils/scopes';
 
 export interface MessagesPluginConfig<Schema extends MessagesSchema> {
@@ -86,6 +88,13 @@ export const intlPlugin =
     });
 
     const scopes = normalizeScopes(scopesConfig);
+
+    const fallbackLocales = Object.fromEntries(
+      getSupportedLocales(config.localization).map((locale) => [
+        locale,
+        resolveFallbackLocales({ localization: config.localization, locale }),
+      ]),
+    );
 
     config.typescript ??= {};
     config.typescript.schema ??= [];
@@ -159,6 +168,8 @@ export const intlPlugin =
                 path: 'payload-intl/client#MessagesField',
                 clientProps: {
                   schema: schema,
+                  fallbackLocales,
+                  messagesGlobalSlug: globalSlug,
                 } satisfies MessagesFieldProps,
               },
             },
@@ -205,6 +216,9 @@ export const intlPlugin =
               path: 'payload-intl/client#MessagesField',
               clientProps: {
                 schema: schema[global.slug] as MessagesType,
+                fallbackLocales,
+                messagesGlobalSlug: globalSlug,
+                scope: global.slug,
               } satisfies MessagesFieldProps,
             },
           },
