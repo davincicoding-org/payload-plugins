@@ -5,7 +5,6 @@ import { toWords } from '@/components/input/utils';
 import { createValidator, parseMessageSchema } from '@/icu';
 import type { Messages } from '@/types';
 import { MessageInput } from '../input/MessageInput';
-import { ReferencePopover } from '../input/ReferencePopover';
 import styles from './MessageField.module.css';
 
 interface MessageFieldProps {
@@ -13,7 +12,7 @@ interface MessageFieldProps {
   messageKey: string;
   path: string;
   control: Control<Messages>;
-  reference: string | undefined;
+  fallback: string | undefined;
 }
 
 export const MessageField = memo(function MessageField({
@@ -21,7 +20,7 @@ export const MessageField = memo(function MessageField({
   messageKey,
   path,
   control,
-  reference,
+  fallback,
 }: MessageFieldProps): React.ReactNode {
   const config = useMemo(() => parseMessageSchema(schema), [schema]);
 
@@ -45,21 +44,20 @@ export const MessageField = memo(function MessageField({
         name={fieldPath}
         render={({ field, fieldState }) => (
           <>
-            <ReferencePopover reference={reference}>
-              <fieldset
-                className={styles.fieldset}
-                data-error={fieldState.error !== undefined}
-              >
-                <MessageInput
-                  error={fieldState.error !== undefined}
-                  multiline={multiline}
-                  onBlur={field.onBlur}
-                  onChange={field.onChange}
-                  value={(field.value as unknown as string) || ''}
-                  variables={config.variables}
-                />
-              </fieldset>
-            </ReferencePopover>
+            <fieldset
+              className={styles.fieldset}
+              data-error={fieldState.error !== undefined}
+            >
+              <MessageInput
+                error={fieldState.error !== undefined}
+                multiline={multiline}
+                onBlur={field.onBlur}
+                onChange={field.onChange}
+                placeholder={fallback}
+                value={(field.value as unknown as string) || ''}
+                variables={config.variables}
+              />
+            </fieldset>
             {fieldState.error?.message && (
               <p className={styles.errorMessage}>{fieldState.error.message}</p>
             )}

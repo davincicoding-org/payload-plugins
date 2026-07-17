@@ -55,6 +55,7 @@ export interface MessageInputProps {
   readOnly?: boolean;
   multiline?: boolean;
   error?: boolean;
+  placeholder?: string;
 }
 
 export function MessageInput({
@@ -64,6 +65,7 @@ export function MessageInput({
   onBlur,
   multiline,
   error,
+  placeholder,
 }: MessageInputProps) {
   const handleChange = useCallback(
     (editorState: EditorState) => {
@@ -120,6 +122,11 @@ export function MessageInput({
             />
           }
           ErrorBoundary={LexicalErrorBoundary}
+          placeholder={
+            placeholder ? (
+              <div className={styles.placeholder}>{placeholder}</div>
+            ) : null
+          }
         />
         {multiline && <SingleLinePlugin />}
         <SyncValuePlugin value={value} />

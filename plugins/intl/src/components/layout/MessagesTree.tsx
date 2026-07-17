@@ -11,7 +11,7 @@ interface MessagesTreeProps {
   nestingLevel?: number;
   schema: MessagesSchema;
   control: Control<Messages>;
-  defaultValues?: Messages | undefined;
+  fallbackValues?: Messages | undefined;
   hiddenGroups?: string[];
 }
 
@@ -20,7 +20,7 @@ export const MessagesTree = memo(function MessagesTree({
   schema,
   nestingLevel = 0,
   control,
-  defaultValues,
+  fallbackValues,
   hiddenGroups = [],
 }: MessagesTreeProps): React.ReactNode {
   return (
@@ -32,14 +32,14 @@ export const MessagesTree = memo(function MessagesTree({
         return typeof value === 'string' ? (
           <MessageField
             control={control}
+            fallback={
+              typeof fallbackValues?.[key] === 'string'
+                ? fallbackValues[key]
+                : undefined
+            }
             key={key}
             messageKey={key}
             path={path}
-            reference={
-              typeof defaultValues?.[key] === 'string'
-                ? defaultValues[key]
-                : undefined
-            }
             schema={value}
           />
         ) : (
@@ -58,9 +58,9 @@ export const MessagesTree = memo(function MessagesTree({
             >
               <MessagesTree
                 control={control}
-                defaultValues={
-                  typeof defaultValues?.[key] === 'object'
-                    ? defaultValues[key]
+                fallbackValues={
+                  typeof fallbackValues?.[key] === 'object'
+                    ? fallbackValues[key]
                     : undefined
                 }
                 nestingLevel={nestingLevel + 1}
