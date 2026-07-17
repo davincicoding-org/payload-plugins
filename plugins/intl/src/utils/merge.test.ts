@@ -42,4 +42,16 @@ describe('mergeMessages', () => {
     expect(target).toEqual({ a: 'de' });
     expect(source).toEqual({ b: 'en' });
   });
+
+  test('target group wins over source string leaf', () => {
+    expect(mergeMessages({ a: { b: 'x' } }, { a: 'en' })).toEqual({
+      a: { b: 'x' },
+    });
+  });
+
+  test('target string leaf wins over source group', () => {
+    expect(mergeMessages({ a: 'de' }, { a: { b: 'en' } })).toEqual({
+      a: 'de',
+    });
+  });
 });

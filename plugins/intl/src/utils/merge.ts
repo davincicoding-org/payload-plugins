@@ -21,7 +21,7 @@ export function mergeMessages(target: Messages, source: Messages): Messages {
       continue;
     }
 
-    if (typeof targetValue === 'string') continue; // target wins
+    if (key in target) continue; // target wins whenever it provides a value
 
     if (isGroup(sourceValue)) {
       result[key] = mergeMessages({}, sourceValue);
