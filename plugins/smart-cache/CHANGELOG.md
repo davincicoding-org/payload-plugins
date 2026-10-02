@@ -1,5 +1,11 @@
 # payload-smart-cache
 
+## 1.3.1
+
+### Patch Changes
+
+- [#50](https://github.com/davincicoding-org/payload-plugins/pull/50) [`2cb86e6`](https://github.com/davincicoding-org/payload-plugins/commit/2cb86e6cbbcdf9a910207e5fc7dfafc2deecab24) Thanks [@michaelcamper](https://github.com/michaelcamper)! - Defer cache invalidation with `after()` so changes made from streaming route handlers (e.g. Payload's MCP endpoint) are no longer silently dropped.
+
 ## 1.3.0
 
 ### Minor Changes
