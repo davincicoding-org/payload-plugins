@@ -1,4 +1,5 @@
 import { revalidateTag } from 'next/cache';
+import { after } from 'next/server';
 import type {
   BasePayload,
   CollectionAfterChangeHook,
@@ -179,6 +180,16 @@ async function invalidateWithDependents(
   }
 }
 
+/**
+ * Next.js only commits tags passed to `revalidateTag` when the route handler
+ * returns its `Response`. Streaming handlers (e.g. Payload's MCP endpoint) return
+ * before the operation runs, so tags revalidated inline would be dropped.
+ * `after()` runs once the response has finished and commits its revalidations.
+ */
+function deferUntilResponseEnds(task: () => Promise<void>): void {
+  after(task);
+}
+
 interface CollectionHookConfig {
   graph: EntitiesGraph;
   invalidationCallback: DocumentInvalidationCallback | undefined;
@@ -207,14 +218,16 @@ export function invalidateCollectionCache({
       tenantField,
     );
 
-    await invalidateWithDependents(req.payload, {
-      graph,
-      invalidationCallback,
-      collection: collection.slug,
-      ids: [doc.id.toString()],
-      tenantId,
-      tenantConfig,
-    });
+    deferUntilResponseEnds(() =>
+      invalidateWithDependents(req.payload, {
+        graph,
+        invalidationCallback,
+        collection: collection.slug,
+        ids: [doc.id.toString()],
+        tenantId,
+        tenantConfig,
+      }),
+    );
   };
 }
 
@@ -236,14 +249,16 @@ export function invalidateCollectionCacheOnDelete({
       tenantField,
     );
 
-    await invalidateWithDependents(req.payload, {
-      graph,
-      invalidationCallback,
-      collection: collection.slug,
-      ids: [doc.id.toString()],
-      tenantId,
-      tenantConfig,
-    });
+    deferUntilResponseEnds(() =>
+      invalidateWithDependents(req.payload, {
+        graph,
+        invalidationCallback,
+        collection: collection.slug,
+        ids: [doc.id.toString()],
+        tenantId,
+        tenantConfig,
+      }),
+    );
   };
 }
 
@@ -257,7 +272,9 @@ export function invalidateGlobalCache(
     }
     if (req.context.skipRevalidation) return;
 
-    revalidateTag(global.slug);
-    await invalidationCallback?.({ type: 'global', slug: global.slug });
+    deferUntilResponseEnds(async () => {
+      revalidateTag(global.slug);
+      await invalidationCallback?.({ type: 'global', slug: global.slug });
+    });
   };
 }

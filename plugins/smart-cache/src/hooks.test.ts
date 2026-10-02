@@ -19,6 +19,19 @@ vi.mock('next/cache', () => ({
   revalidateTag: vi.fn(),
 }));
 
+const afterTasks: Array<() => Promise<void>> = [];
+
+vi.mock('next/server', () => ({
+  after: (task: () => Promise<void>) => {
+    afterTasks.push(task);
+  },
+}));
+
+/** Runs the tasks the hooks deferred with `after()`, as Next.js does once the response ends. */
+async function flushAfter(): Promise<void> {
+  for (const task of afterTasks.splice(0)) await task();
+}
+
 import { revalidateTag } from 'next/cache';
 
 type AfterChangeArgs = Parameters<
@@ -108,6 +121,7 @@ describe('invalidateCollectionCache', () => {
     const hook = invalidateCollectionCache(makeCollectionHookConfig());
 
     await hook(makeCollectionAfterChangeArgs({}));
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
@@ -123,6 +137,7 @@ describe('invalidateCollectionCache', () => {
         _status: 'draft',
       }),
     );
+    await flushAfter();
 
     expect(revalidateTag).not.toHaveBeenCalled();
   });
@@ -139,6 +154,7 @@ describe('invalidateCollectionCache', () => {
         previousStatus: 'draft',
       }),
     );
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
@@ -155,8 +171,37 @@ describe('invalidateCollectionCache', () => {
         previousStatus: 'published',
       }),
     );
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts');
+  });
+});
+
+describe('deferred invalidation', () => {
+  // Streaming handlers (e.g. MCP) return their Response before the hook runs,
+  // so revalidation must wait for after() or Next.js drops the tags.
+  test('collection hook revalidates only once after() tasks run', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateCollectionCache(makeCollectionHookConfig());
+
+    await hook(makeCollectionAfterChangeArgs({}));
+    expect(revalidateTag).not.toHaveBeenCalled();
+
+    await flushAfter();
+    expect(revalidateTag).toHaveBeenCalledWith('posts');
+  });
+
+  test('global hook revalidates only once after() tasks run', async () => {
+    vi.mocked(revalidateTag).mockClear();
+
+    const hook = invalidateGlobalCache(vi.fn());
+
+    await hook(makeGlobalAfterChangeArgs());
+    expect(revalidateTag).not.toHaveBeenCalled();
+
+    await flushAfter();
+    expect(revalidateTag).toHaveBeenCalledWith('nav');
   });
 });
 
@@ -170,6 +215,7 @@ describe('invalidateCollectionCacheOnDelete', () => {
     });
 
     await hook(makeCollectionAfterDeleteArgs());
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
@@ -183,6 +229,7 @@ describe('invalidateGlobalCache', () => {
     const hook = invalidateGlobalCache(invalidationCallback);
 
     await hook(makeGlobalAfterChangeArgs());
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('nav');
     expect(invalidationCallback).toHaveBeenCalledWith({
@@ -202,6 +249,7 @@ describe('invalidationCallback', () => {
     );
 
     await hook(makeCollectionAfterChangeArgs({ slug: 'media' }));
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('media');
     expect(invalidationCallback).toHaveBeenCalledWith({
@@ -221,6 +269,7 @@ describe('invalidationCallback', () => {
     );
 
     await hook(makeCollectionAfterChangeArgs({ slug: 'posts' }));
+    await flushAfter();
 
     expect(invalidationCallback).toHaveBeenCalledWith({
       type: 'collection',
@@ -256,6 +305,7 @@ describe('tenant-scoped invalidation', () => {
     (args.doc as any).camp = 'tenant-abc';
 
     await hook(args);
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts:tenant-abc');
     expect(revalidateTag).not.toHaveBeenCalledWith('posts');
@@ -266,6 +316,7 @@ describe('tenant-scoped invalidation', () => {
 
     const hook = invalidateCollectionCache(makeTenantHookConfig());
     await hook(makeCollectionAfterChangeArgs({ slug: 'posts' }));
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts');
   });
@@ -281,6 +332,7 @@ describe('tenant-scoped invalidation', () => {
     });
 
     await hook(makeCollectionAfterChangeArgs({ slug: 'events' }));
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('events');
   });
@@ -297,6 +349,7 @@ describe('tenant-scoped invalidation', () => {
     (args.doc as any).camp = 'tenant-abc';
 
     await hook(args);
+    await flushAfter();
 
     expect(invalidationCallback).toHaveBeenCalledWith({
       type: 'collection',
@@ -320,6 +373,7 @@ describe('tenant-scoped invalidation', () => {
     (args.doc as any).camp = 'tenant-abc';
 
     await hook(args);
+    await flushAfter();
 
     expect(revalidateTag).toHaveBeenCalledWith('posts:tenant-abc');
   });
@@ -359,6 +413,7 @@ describe('cross-boundary dependency walks', () => {
     (args.req as any).payload = { find: findMock } as any;
 
     await hook(args);
+    await flushAfter();
 
     // The events query should NOT include a tenant filter
     expect(findMock).toHaveBeenCalledWith({
@@ -403,6 +458,7 @@ describe('cross-boundary dependency walks', () => {
     (args.req as any).payload = { find: findMock } as any;
 
     await hook(args);
+    await flushAfter();
 
     // events is shared, no tenant → collection-level tag
     expect(revalidateTag).toHaveBeenCalledWith('events');
